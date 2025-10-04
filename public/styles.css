@@ -231,3 +231,7 @@ input:valid, select:valid {
     border-radius: 0.25rem;
     padding: 0.5rem;
 }
+.historial-box { background-color: #e0f2fe; border-left: 5px solid #0ea5e9; padding: 1rem; margin-bottom: 1.5rem; }
+.recomendaciones-box { background-color: #fff9e6; border-left: 5px solid #ffc107; padding: 1rem; margin-bottom: 1.5rem; }
+.vigentes-box { background-color: #e8f5e9; border-left: 5px solid #4caf50; padding: 1rem; margin-bottom: 1.5rem; }
+.detalle { font-size: 0.9rem; color: #555; }

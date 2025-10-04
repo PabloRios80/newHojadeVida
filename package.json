@@ -1,17 +1,14 @@
 {
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^5.1.0",
-    "googleapis": "^148.0.0",
-    "http-proxy-middleware": "^3.0.5"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.4"
-  },
+  "name": "new_hoja_de_vida",
+  "version": "1.0.0",
+  "description": "Formulario Hoja de Vida con backend en Apps Script.",
+  "main": "server.js",
   "scripts": {
-  "start": "node server.js"
-}
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7"
+  }
 }
