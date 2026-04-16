@@ -52,41 +52,44 @@ async function guardarDatosFormulario() {
     const cancer_de_prostata = document.querySelector('input[name="prostateCancer"]:checked').value;
     
     const formData = {
-        dni: DNI,
-        fecha_nacimiento: fechaDeNacimiento, 
-        apellido: apellido,
-        nombre: nombre,
-        edad: edad,
-        email: email,
-        telefono: telefono,
-        sexo_biologico: sexo_biologico,
-        genero_autopercibido: genero_autopercibido,
-        altura: altura,
-        peso: peso,
-        bmi: bmiValor,
-        categoria_bmi: bmiCategoria,
-        hipertension: hipertension,
-        diabetes: diabetes,
-        colesterol: colesterol,
-        depresion: depresion,
-        actividad_fisica: actividad_fisica, // Corregido
-        sedentarismo: sedentarismo,
-        abuso_alcohol_drogas: abuso_alcohol_otros, // Corregido
-        stress: stress_ansiedad,
-        exceso_preocupacion_salud: preocupacion_salud, // Corregido
-        exceso_pantalla: abuso_pantallas, // Corregido (pantalla en singular)
-        fuma: tabaquismo,
-        fumador_cronico: fumador_cronico,
-        hipertension_familiar: hipertension_familiar,
-        diabetes_familiar: diabetes_familiar,
-        adicciones_familiar: adicciones_familiar,
-        obesidad_familiar: obesidad_familiar,
-        depresion_familiar: depresion_familiar,
-        violencia_familiar: violencia_familiar,
-        cancer_de_colon: cancer_de_colon,
-        cancer_de_mama: cancer_de_mama,
-        cancer_cuello_utero: cancer_de_cuello_utero,
-        cancer_de_prostata: cancer_de_prostata
+        'DNI': DNI, // Clave en castellano
+        'Fecha_Nacimiento': fechaDeNacimiento, 
+        'Apellido': apellido,             
+        'Nombre': nombre,               
+        'Edad': edad,  
+        'Email': email,
+        'Telefono': telefono,
+        'Sexo_biologico': sexo_biologico,
+        'Genero_autopercibido': genero_autopercibido,
+        'Altura': altura,
+        'Peso': peso,
+
+        'BMI': bmiValor,         // Valor del IMC tomado del HTML
+        'Categoria_BMI': bmiCategoria,
+
+
+        'Hipertension': hipertension,
+        'Diabetes': diabetes,
+        'Colesterol': colesterol,
+        'Depresion': depresion,
+        'Actividad fisica': actividad_fisica,
+        'sedentarismo': sedentarismo,
+        'Abuso_alcohol_drogas': abuso_alcohol_otros,
+        'Stress': stress_ansiedad,
+        'Exceso_preocupacion_salud': preocupacion_salud,
+        'Exceso_pantalla': abuso_pantallas,
+        'Fuma': tabaquismo,
+        'Fumador_cronico': fumador_cronico,
+        'Hipertension_familiar': hipertension_familiar,
+        'Diabetes_familiar': diabetes_familiar,
+        'Adicciones_familiar': adicciones_familiar,
+        'Obesidad _familiar': obesidad_familiar,
+        'Depresion_familiar': depresion_familiar,
+        'Violencia_familiar': violencia_familiar,
+        'Cancer_de_colon': cancer_de_colon,
+        'Cancer_de_mama': cancer_de_mama,
+        'Cancer_cuello_utero': cancer_de_cuello_utero,
+        'Cancer_de_prostata': cancer_de_prostata,
     };
     try {
         const response = await fetch('/saveData', {
@@ -418,4 +421,3 @@ document.addEventListener('DOMContentLoaded', function() {
         showRecommendationsButton.addEventListener('click', mostrarRecomendaciones);
     }
 });
-

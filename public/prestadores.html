@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Profesionales - IAPOS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow-md border-b-4 border-blue-900"> 
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://www.iapos.gob.ar/wp-content/uploads/2021/05/logo_iapos_header.png" alt="IAPOS" class="h-10 mr-4">
+                    <h1 class="text-xl font-bold text-blue-900">Portal Prestadores</h1>
+                </div>
+                <a href="index.html" class="text-blue-900 font-bold"><i class="fas fa-home"></i> Inicio</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8 max-w-4xl">
+            <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                <label class="block text-gray-700 font-bold mb-2">DNI del Afiliado:</label>
+                <div class="flex gap-2">
+                    <input type="number" id="dniSearch" class="flex-grow border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 20123456">
+                    <button onclick="buscarPracticas()" class="bg-blue-900 text-white px-6 py-3 rounded-lg font-bold">BUSCAR</button>
+                </div>
+            </div>
+
+            <div id="loading" class="hidden text-center py-4"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+            <div id="listaPracticas" class="space-y-4"></div>
+        </main>
+
+        <div id="modalCarga" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full">
+                <h3 id="modalTitulo" class="text-xl font-bold mb-4 text-blue-900">Cargar Resultado</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Resultado (Valor)</label>
+                        <input type="text" id="resultadoValor" class="w-full border p-2 rounded" placeholder="Ej: Normal / 110 mg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Archivo PDF</label>
+                        <input type="file" id="archivoPdf" accept="application/pdf" class="w-full text-sm">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button onclick="cerrarModal()" class="px-4 py-2 text-gray-500">Cancelar</button>
+                    <button onclick="guardarPractica()" class="bg-green-600 text-white px-6 py-2 rounded font-bold">GUARDAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="prestadores.js"></script>
+</body>
+</html>

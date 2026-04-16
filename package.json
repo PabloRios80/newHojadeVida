@@ -1,14 +1,14 @@
 {
-  "name": "new_hoja_de_vida",
+  "name": "new-hoja-de-vida",
   "version": "1.0.0",
-  "description": "Formulario Hoja de Vida con backend en Apps Script.",
+  "description": "Formulario Hoja de Vida con backend en Apps Script",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "axios": "^1.6.0",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "node-fetch": "^2.6.7"
+    "express": "^4.18.2"
   }
 }

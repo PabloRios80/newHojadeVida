@@ -34,7 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 const planPreventivo = await response.json();
                 console.log("Plan Preventivo Recibido:", planPreventivo);
-                mostrarPlanEnHTML(planPreventivo);
+            if (planPreventivo.anioNoCumplido) {
+                // ...mostramos el aviso en rojo y paramos.
+                resultadosDiv.innerHTML = `<div style="background-color: #fef2f2; border-left: 5px solid #ef4444; padding: 1.5rem; border-radius: 4px;">
+                                                <h2 style="color: #b91c1c; font-size: 1.5rem; font-weight: bold;">Atención</h2>
+                                                <p style="color: #7f1d1d; margin-top: 0.5rem;">${planPreventivo.mensaje}</p>
+                                            </div>`;
+            } else {
+                // Si todo está bien, mostramos el plan como siempre.
+                mostrarPlanEnHTML(planPreventivo, dni);
+            }
             } else if (response.status === 404) {
                 resultadosDiv.innerHTML = '<p>No se encontraron recomendaciones para este DNI.</p>';
             } else {
