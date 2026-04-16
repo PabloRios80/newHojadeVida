@@ -75,15 +75,21 @@ app.get('/getPendingPractices/:dni', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al buscar prácticas.' });
   }
 });
+// RUTA PARA GUARDAR RESULTADOS DEL MÉDICO
 app.post('/savePracticeResult', async (req, res) => {
+  console.log("Recibida carga de resultado para DNI:", req.body.dni);
   try {
+    // Llamada a Apps Script usando AXIOS como venías haciendo
     const response = await axios.post(APPS_SCRIPT_URL, {
       action: 'finalizarCargaPractica',
       payload: req.body
     });
+    
+    console.log("Respuesta de Google:", response.data);
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error al guardar el resultado.' });
+    console.error('Error al contactar Apps Script:', error.message);
+    res.status(500).json({ success: false, message: 'Error de comunicación con Google.' });
   }
 });
 

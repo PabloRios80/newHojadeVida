@@ -1,186 +1,79 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const dniInput = document.getElementById('dniBuscar');
-    const buscarBtn = document.getElementById('buscarRecomendacionesBtn');
     const resultadosDiv = document.getElementById('resultadosRecomendaciones');
 
-    // Función para obtener el DNI de la URL
-    function getDniFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('dni');
+    // 1. Obtener DNI de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const dni = urlParams.get('dni');
+
+    if (dni) {
+        buscarRecomendaciones(dni);
+    } else {
+        resultadosDiv.innerHTML = '<p class="alert alert-warning">No se proporcionó un DNI válido.</p>';
     }
 
-    // Si el DNI está en la URL, lo precargamos
-    const dniDesdeUrl = getDniFromUrl();
-    if (dniDesdeUrl) {
-        dniInput.value = dniDesdeUrl;
-        buscarRecomendaciones(dniDesdeUrl); // Buscar automáticamente al cargar
-    }
-
-    // Evento para el botón "Buscar Recomendaciones"
-    buscarBtn.addEventListener('click', function() {
-        const dni = dniInput.value;
-        if (dni) {
-            buscarRecomendaciones(dni);
-        } else {
-            alert('Por favor, ingresa tu DNI.');
-        }
-    });
-
-    // Función para buscar y mostrar las recomendaciones
     async function buscarRecomendaciones(dni) {
-        resultadosDiv.innerHTML = '<p>Cargando recomendaciones...</p>';
+        resultadosDiv.innerHTML = '<div class="text-center p-5"><p>Cargando sus recomendaciones médicas...</p></div>';
         try {
             const response = await fetch(`/getPreventivePlan/${dni}`);
-            if (response.ok) {
-                const planPreventivo = await response.json();
-                console.log("Plan Preventivo Recibido:", planPreventivo);
-            if (planPreventivo.anioNoCumplido) {
-                // ...mostramos el aviso en rojo y paramos.
-                resultadosDiv.innerHTML = `<div style="background-color: #fef2f2; border-left: 5px solid #ef4444; padding: 1.5rem; border-radius: 4px;">
-                                                <h2 style="color: #b91c1c; font-size: 1.5rem; font-weight: bold;">Atención</h2>
-                                                <p style="color: #7f1d1d; margin-top: 0.5rem;">${planPreventivo.mensaje}</p>
-                                            </div>`;
+            const data = await response.json();
+
+            if (data.success) {
+                // LLAMAMOS A LA FUNCIÓN DE DIBUJO
+                mostrarPlanEnHTML(data);
             } else {
-                // Si todo está bien, mostramos el plan como siempre.
-                mostrarPlanEnHTML(planPreventivo, dni);
-            }
-            } else if (response.status === 404) {
-                resultadosDiv.innerHTML = '<p>No se encontraron recomendaciones para este DNI.</p>';
-            } else {
-                resultadosDiv.innerHTML = '<p>Error al obtener las recomendaciones.</p>';
+                resultadosDiv.innerHTML = `<p class="alert alert-danger">Error: ${data.message || 'No se pudo obtener el plan'}</p>`;
             }
         } catch (error) {
-            console.error('Error al solicitar el plan preventivo:', error);
-            resultadosDiv.innerHTML = '<p>Error al conectar con el servidor.</p>';
+            console.error('Error:', error);
+            resultadosDiv.innerHTML = '<p class="alert alert-danger">Error de conexión con el servidor.</p>';
         }
     }
-// REEMPLAZA TU FUNCIÓN 'mostrarPlanEnHTML' CON ESTA
-function mostrarPlanEnHTML(plan) {
 
     function mostrarPlanEnHTML(plan) {
-    console.log("--- INICIO DEL DIAGNÓSTICO ---");
+        let html = '';
 
-    if (plan) {
-        console.log("El objeto 'plan' fue recibido.");
-
-        // Verificamos la propiedad 'recomendaciones'
-        if (plan.recomendaciones) {
-            console.log(`Se encontraron ${plan.recomendaciones.length} recomendaciones.`);
-            // Usamos JSON.stringify para ver el contenido exacto
-            console.log("Contenido de 'recomendaciones':", JSON.stringify(plan.recomendaciones));
-        } else {
-            console.log("La propiedad 'recomendaciones' NO EXISTE en el objeto.");
-        }
-
-        // Verificamos la propiedad 'controlesVigentes'
-        if (plan.controlesVigentes) {
-            console.log(`Se encontraron ${plan.controlesVigentes.length} controles vigentes.`);
-            console.log("Contenido de 'controlesVigentes':", JSON.stringify(plan.controlesVigentes));
-        } else {
-            console.log("La propiedad 'controlesVigentes' NO EXISTE en el objeto.");
-        }
-
-        // Verificamos la propiedad 'mensajeHistorial'
+        // Cuadro de Historial
         if (plan.mensajeHistorial) {
-            console.log("Mensaje de historial:", plan.mensajeHistorial);
-        } else {
-            console.log("La propiedad 'mensajeHistorial' NO EXISTE en el objeto.");
+            html += `<div style="background-color: #e0f2fe; border-left: 4px solid #0ea5e9; padding: 1rem; margin-bottom: 1.5rem;">
+                        <p style="font-weight: bold; color: #0369a1; margin-bottom: 5px;">Historial del Afiliado</p>
+                        <p style="color: #075985; margin: 0;">${plan.mensajeHistorial}</p>
+                    </div>`;
         }
 
-    } else {
-        console.log("El objeto 'plan' llegó vacío o nulo.");
-    }
-
-    console.log("--- FIN DEL DIAGNÓSTICO ---");
-    
-    // Dejamos la parte visual en blanco por ahora para no generar errores
-    const resultadosDiv = document.getElementById('resultadosRecomendaciones');
-    resultadosDiv.innerHTML = "<p>Diagnóstico completado. Por favor, revisa la consola (F12).</p>";
-}
-    // 'plan' es el objeto que recibimos: { mensajeHistorial: "...", recomendaciones: [...] }
-    console.log('Plan recibido en el frontend:', plan);
-    
-    const resultadosDiv = document.getElementById('resultadosRecomendaciones');
-    let html = '';
-
-    // 1. Mostramos el mensaje del historial que ahora nos envía el backend
-    if (plan.mensajeHistorial) {
-        html += `<div style="background-color: #e0f2fe; border-left: 4px solid #0ea5e9; padding: 1rem; margin-bottom: 1.5rem;" role="alert">
-                    <p style="font-weight: bold; color: #0369a1;">Historial del Afiliado</p>
-                    <p style="color: #075985;">${plan.mensajeHistorial}</p>
-                </div>`;
-    }
-
-    // 2. Mostramos la lista de recomendaciones
-    if (plan.recomendaciones && plan.recomendaciones.length > 0) {
-        html += `<h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Se recomiendan las siguientes ${plan.recomendaciones.length} prácticas:</h3>`;
-        html += '<ul style="list-style: disc; padding-left: 2rem;">';
-        
-        // Simplemente recorremos la lista de textos y creamos un ítem por cada uno
-        plan.recomendaciones.forEach(practica => {
-            html += `<li style="margin-bottom: 0.5rem;">${practica}</li>`;
-        });
-
-        html += '</ul>';
-        }
-        
-    // Mostramos los Controles Vigentes (en un cuadro de éxito/verde)
-    if (plan.controlesVigentes && plan.controlesVigentes.length > 0) {
-        html += `<div class="vigentes-box">
-                    <h2>Controles Vigentes (Al día)</h2>
-                    <ul>`;
-        plan.controlesVigentes.forEach(control => {
-            html += `<li>${control.practica} <span class="detalle">(Próximo control sugerido: ${control.proximo})</span></li>`;
-        });
-        html += `</ul></div>`;
-    
-
-    if (plan.recomendaciones.length === 0 && plan.controlesVigentes.length === 0) {
-        html += '<p>No se encontraron prácticas preventivas aplicables para este perfil.</p>';
-    }
-    
-    resultadosDiv.innerHTML = html;
-}
-    
-    resultadosDiv.innerHTML = html;
-   // CREAR BOTÓN CON ESTILOS INLINE (para asegurar que se vea bien)
-    const volverButton = document.createElement('div');
-    volverButton.style.textAlign = 'center';
-    volverButton.style.marginTop = '2rem';
-    volverButton.style.marginBottom = '1.5rem';
-    
-    volverButton.innerHTML = `
-        <button id="volverBtn" style="
-            background-color: #3b82f6; 
-            color: white; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            border: none; 
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        " onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
-            ← Volver al Inicio
-        </button>
-    `;
-    
-    // Insertar el botón antes del footer
-    const footer = document.querySelector('footer');
-    if (footer) {
-        footer.parentNode.insertBefore(volverButton, footer);
-    } else {
-        // Si no encuentra footer, agregarlo al final del main
-        document.querySelector('main').appendChild(volverButton);
-    }
-        
-        
-        
-        // Configurar el evento para el botón Volver
-        const volverBtn = document.getElementById('volverBtn');
-        if (volverBtn) {
-            volverBtn.addEventListener('click', function() {
-                window.location.href = 'index.html'; // Cambia por el nombre de tu página inicial
+        // Lista de Recomendaciones
+        if (plan.recomendaciones && plan.recomendaciones.length > 0) {
+            html += `<h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Prácticas Sugeridas:</h3>`;
+            html += '<div style="display: grid; gap: 10px;">';
+            plan.recomendaciones.forEach(practica => {
+                html += `
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 5px solid #3b82f6; shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center;">
+                        <span style="font-weight: 600; text-transform: uppercase;">${practica}</span>
+                    </div>`;
             });
+            html += '</div>';
+        }
+
+        // Controles Vigentes
+        if (plan.controlesVigentes && plan.controlesVigentes.length > 0) {
+            html += `<div style="margin-top: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1rem; border-radius: 8px;">
+                        <h3 style="color: #166534; font-size: 1.1rem; font-weight: bold;">Controles al Día</h3>
+                        <ul style="margin: 0; padding-left: 1.5rem; color: #15803d;">`;
+            plan.controlesVigentes.forEach(c => {
+                html += `<li>${c.practica || c}</li>`;
+            });
+            html += '</ul></div>';
+        }
+
+        resultadosDiv.innerHTML = html;
+        
+        // Agregar botón de volver una sola vez
+        if (!document.getElementById('volverBtn')) {
+            const btnDiv = document.createElement('div');
+            btnDiv.style.textAlign = 'center';
+            btnDiv.style.marginTop = '2rem';
+            btnDiv.innerHTML = `<button id="volverBtn" style="background: #1e3a8a; color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer;">← Volver al Inicio</button>`;
+            resultadosDiv.appendChild(btnDiv);
+            document.getElementById('volverBtn').onclick = () => window.location.href = 'index.html';
         }
     }
 });

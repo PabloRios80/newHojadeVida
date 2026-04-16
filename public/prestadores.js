@@ -59,6 +59,7 @@ async function guardarPractica() {
     const payload = {
         dni: dni,
         codigo: practicaActual.codigo,
+        descripcion: document.getElementById('modalTitulo').innerText,
         resultadoValor: valor,
         archivoBase64: null,
         archivoNombre: `Resultado_${dni}_${practicaActual.codigo}.pdf`
