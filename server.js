@@ -92,6 +92,20 @@ app.post('/savePracticeResult', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error de comunicación con Google.' });
   }
 });
+// --- Ruta para obtener prácticas guardadas (rápido, sin regenerar) ---
+app.get('/getPracticasGuardadas/:dni', async (req, res) => {
+  console.log(`Consulta de prácticas guardadas para DNI: ${req.params.dni}`);
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'obtenerPracticasGuardadas',
+      payload: { dni: req.params.dni }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error en /getPracticasGuardadas:', error.message);
+    res.status(500).json({ success: false, message: 'Error al obtener prácticas.' });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));

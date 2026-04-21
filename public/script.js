@@ -92,23 +92,29 @@ async function guardarDatosFormulario() {
         'Cancer_de_prostata': cancer_de_prostata,
     };
     try {
-        const response = await fetch('/saveData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-        if (response.ok) {
-            alert('Datos guardados correctamente.');
-            // Redirigir a la nueva página para ver recomendaciones, pasando el DNI como parámetro
-            window.location.href = `ver_recomendaciones.html?dni=${DNI}`;
-        } else {
-            alert('Error al guardar datos. Inténtalo de nuevo.');
-        }
+    const response = await fetch('/saveData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const resultado = await response.json();
+
+    if (response.ok && resultado.success) {
+        // Cartel de éxito
+        alert('✅ Sus datos fueron guardados correctamente.\n\nCuando quiera ver sus recomendaciones, vuelva a esta página e ingrese su DNI.');
+        // Volvemos a la página principal
+        window.location.href = 'index.html';
+    } else {
+        // Cartel de error con detalle
+        const mensajeError = resultado.message || 'Error desconocido';
+        alert('❌ Error al guardar los datos.\n\nDetalle: ' + mensajeError + '\n\nPor favor intente nuevamente o comuníquese con IAPOS.');
+    }
     } catch (error) {
         console.error('Error al guardar datos:', error);
-        alert('Error al guardar datos. Inténtalo de nuevo.');
+        alert('❌ Error de conexión con el servidor.\n\nPor favor verifique su conexión e intente nuevamente.');
     }
 }
 
