@@ -3,57 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Profesionales - IAPOS</title>
+    <title>Portal Prestadores - IAPOS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen flex flex-col">
-        <header class="bg-white shadow-md border-b-4 border-blue-900"> 
-            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center">
-                    <img src="https://www.iapos.gob.ar/wp-content/uploads/2021/05/logo_iapos_header.png" alt="IAPOS" class="h-10 mr-4">
-                    <h1 class="text-xl font-bold text-blue-900">Portal Prestadores</h1>
-                </div>
-                <a href="index.html" class="text-blue-900 font-bold"><i class="fas fa-home"></i> Inicio</a>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="pantallaLogin" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+            <div class="text-center mb-6">
+                <img src="images/logo_iapos.png" alt="IAPOS" class="h-12 mx-auto mb-3">
+                <h1 class="text-2xl font-bold text-blue-900">Portal Prestadores</h1>
+                <p class="text-gray-500 text-sm">Día Preventivo IAPOS</p>
             </div>
-        </header>
-
-        <main class="container mx-auto px-4 py-8 max-w-4xl">
-            <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
-                <label class="block text-gray-700 font-bold mb-2">DNI del Afiliado:</label>
-                <div class="flex gap-2">
-                    <input type="number" id="dniSearch" class="flex-grow border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 20123456">
-                    <button onclick="buscarPracticas()" class="bg-blue-900 text-white px-6 py-3 rounded-lg font-bold">BUSCAR</button>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Usuario</label>
+                    <input type="text" id="loginUsuario" 
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="Ingrese su usuario">
                 </div>
-            </div>
-
-            <div id="loading" class="hidden text-center py-4"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
-            <div id="listaPracticas" class="space-y-4"></div>
-        </main>
-
-        <div id="modalCarga" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl p-6 max-w-md w-full">
-                <h3 id="modalTitulo" class="text-xl font-bold mb-4 text-blue-900">Cargar Resultado</h3>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Resultado (Valor)</label>
-                        <input type="text" id="resultadoValor" class="w-full border p-2 rounded" placeholder="Ej: Normal / 110 mg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold mb-1">Archivo PDF</label>
-                        <input type="file" id="archivoPdf" accept="application/pdf" class="w-full text-sm">
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
+                    <input type="password" id="loginPassword"
+                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="Ingrese su contraseña">
                 </div>
-
-                <div class="flex justify-end gap-2 mt-6">
-                    <button onclick="cerrarModal()" class="px-4 py-2 text-gray-500">Cancelar</button>
-                    <button onclick="guardarPractica()" class="bg-green-600 text-white px-6 py-2 rounded font-bold">GUARDAR</button>
-                </div>
+                <button onclick="hacerLogin()"
+                    class="w-full bg-blue-900 text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Ingresar
+                </button>
+                <div id="loginError" class="hidden text-red-500 text-sm text-center"></div>
             </div>
         </div>
     </div>
+
+    <!-- PORTAL PRINCIPAL (oculto hasta login) -->
+    <div id="portalPrincipal" class="hidden min-h-screen flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="bg-blue-900 text-white shadow-md">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img src="images/logo_iapos.png" alt="IAPOS" class="h-8">
+                    <div>
+                        <h1 class="font-bold text-lg">Portal Prestadores</h1>
+                        <p id="headerEspecialidad" class="text-blue-200 text-xs"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="headerNombre" class="text-sm hidden md:block"></span>
+                    <button onclick="verFacturacion()"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition">
+                        <i class="fas fa-file-invoice-dollar mr-1"></i> Facturación
+                    </button>
+                    <button onclick="cerrarSesion()"
+                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+            
+            <!-- BÚSQUEDA DE AFILIADO -->
+            <div class="bg-white rounded-xl shadow p-6 mb-6">
+                <h2 class="font-bold text-gray-700 mb-3">
+                    <i class="fas fa-search text-blue-900 mr-2"></i>Buscar Afiliado
+                </h2>
+                <div class="flex gap-2">
+                    <input type="number" id="dniSearch"
+                        class="flex-grow border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ingrese DNI del afiliado">
+                    <button onclick="buscarPracticas()"
+                        class="bg-blue-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition">
+                        BUSCAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESULTADO -->
+            <div id="loading" class="hidden text-center py-4">
+                <i class="fas fa-spinner fa-spin fa-2x text-blue-900"></i>
+                <p class="text-gray-500 mt-2">Buscando prácticas...</p>
+            </div>
+
+            <!-- INFO AFILIADO -->
+            <div id="infoAfiliado" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                <p class="font-bold text-blue-900" id="nombreAfiliado"></p>
+                <p class="text-sm text-blue-700" id="especialidadVista"></p>
+            </div>
+
+            <div id="listaPracticas" class="space-y-3"></div>
+        </main>
+    </div>
+
+    <!-- MODAL CARGA DE RESULTADO -->
+    <div id="modalCarga" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-xl">
+            <h3 id="modalTitulo" class="text-lg font-bold mb-4 text-blue-900"></h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Resultado</label>
+                    <input type="text" id="resultadoValor"
+                        class="w-full border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ej: Normal / 110 mg/dl">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Archivo PDF (opcional)</label>
+                    <input type="file" id="archivoPdf" accept="application/pdf" class="w-full text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="cerrarModal()"
+                    class="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+                <button id="btnGuardarPractica"
+                    class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700">
+                    GUARDAR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FACTURACIÓN -->
+    <div id="modalFacturacion" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 max-w-2xl w-full shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-blue-900">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i>Generar Planilla de Facturación
+                </h3>
+                <button onclick="cerrarModalFacturacion()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="flex gap-3 mb-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Mes</label>
+                    <select id="mesFact" class="w-full border border-gray-300 rounded-lg p-2">
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Año</label>
+                    <input type="number" id="anioFact" value="2026"
+                        class="w-full border border-gray-300 rounded-lg p-2">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="generarFacturacion()"
+                        class="bg-blue-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-800">
+                        BUSCAR
+                    </button>
+                </div>
+            </div>
+            <div id="tablaFacturacion" class="overflow-x-auto"></div>
+            <div id="btnDescargarExcel" class="hidden text-center mt-4">
+                <button onclick="descargarExcel()"
+                    class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">
+                    <i class="fas fa-file-excel mr-2"></i> Descargar Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="prestadores.js"></script>
 </body>
 </html>

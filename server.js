@@ -106,6 +106,62 @@ app.get('/getPracticasGuardadas/:dni', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al obtener prácticas.' });
   }
 });
+// --- Ruta para login de prestadores ---
+app.post('/loginPrestador', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'loginPrestador',
+      payload: { usuario: req.body.usuario, password: req.body.password }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
+
+// --- Ruta para obtener prácticas por especialidad ---
+app.get('/getPracticasPrestador/:dni/:especialidad', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'getPracticasPrestador',
+      payload: { 
+        dni: req.params.dni, 
+        especialidad: req.params.especialidad 
+      }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
+
+// --- Ruta para generar planilla de facturación ---
+app.get('/getFacturacion/:idPrestador/:mes/:anio', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'getFacturacion',
+      payload: {
+        idPrestador: req.params.idPrestador,
+        mes: req.params.mes,
+        anio: req.params.anio
+      }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
+app.post('/marcarFacturadas', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'marcarComoFacturadas',
+      payload: req.body
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));

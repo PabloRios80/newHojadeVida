@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Login Prestador</title>
+</head>
+<body>
+    <h2>Test Login Prestador</h2>
+    
+    <input type="text" id="usuario" placeholder="Usuario" value="lab001"><br><br>
+    <input type="password" id="password" placeholder="Password" value="1234"><br><br>
+    <button onclick="testLogin()">Probar Login</button>
+    
+    <pre id="resultado" style="background:#f0f0f0; padding:1rem; margin-top:1rem;"></pre>
+
+    <script>
+        async function testLogin() {
+            const resultado = document.getElementById('resultado');
+            resultado.textContent = 'Probando...';
+            try {
+                const response = await fetch('/loginPrestador', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        usuario: document.getElementById('usuario').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await response.json();
+                resultado.textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                resultado.textContent = 'Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
