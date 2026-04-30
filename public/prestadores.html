@@ -96,7 +96,26 @@
                 <p class="text-sm text-blue-700" id="especialidadVista"></p>
             </div>
 
-            <div id="listaPracticas" class="space-y-3"></div>
+            <!-- BOTONES DE MODO DE CARGA (solo para Laboratorio) -->
+<div id="modoCargaLab" class="hidden mb-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
+    <p class="font-bold text-blue-900 mb-3">
+        <i class="fas fa-flask mr-2"></i>¿Cómo querés cargar los resultados?
+    </p>
+    <div class="flex gap-3">
+        <button onclick="modoCargaIndividual()"
+            class="flex-1 bg-white border-2 border-blue-600 text-blue-600 py-3 rounded-lg font-bold hover:bg-blue-50 transition">
+            <i class="fas fa-list mr-2"></i>Individual
+            <p class="text-xs font-normal mt-1">Una práctica a la vez</p>
+        </button>
+        <button onclick="modoCargaPDF()"
+            class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+            <i class="fas fa-file-pdf mr-2"></i>Cargar PDF completo
+            <p class="text-xs font-normal mt-1">Lee todas las prácticas automáticamente</p>
+        </button>
+    </div>
+</div>
+
+<div id="listaPracticas" class="space-y-3"></div>
         </main>
     </div>
 
@@ -178,6 +197,45 @@
         </div>
     </div>
 
+<!-- MODAL CARGA PDF LABORATORIO -->
+<div id="modalPDFLab" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-2xl w-full shadow-xl">
+        <h3 class="text-lg font-bold mb-4 text-blue-900">
+            <i class="fas fa-flask mr-2"></i>Carga de Resultados de Laboratorio
+        </h3>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-800">
+            <p class="font-bold mb-1"><i class="fas fa-info-circle mr-1"></i>Instrucciones:</p>
+            <ol class="list-decimal pl-4 space-y-1">
+                <li>Abrí cada PDF en Chrome</li>
+                <li>Presioná <strong>Ctrl+A</strong> y luego <strong>Ctrl+C</strong></li>
+                <li>Pegalo en el cuadro de abajo</li>
+                <li>Si tenés más PDFs hacé click en <strong>+ Agregar otro informe</strong> y repetí</li>
+                <li>Cuando terminés hacé click en <strong>PROCESAR TODO</strong></li>
+            </ol>
+        </div>
+
+        <div id="contenedorInformes" class="space-y-3">
+            <!-- Los textareas se agregan dinámicamente -->
+        </div>
+
+        <button onclick="agregarInforme()"
+            class="mt-3 w-full border-2 border-dashed border-blue-300 text-blue-600 py-2 rounded-lg hover:bg-blue-50 text-sm font-bold">
+            <i class="fas fa-plus mr-2"></i>Agregar otro informe
+        </button>
+
+        <div id="pdfResultado" class="hidden mt-4 max-h-64 overflow-y-auto"></div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="cerrarModalPDFLab()"
+                class="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+            <button onclick="procesarTodosLosInformes()" id="btnProcesarPDF"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700">
+                <i class="fas fa-magic mr-2"></i>PROCESAR TODO
+            </button>
+        </div>
+    </div>
+</div>
     <script src="prestadores.js"></script>
 </body>
 </html>

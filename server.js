@@ -162,6 +162,90 @@ app.post('/marcarFacturadas', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error de conexión.' });
   }
 });
+// --- Ruta para leer PDF de laboratorio con Gemini ---
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+app.post('/leerPDFLaboratorio', async (req, res) => {
+  try {
+    const { pdfBase64, dni, nombre, apellido } = req.body;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const prompt = `Analizá este informe de laboratorio y extraé los resultados en formato JSON.
+    
+Los campos que necesito son exactamente estos (si no encontrás el valor dejá null):
+{
+  "glucemia": "",
+  "creatinina": "",
+  "indice_filtrado_glomerular": "",
+  "colesterol_total": "",
+  "colesterol_hdl": "",
+  "colesterol_ldl": "",
+  "trigliceridos": "",
+  "hiv": "",
+  "hepatitis_b_antigeno_superficie": "",
+  "hepatitis_b_anti_core": "",
+  "hepatitis_c": "",
+  "vdrl": "",
+  "psa": "",
+  "chagas_hai": "",
+  "chagas_eclia": "",
+  "hemoglobina_glicosilada": "",
+  "microalbuminuria": "",
+  "proteinuria": "",
+  "clearence_creatinina": "",
+  "somf": "",
+  "hpv": ""
+}
+
+Devolvé SOLO el JSON sin ningún texto adicional, sin markdown, sin explicaciones.
+Para valores negativos usá "NEGATIVO", para valores numéricos incluí la unidad (ej: "160 mg/dl").`;
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: "application/pdf",
+          data: pdfBase64
+        }
+      }
+    ]);
+
+    const texto = result.response.text().trim();
+    
+    // Limpiamos por si Gemini agrega markdown
+    const jsonLimpio = texto.replace(/```json/g, '').replace(/```/g, '').trim();
+    const valores = JSON.parse(jsonLimpio);
+
+    return res.json({
+      success: true,
+      dni,
+      nombre,
+      apellido,
+      valores
+    });
+
+  } catch (error) {
+    console.error('Error leyendo PDF con Gemini:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al procesar el PDF: ' + error.message 
+    });
+  }
+});
+app.post('/savePracticasLaboratorio', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'guardarPracticasLaboratorio',
+      payload: req.body
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error en /savePracticasLaboratorio:', error.message);
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));
