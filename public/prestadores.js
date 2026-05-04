@@ -87,7 +87,7 @@ async function buscarPracticas() {
             document.getElementById('especialidadVista').textContent =
                 'Prácticas de ' + prestadorActual.especialidad;
             infoAfiliado.classList.remove('hidden');
-            // Mostrar selector de modo solo para laboratorio
+
             const modoCarga = document.getElementById('modoCargaLab');
             if (prestadorActual.especialidad === 'Laboratorio Bioquimico') {
                 modoCarga.classList.remove('hidden');
@@ -170,7 +170,7 @@ async function buscarPracticas() {
 }
 
 // ==========================================
-// MODAL CARGA
+// MODAL CARGA INDIVIDUAL
 // ==========================================
 function abrirModal(codigo, descripcion) {
     practicaActual = { codigo, descripcion };
@@ -258,20 +258,14 @@ async function generarFacturacion() {
     tablaDiv.innerHTML = '<p class="text-center text-gray-500 py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Cargando...</p>';
 
     try {
-        const response = await fetch(
-            `/getFacturacion/${prestadorActual.id}/${mes}/${anio}`
-        );
+        const response = await fetch(`/getFacturacion/${prestadorActual.id}/${mes}/${anio}`);
         const data = await response.json();
 
         if (data.success && data.practicas.length > 0) {
-            // Guardamos con índice para poder eliminar filas
             facturacionData = data.practicas.map((p, i) => ({ ...p, _incluir: true, _index: i }));
             renderTablaFacturacion();
         } else {
-            tablaDiv.innerHTML = `
-                <p class="text-center text-gray-500 py-4">
-                    No hay prácticas realizadas pendientes de facturación en ese período.
-                </p>`;
+            tablaDiv.innerHTML = `<p class="text-center text-gray-500 py-4">No hay prácticas realizadas pendientes de facturación en ese período.</p>`;
             document.getElementById('btnDescargarExcel').classList.add('hidden');
         }
     } catch (e) {
@@ -289,7 +283,6 @@ function renderTablaFacturacion() {
         return;
     }
 
-    // Contenedor principal
     tablaDiv.innerHTML = `
         <p class="text-sm text-gray-500 mb-3 italic">
             <i class="fas fa-info-circle mr-1"></i>
@@ -297,7 +290,6 @@ function renderTablaFacturacion() {
             <span class="text-red-500 font-bold">✕</span>
         </p>`;
 
-    // Tabla
     const tabla = document.createElement('table');
     tabla.className = "w-full text-sm border-collapse";
     tabla.innerHTML = `
@@ -315,10 +307,7 @@ function renderTablaFacturacion() {
     const tbody = document.createElement('tbody');
 
     incluidas.forEach(p => {
-        const fecha = p.fecha_carga
-            ? new Date(p.fecha_carga).toLocaleDateString('es-AR')
-            : 'S/F';
-
+        const fecha = p.fecha_carga ? new Date(p.fecha_carga).toLocaleDateString('es-AR') : 'S/F';
         const tr = document.createElement('tr');
         tr.className = "border-b hover:bg-gray-50";
         tr.innerHTML = `
@@ -329,22 +318,17 @@ function renderTablaFacturacion() {
             <td class="p-2">${p.codigo_prestacion || 'S/C'}</td>
             <td class="p-2 text-center"></td>`;
 
-        // Botón quitar con addEventListener
         const btnQuitar = document.createElement('button');
         btnQuitar.className = "text-red-500 hover:text-red-700 font-bold text-lg leading-none";
         btnQuitar.textContent = "✕";
-        btnQuitar.addEventListener('click', function() {
-            quitarDeFacturacion(p._index);
-        });
+        btnQuitar.addEventListener('click', function() { quitarDeFacturacion(p._index); });
         tr.lastElementChild.appendChild(btnQuitar);
-
         tbody.appendChild(tr);
     });
 
     tabla.appendChild(tbody);
     tablaDiv.appendChild(tabla);
 
-    // Total
     const total = document.createElement('p');
     total.className = "text-right font-bold text-gray-700 mt-3";
     total.innerHTML = `Total a facturar: <span class="text-blue-900">${incluidas.length} prácticas</span>`;
@@ -352,6 +336,7 @@ function renderTablaFacturacion() {
 
     document.getElementById('btnDescargarExcel').classList.remove('hidden');
 }
+
 function quitarDeFacturacion(index) {
     facturacionData[index]._incluir = false;
     renderTablaFacturacion();
@@ -364,14 +349,11 @@ async function descargarExcel() {
     const mes = document.getElementById('mesFact').value;
     const anio = document.getElementById('anioFact').value;
 
-    // Generamos el CSV
     const headers = ['Fecha', 'DNI Afiliado', 'Afiliado', 'Práctica', 'Código', 'Prestador'];
     const filas = incluidas.map(p => [
         p.fecha_carga ? new Date(p.fecha_carga).toLocaleDateString('es-AR') : '',
-        p.dni || '',
-        p.nombre_completo || '',
-        p.descripcion_practica || '',
-        p.codigo_prestacion || '',
+        p.dni || '', p.nombre_completo || '',
+        p.descripcion_practica || '', p.codigo_prestacion || '',
         prestadorActual.nombre
     ]);
 
@@ -387,39 +369,132 @@ async function descargarExcel() {
     link.click();
     URL.revokeObjectURL(url);
 
-    // Marcamos como FACTURADAS en la hoja
     try {
-        const practicasAMarcar = incluidas.map(p => ({
-            dni: p.dni,
-            descripcion: p.descripcion_practica
-        }));
-
+        const practicasAMarcar = incluidas.map(p => ({ dni: p.dni, descripcion: p.descripcion_practica }));
         await fetch('/marcarFacturadas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                idPrestador: prestadorActual.id,
-                practicas: practicasAMarcar
-            })
+            body: JSON.stringify({ idPrestador: prestadorActual.id, practicas: practicasAMarcar })
         });
-
         alert(`✅ Planilla descargada. ${incluidas.length} prácticas marcadas como FACTURADAS.`);
         cerrarModalFacturacion();
-
     } catch (e) {
-        alert("La planilla se descargó pero hubo un error al actualizar el estado. Contacte al administrador.");
+        alert("La planilla se descargó pero hubo un error al actualizar el estado.");
     }
 }
+
+// ==========================================
+// SEMÁFORO DE VALORES
+// ==========================================
+function evaluarSemaforo(campo, valor, datosAfiliado) {
+    if (!valor) return null;
+
+    const v = valor.toString().trim();
+    const vUpper = v.toUpperCase();
+    const vNum = parseFloat(v.replace(',', '.'));
+    const edad = datosAfiliado ? parseInt(datosAfiliado.edad) || 0 : 0;
+    const sexo = datosAfiliado ? (datosAfiliado.sexo_biologico || '').toLowerCase() : '';
+
+    const VERDE    = { color: '#16a34a', bg: '#dcfce7', icono: '🟢', texto: 'Normal' };
+    const AMARILLO = { color: '#d97706', bg: '#fef3c7', icono: '🟡', texto: 'Límite' };
+    const ROJO     = { color: '#dc2626', bg: '#fee2e2', icono: '🔴', texto: 'Alterado' };
+
+    if (campo === 'glucemia') {
+        if (isNaN(vNum)) return null;
+        const glucVal = vUpper.includes('MG') ? vNum / 1000 : vNum;
+        if (glucVal <= 1.00) return VERDE;
+        if (glucVal <= 1.25) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'colesterol_total') {
+        if (isNaN(vNum)) return null;
+        if (vNum < 200) return VERDE;
+        if (vNum < 240) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'colesterol_hdl') {
+        if (isNaN(vNum)) return null;
+        const hdlMin    = sexo.includes('fem') ? 50 : 40;
+        const hdlLimite = sexo.includes('fem') ? 40 : 35;
+        if (vNum >= hdlMin)    return VERDE;
+        if (vNum >= hdlLimite) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'colesterol_ldl') {
+        if (isNaN(vNum)) return null;
+        if (vNum < 130) return VERDE;
+        if (vNum < 160) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'trigliceridos') {
+        if (isNaN(vNum)) return null;
+        if (vNum < 150) return VERDE;
+        if (vNum < 200) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'creatinina') {
+        if (isNaN(vNum)) return null;
+        const creatMax    = sexo.includes('fem') ? 0.90 : 1.20;
+        const creatLimite = sexo.includes('fem') ? 1.20 : 1.50;
+        if (vNum <= creatMax)    return VERDE;
+        if (vNum <= creatLimite) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'indice_filtrado_glomerular') {
+        if (isNaN(vNum)) return null;
+        if (vNum >= 90) return VERDE;
+        if (vNum >= 60) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'psa') {
+        if (isNaN(vNum)) return null;
+        let psaNormal, psaLimite;
+        if (edad <= 50)      { psaNormal = 2.00; psaLimite = 3.00; }
+        else if (edad <= 60) { psaNormal = 3.00; psaLimite = 4.00; }
+        else if (edad <= 70) { psaNormal = 4.00; psaLimite = 5.00; }
+        else                 { psaNormal = 4.50; psaLimite = 6.00; }
+        if (vNum <= psaNormal) return VERDE;
+        if (vNum <= psaLimite) return AMARILLO;
+        return ROJO;
+    }
+    if (campo === 'hemoglobina_glicosilada') {
+        if (isNaN(vNum)) return null;
+        if (vNum < 5.7) return VERDE;
+        if (vNum < 6.5) return AMARILLO;
+        return ROJO;
+    }
+    if (['hiv', 'hepatitis_b_antigeno_superficie', 'hepatitis_b_anti_core',
+         'hepatitis_c', 'somf', 'vdrl', 'chagas_hai', 'chagas_eclia'].includes(campo)) {
+        if (vUpper === 'NEGATIVO' || vUpper === 'NO REACTIVO') return VERDE;
+        if (vUpper === 'POSITIVO' || vUpper === 'REACTIVO')    return ROJO;
+        return null;
+    }
+    if (campo === 'hpv_genotipo_16' || campo === 'hpv_genotipo_18') {
+        if (vUpper.includes('NO DETECTABLE')) return VERDE;
+        if (vUpper.includes('DETECTABLE'))    return ROJO;
+        return null;
+    }
+    if (campo === 'hpv_otros') {
+        if (vUpper.includes('NO DETECTABLE')) return VERDE;
+        if (vUpper.includes('DETECTABLE')) return {
+            color: '#dc2626', bg: '#fee2e2', icono: '🔴',
+            texto: 'Otros genotipos de alto riesgo'
+        };
+        return null;
+    }
+    return null;
+}
+
 // ==========================================
 // CARGA PDF LABORATORIO
 // ==========================================
 function modoCargaIndividual() {
     document.getElementById('modoCargaLab').classList.add('hidden');
 }
+
 function modoCargaPDF() {
     document.getElementById('pdfResultado').classList.add('hidden');
     document.getElementById('pdfResultado').innerHTML = '';
-    // Iniciamos con un solo textarea
     document.getElementById('contenedorInformes').innerHTML = '';
     agregarInforme();
     document.getElementById('modalPDFLab').classList.remove('hidden');
@@ -434,7 +509,6 @@ function cerrarModalPDFLab() {
 function agregarInforme() {
     const contenedor = document.getElementById('contenedorInformes');
     const index = contenedor.children.length + 1;
-
     const div = document.createElement('div');
     div.className = "relative border border-gray-200 rounded-lg p-2";
     div.innerHTML = `
@@ -450,14 +524,13 @@ function agregarInforme() {
         <textarea class="textoPDFItem w-full border border-gray-300 rounded-lg p-2 
                          outline-none focus:ring-2 focus:ring-blue-500 text-xs font-mono" 
                   rows="4"
-                  placeholder="Pegá aquí el texto copiado del PDF ${index}..."></textarea>
-    `;
+                  placeholder="Pegá aquí el texto copiado del PDF ${index}..."></textarea>`;
     contenedor.appendChild(div);
 }
+
 async function procesarTodosLosInformes() {
     const textareas = document.querySelectorAll('.textoPDFItem');
     const dni = document.getElementById('dniSearch').value.trim();
-    const resultadoDiv = document.getElementById('pdfResultado');
 
     if (!dni) return alert("Ingresá el DNI del paciente primero.");
 
@@ -467,68 +540,49 @@ async function procesarTodosLosInformes() {
 
     if (textos.length === 0) return alert("Pegá al menos un informe.");
 
-    // Verificamos DNIs de cada informe
+    // Verificamos DNIs
     const dnisDiferentes = [];
     textos.forEach((texto, i) => {
         const dniDetectado = extraerDNIDelTexto(texto);
         if (dniDetectado && dniDetectado !== dni) {
-            dnisDiferentes.push({
-                informe: i + 1,
-                dniDetectado
-            });
+            dnisDiferentes.push({ informe: i + 1, dniDetectado });
         }
     });
 
-    // Si hay DNIs que no coinciden avisamos
     if (dnisDiferentes.length > 0) {
-        const mensajes = dnisDiferentes.map(d =>
-            `Informe ${d.informe}: DNI ${d.dniDetectado}`
-        ).join('\n');
-
+        const mensajes = dnisDiferentes.map(d => `Informe ${d.informe}: DNI ${d.dniDetectado}`).join('\n');
         const confirmar = confirm(
             `⚠️ ATENCIÓN: Se detectaron informes con DNI diferente al paciente buscado (${dni}):\n\n` +
-            `${mensajes}\n\n` +
-            `¿Querés continuar igualmente cargando todo para el DNI ${dni}?`
+            `${mensajes}\n\n¿Querés continuar igualmente cargando todo para el DNI ${dni}?`
         );
-
         if (!confirmar) return;
     }
 
-    // Combinamos todos los valores
+    // Combinamos valores
     let valoresCombinados = {};
     textos.forEach(texto => {
         const valores = extraerValoresLaboratorio(texto);
         Object.entries(valores).forEach(([campo, valor]) => {
-            if (valor && !valoresCombinados[campo]) {
-                valoresCombinados[campo] = valor;
-            }
+            if (valor && !valoresCombinados[campo]) valoresCombinados[campo] = valor;
         });
     });
 
     const valoresConDatos = Object.entries(valoresCombinados).filter(([k, v]) => v);
-
     if (valoresConDatos.length === 0) {
         alert("No se encontraron valores. Verificá que el texto esté completo.");
         return;
     }
 
-    mostrarValoresExtraidos({
-        dni,
-        nombre: '',
-        apellido: '',
-        valores: valoresCombinados
-    });
+    mostrarValoresExtraidos({ dni, nombre: '', apellido: '', valores: valoresCombinados });
 }
+
 function extraerDNIDelTexto(texto) {
-    // Busca patrones de DNI en el texto
     const patrones = [
         /DNI[:\s]+(\d{7,8})/i,
         /D\.N\.I[:\s]+(\d{7,8})/i,
         /DOCUMENTO[:\s]+(\d{7,8})/i,
-        // También del formato Omega: "TORRES NATALIA GUADALUPE 32733266"
         /PACIENTE[:\s]+[A-ZÁÉÍÓÚ\s]+(\d{7,8})/i
     ];
-
     for (const patron of patrones) {
         const match = texto.match(patron);
         if (match) return match[1];
@@ -539,24 +593,18 @@ function extraerDNIDelTexto(texto) {
 function extraerValoresLaboratorio(texto) {
     const lineas = texto.split('\n').map(l => l.trim()).filter(l => l);
 
-    // ── FUNCIONES AUXILIARES ──────────────────────────────────────────
-
     function buscarValor(terminosClave, maxLineas = 6) {
         for (let i = 0; i < lineas.length; i++) {
             const lineaUpper = lineas[i].toUpperCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
             const encontrado = terminosClave.some(t =>
-                lineaUpper.includes(t.toUpperCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+                lineaUpper.includes(t.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
             );
-
             if (encontrado) {
                 const matchMisma = lineas[i].match(
                     /(\d+[.,]?\d*\s*(?:mg\/d[lI]|g\/l|ml\/min|ng\/ml|%|mg\/l|u\/l))/i
                 );
                 if (matchMisma) return matchMisma[1].trim();
-
                 for (let j = i + 1; j < Math.min(i + maxLineas, lineas.length); j++) {
                     const lineaSigUpper = lineas[j].toUpperCase()
                         .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -575,18 +623,14 @@ function extraerValoresLaboratorio(texto) {
         for (let i = 0; i < lineas.length; i++) {
             const lineaUpper = lineas[i].toUpperCase()
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
             const encontrado = terminosClave.some(t =>
-                lineaUpper.includes(t.toUpperCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+                lineaUpper.includes(t.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
             );
-
             if (encontrado) {
                 const matchMisma = lineas[i].match(
                     /(NEGATIVO|POSITIVO|REACTIVO|NO REACTIVO|DETECTABLE|NO DETECTABLE)/i
                 );
                 if (matchMisma) return matchMisma[1].toUpperCase();
-
                 for (let j = i + 1; j < Math.min(i + maxLineas, lineas.length); j++) {
                     const match = lineas[j].match(
                         /^(NEGATIVO|POSITIVO|REACTIVO|NO REACTIVO|DETECTABLE|NO DETECTABLE)$/i
@@ -597,49 +641,31 @@ function extraerValoresLaboratorio(texto) {
         }
         return null;
     }
+
     function buscarColesterolTotal() {
-    for (let i = 0; i < lineas.length; i++) {
-        const l = lineas[i].toUpperCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-        if (l.includes('COLESTEROL') &&
-            !l.includes('HDL') &&
-            !l.includes('LDL') &&
-            !l.includes('REFERENCIA')) {
-
-            // Buscamos en la misma línea
-            const m = lineas[i].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
-            if (m) return m[1].trim();
-
-            // Buscamos en las siguientes líneas
-            // Saltamos las de referencia pero no paramos en ellas
-            for (let j = i + 1; j < Math.min(i + 8, lineas.length); j++) {
-                const lj = lineas[j].toUpperCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-                // Saltamos líneas de referencia y descripción
-                if (lj.includes('VALORES DE REFERENCIA') ||
-                    lj.includes('DESEABLE') ||
-                    lj.includes('MODERADAMENTE') ||
-                    lj.includes('METODO:')) continue;
-
-                // Si encontramos otra práctica con nombre largo paramos
-                if (lj.length > 40 && 
-                    !lj.match(/^\d/) && 
-                    !lj.includes('COLESTEROL')) break;
-
-                const mj = lineas[j].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
-                if (mj) return mj[1].trim();
+        for (let i = 0; i < lineas.length; i++) {
+            const l = lineas[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (l.includes('COLESTEROL') && !l.includes('HDL') &&
+                !l.includes('LDL') && !l.includes('REFERENCIA')) {
+                const m = lineas[i].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
+                if (m) return m[1].trim();
+                for (let j = i + 1; j < Math.min(i + 8, lineas.length); j++) {
+                    const lj = lineas[j].toUpperCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    if (lj.includes('VALORES DE REFERENCIA') || lj.includes('DESEABLE') ||
+                        lj.includes('MODERADAMENTE') || lj.includes('METODO:')) continue;
+                    if (lj.length > 40 && !lj.match(/^\d/) && !lj.includes('COLESTEROL')) break;
+                    const mj = lineas[j].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
+                    if (mj) return mj[1].trim();
+                }
             }
         }
+        return null;
     }
-    return null;
-}
 
     function buscarHDL() {
         for (let i = 0; i < lineas.length; i++) {
-            const l = lineas[i].toUpperCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const l = lineas[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (l.includes('HDL') && l.includes('COLESTEROL')) {
                 const m = lineas[i].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
                 if (m) return m[1].trim();
@@ -657,8 +683,7 @@ function extraerValoresLaboratorio(texto) {
 
     function buscarLDL() {
         for (let i = 0; i < lineas.length; i++) {
-            const l = lineas[i].toUpperCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const l = lineas[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (l.includes('LDL') && l.includes('COLESTEROL')) {
                 const m = lineas[i].match(/(\d+[.,]?\d*\s*mg\/d[lI])/i);
                 if (m) return m[1].trim();
@@ -676,8 +701,7 @@ function extraerValoresLaboratorio(texto) {
 
     function buscarFiltradoGlomerular() {
         for (let i = 0; i < lineas.length; i++) {
-            const l = lineas[i].toUpperCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const l = lineas[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (l.includes('FILTRADO GLOMERULAR') || l.includes('FILTRO GLOMERULAR')) {
                 for (let j = i; j < Math.min(i + 4, lineas.length); j++) {
                     const m = lineas[j].match(/(\d+[.,]\d+\s*ml\/min)/i);
@@ -689,23 +713,13 @@ function extraerValoresLaboratorio(texto) {
     }
 
     function buscarSOMF() {
-        const t = texto.toUpperCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-        // Formato Omega — buscarEstado normal
+        const t = texto.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         const porEstado = buscarEstado(['SANGRE OCULTA', 'SOMF']);
         if (porEstado) return porEstado;
-
-        // Formato IAPOS — "Test Sangre Oculta en Materia Fecal: POSITIVO"
-        const matchIAPOS = t.match(
-            /TEST\s+SANGRE\s+OCULTA[^A-Z]*(POSITIVO|NEGATIVO)/
-        );
+        const matchIAPOS = t.match(/TEST\s+SANGRE\s+OCULTA[^A-Z]*(POSITIVO|NEGATIVO)/);
         if (matchIAPOS) return matchIAPOS[1];
-
-        // Formato simple línea siguiente
         for (let i = 0; i < lineas.length; i++) {
-            const l = lineas[i].toUpperCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const l = lineas[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             if (l.includes('SANGRE OCULTA') || l.includes('SOMF')) {
                 const m = lineas[i].match(/(POSITIVO|NEGATIVO)/i);
                 if (m) return m[1].toUpperCase();
@@ -718,124 +732,198 @@ function extraerValoresLaboratorio(texto) {
         return null;
     }
 
-    // ── RESULTADO FINAL ───────────────────────────────────────────────
     return {
-        glucemia:                      buscarValor(['GLUCOSA', 'GLUCEMIA', 'GLUCEMIA EN AYUNAS']),
-        trigliceridos:                 buscarValor(['TRIGLICERIDOS', 'TRIGLICÉRIDOS']),
-        colesterol_total:              buscarColesterolTotal(),
-        colesterol_hdl:                buscarHDL(),
-        colesterol_ldl:                buscarLDL(),
-        creatinina:                    buscarValor(['CREATININA']),
-        indice_filtrado_glomerular:    buscarFiltradoGlomerular(),
-        psa:                           buscarValor(['PSA', 'PSA - AG', 'PROSTATICO', 'PROSTÁTICO', 'ANTIGENO PROSTATICO', 'ANTÍGENO PROSTÁTICO']),
-        hiv:                           buscarEstado(['HIV', 'VIH']),
+        glucemia:                        buscarValor(['GLUCOSA', 'GLUCEMIA', 'GLUCEMIA EN AYUNAS']),
+        trigliceridos:                   buscarValor(['TRIGLICERIDOS', 'TRIGLICÉRIDOS']),
+        colesterol_total:                buscarColesterolTotal(),
+        colesterol_hdl:                  buscarHDL(),
+        colesterol_ldl:                  buscarLDL(),
+        creatinina:                      buscarValor(['CREATININA']),
+        indice_filtrado_glomerular:      buscarFiltradoGlomerular(),
+        psa:                             buscarValor(['PSA', 'PSA - AG', 'PROSTATICO', 'PROSTÁTICO', 'ANTIGENO PROSTATICO', 'ANTÍGENO PROSTÁTICO']),
+        hiv:                             buscarEstado(['HIV', 'VIH']),
         hepatitis_b_antigeno_superficie: buscarEstado(['HBSAG', 'AG DE SUPERFICIE', 'HEPATITIS B - HBS']),
-        hepatitis_b_anti_core:         buscarEstado(['ANTI HBC', 'ANTI HBC (CORE)', 'AC. IGG ANTI HBC', 'HEPATITIS B - AC. IGG']),
-        hepatitis_c:                   buscarEstado(['HEPATITIS C', 'ANTI HCV', 'HCV']),
-        vdrl:                          buscarEstado(['VDRL', 'USR']),
-        chagas_hai:                    buscarEstado(['CHAGAS AC. - HAI', 'CHAGAS HAI', 'CHAGAS - HAI']),
-        chagas_eclia:                  buscarEstado(['CHAGAS AC. IGG', 'CHAGAS ECLIA', 'CHAGAS IGG']),
-        hpv_genotipo_16:               buscarEstado(['HPV GENOTIPO 16', 'GENOTIPO 16']),
-        hpv_genotipo_18:               buscarEstado(['HPV GENOTIPO 18', 'GENOTIPO 18']),
-        hpv_otros:                     buscarEstado(['HPV OTROS GENOTIPOS', 'OTROS GENOTIPOS DE ALTO RIESGO']),
-        hemoglobina_glicosilada:       buscarValor(['HEMOGLOBINA GLICOSILADA', 'HBA1C', 'HB A1C']),
-        somf:                          buscarSOMF(),
-        microalbuminuria:              buscarValor(['MICROALBUMINURIA', 'ALBUMINA ORINA', 'MICROALBUMINA']),
-        proteinuria:                   buscarValor(['PROTEINURIA', 'PROTEINAS EN ORINA']),
-        clearence_creatinina:          buscarValor(['CLEARENCE', 'DEPURACION DE CREATININA', 'DEPURACIÓN'])
+        hepatitis_b_anti_core:           buscarEstado(['ANTI HBC', 'ANTI HBC (CORE)', 'AC. IGG ANTI HBC', 'HEPATITIS B - AC. IGG']),
+        hepatitis_c:                     buscarEstado(['HEPATITIS C', 'ANTI HCV', 'HCV']),
+        vdrl:                            buscarEstado(['VDRL', 'USR']),
+        chagas_hai:                      buscarEstado(['CHAGAS AC. - HAI', 'CHAGAS HAI', 'CHAGAS - HAI']),
+        chagas_eclia:                    buscarEstado(['CHAGAS AC. IGG', 'CHAGAS ECLIA', 'CHAGAS IGG']),
+        hpv_genotipo_16:                 buscarEstado(['HPV GENOTIPO 16', 'GENOTIPO 16']),
+        hpv_genotipo_18:                 buscarEstado(['HPV GENOTIPO 18', 'GENOTIPO 18']),
+        hpv_otros:                       buscarEstado(['HPV OTROS GENOTIPOS', 'OTROS GENOTIPOS DE ALTO RIESGO']),
+        hemoglobina_glicosilada:         buscarValor(['HEMOGLOBINA GLICOSILADA', 'HBA1C', 'HB A1C']),
+        somf:                            buscarSOMF(),
+        microalbuminuria:                buscarValor(['MICROALBUMINURIA', 'ALBUMINA ORINA', 'MICROALBUMINA']),
+        proteinuria:                     buscarValor(['PROTEINURIA', 'PROTEINAS EN ORINA']),
+        clearence_creatinina:            buscarValor(['CLEARENCE', 'DEPURACION DE CREATININA', 'DEPURACIÓN'])
     };
 }
+
+// ==========================================
+// MOSTRAR VALORES CON SEMÁFORO
+// ==========================================
 function mostrarValoresExtraidos(data) {
     const resultadoDiv = document.getElementById('pdfResultado');
-const ETIQUETAS = {
-    glucemia: 'Glucemia',
-    creatinina: 'Creatinina',
-    indice_filtrado_glomerular: 'Índice Filtrado Glomerular',
-    colesterol_total: 'Colesterol Total',
-    colesterol_hdl: 'Colesterol HDL',
-    colesterol_ldl: 'Colesterol LDL',
-    trigliceridos: 'Triglicéridos',
-    hiv: 'HIV',
-    hepatitis_b_antigeno_superficie: 'Hepatitis B Ag Superficie',
-    hepatitis_b_anti_core: 'Hepatitis B Anti Core',
-    hepatitis_c: 'Hepatitis C',
-    vdrl: 'VDRL',
-    psa: 'PSA',
-    chagas_hai: 'Chagas HAI',
-    chagas_eclia: 'Chagas ECLIA',
-    hpv_genotipo_16: 'HPV Genotipo 16',
-    hpv_genotipo_18: 'HPV Genotipo 18',
-    hpv_otros: 'HPV Otros Genotipos Alto Riesgo',
-    hemoglobina_glicosilada: 'Hemoglobina Glicosilada',
-    microalbuminuria: 'Microalbuminuria',
-    proteinuria: 'Proteinuria',
-    clearence_creatinina: 'Clearence Creatinina',
-    somf: 'SOMF'
-};
 
-const MAPEO_PRACTICAS = {
-    glucemia: 'glucemia en ayunas',
-    creatinina: 'creatinina',
-    indice_filtrado_glomerular: 'formula filtrado glomerular',
-    colesterol_total: 'colesterol total',
-    colesterol_hdl: 'HDL/colesterol',
-    colesterol_ldl: 'LDL/colesterol',
-    trigliceridos: 'trigliceridos',
-    hiv: 'anticuerpos anti_VIH',
-    hepatitis_b_antigeno_superficie: 'hepatitis b antigeno de superficie_AGHB',
-    hepatitis_b_anti_core: 'hepatitis b antigeno de superficie_AGHB',
-    hepatitis_c: 'hepatitis c _HCV_AC_IGG',
-    vdrl: 'VDRL',
-    psa: 'antigeno prostatico especifico total - PSA',
-    chagas_hai: 'test chagas',
-    chagas_eclia: 'test chagas',
-    hpv_genotipo_16: 'test HPV',
-    hpv_genotipo_18: 'test HPV',
-    hpv_otros: 'test HPV',
-    hemoglobina_glicosilada: 'hemoglobina glicosilada',
-    microalbuminuria: 'microalbuminuria',
-    proteinuria: 'proteinuria',
-    clearence_creatinina: 'clearence creatinina',
-    somf: 'sangre oculta en materia fecal - SOMF'
-};
+    const ETIQUETAS = {
+        glucemia: 'Glucemia',
+        creatinina: 'Creatinina',
+        indice_filtrado_glomerular: 'Índice Filtrado Glomerular',
+        colesterol_total: 'Colesterol Total',
+        colesterol_hdl: 'Colesterol HDL',
+        colesterol_ldl: 'Colesterol LDL',
+        trigliceridos: 'Triglicéridos',
+        hiv: 'HIV',
+        hepatitis_b_antigeno_superficie: 'Hepatitis B Ag Superficie',
+        hepatitis_b_anti_core: 'Hepatitis B Anti Core',
+        hepatitis_c: 'Hepatitis C',
+        vdrl: 'VDRL',
+        psa: 'PSA',
+        chagas_hai: 'Chagas HAI',
+        chagas_eclia: 'Chagas ECLIA',
+        hpv_genotipo_16: 'HPV Genotipo 16',
+        hpv_genotipo_18: 'HPV Genotipo 18',
+        hpv_otros: 'HPV Otros Genotipos Alto Riesgo',
+        hemoglobina_glicosilada: 'Hemoglobina Glicosilada',
+        microalbuminuria: 'Microalbuminuria',
+        proteinuria: 'Proteinuria',
+        clearence_creatinina: 'Clearence Creatinina',
+        somf: 'SOMF'
+    };
+
+    const MAPEO_PRACTICAS = {
+        glucemia: 'glucemia en ayunas',
+        creatinina: 'creatinina',
+        indice_filtrado_glomerular: 'formula filtrado glomerular',
+        colesterol_total: 'colesterol total',
+        colesterol_hdl: 'HDL/colesterol',
+        colesterol_ldl: 'LDL/colesterol',
+        trigliceridos: 'trigliceridos',
+        hiv: 'anticuerpos anti_VIH',
+        hepatitis_b_antigeno_superficie: 'hepatitis b antigeno de superficie_AGHB',
+        hepatitis_b_anti_core: 'hepatitis b antigeno de superficie_AGHB',
+        hepatitis_c: 'hepatitis c _HCV_AC_IGG',
+        vdrl: 'VDRL',
+        psa: 'antigeno prostatico especifico total - PSA',
+        chagas_hai: 'test chagas',
+        chagas_eclia: 'test chagas',
+        hpv_genotipo_16: 'test HPV',
+        hpv_genotipo_18: 'test HPV',
+        hpv_otros: 'test HPV',
+        hemoglobina_glicosilada: 'hemoglobina glicosilada',
+        microalbuminuria: 'microalbuminuria',
+        proteinuria: 'proteinuria',
+        clearence_creatinina: 'clearence creatinina',
+        somf: 'sangre oculta en materia fecal - SOMF'
+    };
 
     const valores = data.valores;
     const valoresConDatos = Object.entries(valores).filter(([k, v]) => v);
 
-    let html = `
-        <div class="border-t pt-3">
-            <p class="font-bold text-gray-700 mb-2">
-                <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                Se encontraron ${valoresConDatos.length} resultados. Revisá y confirmá:
-            </p>
-            <div class="space-y-1 mb-3">`;
+    buscarDatosAfiliado(data.dni).then(datosAfiliado => {
+        const rojos = [], amarillos = [], verdes = [], sinSemaforo = [];
 
-    valoresConDatos.forEach(([campo, valor]) => {
-        html += `
-            <div class="flex justify-between items-center bg-gray-50 px-3 py-2 rounded text-sm">
-                <span class="text-gray-700">${ETIQUETAS[campo] || campo}</span>
-                <span class="font-bold text-blue-900">${valor}</span>
-            </div>`;
-    });
+        valoresConDatos.forEach(([campo, valor]) => {
+            const semaforo = evaluarSemaforo(campo, valor, datosAfiliado);
+            const item = { campo, valor, semaforo };
+            if (!semaforo)                     sinSemaforo.push(item);
+            else if (semaforo.icono === '🔴')  rojos.push(item);
+            else if (semaforo.icono === '🟡')  amarillos.push(item);
+            else                               verdes.push(item);
+        });
 
-    // Guardamos datos para el botón confirmar
-    window._datosPDFLab = { data, mapeo: MAPEO_PRACTICAS };
+        const hayRojos = rojos.length > 0;
 
-    html += `</div>
-            <button id="btnConfirmarPDF"
-                class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">
-                <i class="fas fa-save mr-2"></i>CONFIRMAR Y GUARDAR TODO
-            </button>
-        </div>`;
+        const renderFila = (item) => {
+            const { campo, valor, semaforo } = item;
+            const bg    = semaforo ? semaforo.bg    : '#f9fafb';
+            const color = semaforo ? semaforo.color : '#374151';
+            const icono = semaforo ? semaforo.icono : '⚪';
+            const texto = semaforo ? semaforo.texto : '';
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; 
+                            background:${bg}; border-left:4px solid ${color};
+                            padding:8px 12px; border-radius:6px; margin-bottom:4px;">
+                    <span style="color:#374151; font-size:0.85rem;">${ETIQUETAS[campo] || campo}</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-weight:bold; color:${color}; font-size:0.85rem;">${valor}</span>
+                        <span style="font-size:0.75rem; background:white; padding:2px 6px; 
+                                     border-radius:12px; color:${color}; font-weight:bold;
+                                     border:1px solid ${color};">
+                            ${icono} ${texto}
+                        </span>
+                    </div>
+                </div>`;
+        };
 
-    resultadoDiv.classList.remove('hidden');
-    resultadoDiv.innerHTML = html;
+        let html = `
+            <div class="border-t pt-3">
+                <p class="font-bold text-gray-700 mb-3">
+                    Se encontraron <strong>${valoresConDatos.length}</strong> resultados.
+                    ${hayRojos ? '<span class="text-red-600 ml-2">⚠️ Hay valores alterados — revisá antes de confirmar.</span>' : ''}
+                </p>`;
 
-    // Evento en el botón confirmar
-    document.getElementById('btnConfirmarPDF').addEventListener('click', () => {
-        confirmarCargaPDFLab(window._datosPDFLab.data, window._datosPDFLab.mapeo);
+        if (rojos.length > 0) {
+            html += `<p style="font-size:0.75rem;font-weight:bold;color:#dc2626;text-transform:uppercase;margin:8px 0 4px 0;">🔴 Valores alterados (${rojos.length})</p>`;
+            rojos.forEach(item => { html += renderFila(item); });
+        }
+        if (amarillos.length > 0) {
+            html += `<p style="font-size:0.75rem;font-weight:bold;color:#d97706;text-transform:uppercase;margin:8px 0 4px 0;">🟡 Valores límite (${amarillos.length})</p>`;
+            amarillos.forEach(item => { html += renderFila(item); });
+        }
+        if (verdes.length > 0) {
+            html += `<p style="font-size:0.75rem;font-weight:bold;color:#16a34a;text-transform:uppercase;margin:8px 0 4px 0;">🟢 Valores normales (${verdes.length})</p>`;
+            verdes.forEach(item => { html += renderFila(item); });
+        }
+        if (sinSemaforo.length > 0) {
+            html += `<p style="font-size:0.75rem;font-weight:bold;color:#6b7280;text-transform:uppercase;margin:8px 0 4px 0;">⚪ Otros valores</p>`;
+            sinSemaforo.forEach(item => { html += renderFila(item); });
+        }
+
+        window._datosPDFLab = { data, mapeo: MAPEO_PRACTICAS };
+
+        if (hayRojos) {
+            html += `
+                <div style="background:#fee2e2;border:1px solid #dc2626;border-radius:8px;padding:12px;margin-top:12px;text-align:center;">
+                    <p style="color:#dc2626;font-weight:bold;margin-bottom:8px;">
+                        ⚠️ Hay ${rojos.length} valor/es alterado/s. ¿Confirmás que los revisaste?
+                    </p>
+                    <button id="btnConfirmarPDF"
+                        style="background:#dc2626;color:white;padding:10px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;">
+                        ✓ Revisé los valores — CONFIRMAR Y GUARDAR
+                    </button>
+                </div>`;
+        } else {
+            html += `
+                <div style="text-align:center;margin-top:12px;">
+                    <button id="btnConfirmarPDF"
+                        style="background:#16a34a;color:white;padding:10px 24px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;">
+                        ✓ CONFIRMAR Y GUARDAR TODO
+                    </button>
+                </div>`;
+        }
+
+        html += `</div>`;
+        resultadoDiv.classList.remove('hidden');
+        resultadoDiv.innerHTML = html;
+
+        document.getElementById('btnConfirmarPDF').addEventListener('click', () => {
+            confirmarCargaPDFLab(window._datosPDFLab.data, window._datosPDFLab.mapeo);
+        });
     });
 }
+
+async function buscarDatosAfiliado(dni) {
+    try {
+        const response = await fetch(`/getDatosAfiliado/${dni}`);
+        const data = await response.json();
+        if (data.success) return data.afiliado;
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
 async function confirmarCargaPDFLab(data, mapeo) {
     const valores = data.valores;
     const dni = data.dni;
@@ -847,7 +935,6 @@ async function confirmarCargaPDFLab(data, mapeo) {
             <p class="text-blue-700">Guardando prácticas...</p>
         </div>`;
 
-    // Armamos array con todas las prácticas de una sola vez
     const practicasParaGuardar = [];
     Object.entries(valores).forEach(([campo, valor]) => {
         if (!valor) return;
@@ -877,7 +964,6 @@ async function confirmarCargaPDFLab(data, mapeo) {
         });
 
         const res = await response.json();
-
         let mensaje = '';
         if (res.success) {
             mensaje = `<p class="font-bold text-green-700">✅ ${res.guardadas} prácticas guardadas.</p>`;
@@ -906,6 +992,7 @@ async function confirmarCargaPDFLab(data, mapeo) {
             </div>`;
     }
 }
+
 // ==========================================
 // UTILIDADES
 // ==========================================
@@ -923,11 +1010,9 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarPortal();
     }
     document.getElementById('btnGuardarPractica').addEventListener('click', guardarPractica);
-
     document.getElementById('loginPassword').addEventListener('keypress', e => {
         if (e.key === 'Enter') hacerLogin();
     });
-
     document.getElementById('dniSearch')?.addEventListener('keypress', e => {
         if (e.key === 'Enter') buscarPracticas();
     });

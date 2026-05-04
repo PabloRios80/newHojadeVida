@@ -247,5 +247,17 @@ app.post('/savePracticasLaboratorio', async (req, res) => {
   }
 });
 
+app.get('/getDatosAfiliado/:dni', async (req, res) => {
+  try {
+    const response = await axios.post(APPS_SCRIPT_URL, {
+      action: 'getDatosAfiliado',
+      payload: { dni: req.params.dni }
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));
