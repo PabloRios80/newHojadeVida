@@ -1,4 +1,9 @@
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
 const express = require('express');
 const axios = require('axios'); // La herramienta correcta que sí tenemos instalada
 const path = require('path');
