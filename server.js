@@ -303,19 +303,57 @@ app.get('/getPendingPractices/:dni', async (req, res) => {
 });
 // RUTA PARA GUARDAR RESULTADOS DEL MÉDICO
 app.post('/savePracticeResult', async (req, res) => {
-  console.log("Recibida carga de resultado para DNI:", req.body.dni);
+  const { dni, codigo, descripcion, resultadoValor, archivoBase64, archivoNombre, idPrestador, nombrePrestador } = req.body;
+  
   try {
-    // Llamada a Apps Script usando AXIOS como venías haciendo
-    const response = await axios.post(APPS_SCRIPT_URL, {
-      action: 'finalizarCargaPractica',
-      payload: req.body
-    });
-    
-    console.log("Respuesta de Google:", response.data);
-    res.json(response.data);
+    // Subir PDF a Supabase Storage si hay archivo
+    let enlacePdf = null;
+    if (archivoBase64) {
+      const buffer = Buffer.from(archivoBase64, 'base64');
+      const fileName = `${dni}/${Date.now()}_${archivoNombre}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('resultados-practicas')
+        .upload(fileName, buffer, { contentType: 'application/pdf' });
+      
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from('resultados-practicas')
+          .getPublicUrl(fileName);
+        enlacePdf = urlData.publicUrl;
+      }
+    }
+
+    // Buscar práctica autorizada
+    const { data: existente } = await supabase
+      .from('practicas_autorizadas')
+      .select('id')
+      .eq('dni', dni)
+      .ilike('descripcion_practica', `%${descripcion}%`)
+      .eq('estado', 'AUTORIZADA')
+      .single();
+
+    if (existente) {
+      await supabase
+        .from('practicas_autorizadas')
+        .update({
+          estado: 'REALIZADA',
+          resultado_texto: resultadoValor,
+          enlace_pdf: enlacePdf,
+          fecha_carga: new Date().toISOString(),
+          id_prestador: idPrestador?.toString(),
+          nombre_prestador: nombrePrestador
+        })
+        .eq('id', existente.id);
+
+      res.json({ success: true, message: 'Práctica guardada correctamente.' });
+    } else {
+      res.json({ success: false, message: 'Práctica no encontrada o ya realizada.' });
+    }
+
   } catch (error) {
-    console.error('Error al contactar Apps Script:', error.message);
-    res.status(500).json({ success: false, message: 'Error de comunicación con Google.' });
+    console.error('Error en /savePracticeResult:', error.message);
+    res.status(500).json({ success: false, message: 'Error al guardar.' });
   }
 });
 // --- Ruta para obtener prácticas guardadas (rápido, sin regenerar) ---
@@ -335,12 +373,31 @@ app.get('/getPracticasGuardadas/:dni', async (req, res) => {
 // --- Ruta para login de prestadores ---
 app.post('/loginPrestador', async (req, res) => {
   try {
-    const response = await axios.post(APPS_SCRIPT_URL, {
-      action: 'loginPrestador',
-      payload: { usuario: req.body.usuario, password: req.body.password }
+    const { usuario, password } = req.body;
+    
+    const { data, error } = await supabase
+      .from('prestadores')
+      .select('*')
+      .eq('usuario', usuario)
+      .eq('password', password)
+      .eq('activo', true)
+      .single();
+
+    if (error || !data) {
+      return res.json({ success: false, message: 'Usuario o contraseña incorrectos.' });
+    }
+
+    res.json({ 
+      success: true, 
+      prestador: {
+        id: data.id,
+        nombre: data.nombre,
+        especialidad: data.especialidad,
+        ciudad: data.ciudad
+      }
     });
-    res.json(response.data);
   } catch (error) {
+    console.error('Error en /loginPrestador:', error.message);
     res.status(500).json({ success: false, message: 'Error de conexión.' });
   }
 });
