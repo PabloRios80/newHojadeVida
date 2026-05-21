@@ -137,6 +137,8 @@
         .screen { display: none; }
         .screen.visible { display: block; }
 
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         @media (max-width: 540px) {
             .grid2 { grid-template-columns: 1fr; }
             .derechos { grid-template-columns: 1fr; }
@@ -146,7 +148,7 @@
 <body>
 
 <header class="iapos-header">
-    <img src="images/logo_iapos.png" alt="Logo IAPOS">
+    <img src="images/logo_iapos.png" alt="Logo IAPOS" style="height:42px; display:block;">
     <div class="iapos-header-right">
         <p class="iapos-header-title">Hoja de Vida</p>
         <p class="iapos-header-sub">Día Preventivo</p>
@@ -250,7 +252,7 @@
             <div class="grid2">
                 <div class="field">
                     <label for="dni">DNI <span class="req">*</span></label>
-                    <input type="text" id="dni" placeholder="Ej: 28456789" maxlength="8">
+                    <input type="text" id="dni" placeholder="Ej: 28456789" maxlength="8" onblur="verificarDNI()">
                 </div>
                 <div class="field">
                     <label for="birthDate">Fecha de nacimiento <span class="req">*</span></label>
@@ -407,6 +409,13 @@
         </div>
     </div>
 
+    <!-- SPINNER DE CARGA -->
+    <div id="spinnerGuardando" style="display:none; text-align:center; padding: 3rem 1rem;">
+        <div style="width:56px; height:56px; border:4px solid #e2e8f0; border-top-color:#003366; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.25rem;"></div>
+        <p style="font-size:16px; font-weight:600; color:#003366; margin-bottom:6px;">Guardando sus datos...</p>
+        <p style="font-size:13px; color:#94a3b8;">Por favor no cierre esta página.</p>
+    </div>
+
 </div><!-- fin screenForm -->
 
 <!-- PANTALLA 4: RESULTADO -->
@@ -420,7 +429,7 @@
             <p style="font-size:15px; color:#64748b; line-height:1.6; max-width:380px; margin:0 auto 1.5rem;">Sus datos fueron recibidos correctamente. En breve lo redirigiremos al inicio donde podrá ver sus recomendaciones preventivas.</p>
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px; max-width:380px; margin:0 auto 2rem;">
                 <i class="fas fa-clock" style="color:#16a34a; font-size:15px; flex-shrink:0;"></i>
-                <span style="font-size:13px; color:#166534;" id="cuentaRegresiva">Redirigiendo en 5 segundos...</span>
+                <span style="font-size:13px; color:#166534;" id="cuentaRegresiva">Redirigiendo en 10 segundos...</span>
             </div>
             <button onclick="window.location.href='index.html'" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
                 Ir al inicio ahora <i class="fas fa-arrow-right"></i>
@@ -448,6 +457,60 @@
 var vals = {};
 var pasoActual = 1;
 var stepNames = ['','Identificación','Contacto','Datos personales','Condiciones de salud','Hábitos','Antecedentes familiares'];
+
+var afiliadoVerificado = false;
+
+async function verificarDNI() {
+    var dni = document.getElementById('dni').value.trim();
+    if (dni.length < 7) return;
+
+    var msgEl = document.getElementById('dniMsg');
+    if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.id = 'dniMsg';
+        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;';
+        document.getElementById('dni').parentNode.appendChild(msgEl);
+    }
+
+    msgEl.style.background = '#f8fafc';
+    msgEl.style.color = '#64748b';
+    msgEl.style.border = '1px solid #e2e8f0';
+    msgEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
+
+    try {
+        var res = await fetch('/verificar-afiliado/' + dni);
+        var data = await res.json();
+        if (data.esActivo) {
+            msgEl.style.background = '#f0fdf4';
+            msgEl.style.color = '#16a34a';
+            msgEl.style.border = '1px solid #bbf7d0';
+            msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
+            afiliadoVerificado = true;
+            // Autocompletar nombre y apellido si están vacíos
+            if (data.nombre) {
+                var partes = data.nombre.trim().split(' ');
+                if (partes.length >= 2 && !document.getElementById('apellido').value) {
+                    document.getElementById('apellido').value = partes[0];
+                    document.getElementById('nombre').value = partes.slice(1).join(' ');
+                }
+            }
+        } else {
+            msgEl.style.background = '#fef2f2';
+            msgEl.style.color = '#dc2626';
+            msgEl.style.border = '1px solid #fecaca';
+            msgEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS. No puede continuar.';
+            afiliadoVerificado = false;
+            document.getElementById('dni').value = '';
+            document.getElementById('dni').focus();
+        }
+    } catch(e) {
+        msgEl.style.background = '#fffbeb';
+        msgEl.style.color = '#d97706';
+        msgEl.style.border = '1px solid #fde68a';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá igual o consultá a IAPOS.';
+        afiliadoVerificado = true; // permitir continuar si el servicio falla
+    }
+}
 
 // ── NAVEGACIÓN DE PANTALLAS ──
 function irA(screenId) {
@@ -667,6 +730,10 @@ async function guardar() {
         'Cancer_de_prostata': vals['prostateCancer'] || ''
     };
 
+    // Mostrar spinner
+    document.querySelectorAll('.paso').forEach(function(p) { p.style.display = 'none'; });
+    document.getElementById('spinnerGuardando').style.display = 'block';
+
     try {
         var response = await fetch('/saveData', {
             method: 'POST',
@@ -693,7 +760,7 @@ function mostrarResultado(ok, msg) {
     if (ok) {
         document.getElementById('resultOk').style.display = 'block';
         document.getElementById('resultError').style.display = 'none';
-        var seg = 5;
+        var seg = 10;
         var el = document.getElementById('cuentaRegresiva');
         var timer = setInterval(function() {
             seg--;

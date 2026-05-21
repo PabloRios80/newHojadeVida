@@ -18,6 +18,59 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
 
+app.get('/verificar-afiliado/:dni', async (req, res) => {
+    const dni = req.params.dni;
+    const hoy = new Date().toISOString().split('T')[0];
+    const soapBody = `<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <BEWsValidaAfi.Execute xmlns="IAPOS_WS">
+            <Usuario>CONSULTAPDP</Usuario>
+            <Passwd>1Qaz</Passwd>
+            <Nafiliado>${dni}</Nafiliado>
+            <Badocnumdo>${dni}</Badocnumdo>
+            <Tidocodigo_de_documento>96</Tidocodigo_de_documento>
+            <Ogorcodigo>1</Ogorcodigo>
+            <Fechpresta>${hoy}</Fechpresta>
+        </BEWsValidaAfi.Execute>
+      </soap:Body>
+    </soap:Envelope>`;
+    try {
+        const response = await axios.post(
+            'https://aswe.santafe.gov.ar/iapos-sw-srvt/servlet/abewsvalidaafi',
+            soapBody,
+            {
+                headers: {
+                    'Content-Type': 'text/xml; charset=utf-8',
+                    'SOAPAction': 'IAPOS_WSaction/ABEWSVALIDAAFI.Execute'
+                },
+                timeout: 10000
+            }
+        );
+        const xml = response.data;
+        const get = (tag) => {
+            const m = xml.match(new RegExp(`<${tag}[^>]*>([^<]*)<\/${tag}>`));
+            return m ? m[1].trim() : null;
+        };
+        const estado = get('Estado');
+        res.json({
+            esActivo: estado === 'A',
+            estado,
+            nombre: get('Apenom'),
+            edad: get('Edad'),
+            sexo: get('Sexo'),
+            localidad: get('Localidad'),
+            mensaje: get('Msgdsc')
+        });
+
+        console.log('XML IAPOS:', xml.substring(0, 500));
+        console.log('Estado:', estado);
+        console.log('XML IAPOS:', xml.substring(0, 1000));
+    } catch(e) {
+        res.status(500).json({ esActivo: false, error: e.message });
+    }
+});
+
 // --- Ruta para guardar datos (CORREGIDA CON AXIOS) ---
 app.post('/saveData', async (req, res) => {
   console.log("Recibida petición en /saveData. Enviando a Apps Script...");
