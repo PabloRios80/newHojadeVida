@@ -273,7 +273,7 @@
             </div>
         </div>
         <div class="nav-row end">
-            <button class="btn-next" onclick="irPaso(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
+            <button class="btn-next" onclick="if(validarPaso(1)) irPaso(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
@@ -296,7 +296,7 @@
         </div>
         <div class="nav-row">
             <button class="btn-prev" onclick="irPaso(1)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="irPaso(3)">Siguiente <i class="fas fa-arrow-right"></i></button>
+            <button class="btn-next" onclick="if(validarPaso(2)) irPaso(3)">Siguiente <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
@@ -311,6 +311,7 @@
                         <span class="chip" id="chip-masculino" onclick="selChipSexo('masculino')"><i class="fas fa-mars" style="margin-right:5px"></i> Masculino</span>
                         <span class="chip" id="chip-femenino" onclick="selChipSexo('femenino')"><i class="fas fa-venus" style="margin-right:5px"></i> Femenino</span>
                     </div>
+                    <span id="sexoErr" style="font-size:12px; color:#dc2626; margin-top:3px; display:block;"></span>
                 </div>
                 <div class="field full">
                     <label for="genderIdentity">Género autopercibido <span class="opt">(opcional)</span></label>
@@ -341,7 +342,7 @@
         </div>
         <div class="nav-row">
             <button class="btn-prev" onclick="irPaso(2)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="irPaso(4)">Siguiente <i class="fas fa-arrow-right"></i></button>
+            <button class="btn-next" onclick="if(validarPaso(3)) irPaso(4)">Siguiente <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
@@ -453,64 +454,11 @@
 </main>
 
 <script>
+
 // ── ESTADO GLOBAL ──
 var vals = {};
 var pasoActual = 1;
 var stepNames = ['','Identificación','Contacto','Datos personales','Condiciones de salud','Hábitos','Antecedentes familiares'];
-
-var afiliadoVerificado = false;
-
-async function verificarDNI() {
-    var dni = document.getElementById('dni').value.trim();
-    if (dni.length < 7) return;
-
-    var msgEl = document.getElementById('dniMsg');
-    if (!msgEl) {
-        msgEl = document.createElement('div');
-        msgEl.id = 'dniMsg';
-        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;';
-        document.getElementById('dni').parentNode.appendChild(msgEl);
-    }
-
-    msgEl.style.background = '#f8fafc';
-    msgEl.style.color = '#64748b';
-    msgEl.style.border = '1px solid #e2e8f0';
-    msgEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
-
-    try {
-        var res = await fetch('/verificar-afiliado/' + dni);
-        var data = await res.json();
-        if (data.esActivo) {
-            msgEl.style.background = '#f0fdf4';
-            msgEl.style.color = '#16a34a';
-            msgEl.style.border = '1px solid #bbf7d0';
-            msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
-            afiliadoVerificado = true;
-            // Autocompletar nombre y apellido si están vacíos
-            if (data.nombre) {
-                var partes = data.nombre.trim().split(' ');
-                if (partes.length >= 2 && !document.getElementById('apellido').value) {
-                    document.getElementById('apellido').value = partes[0];
-                    document.getElementById('nombre').value = partes.slice(1).join(' ');
-                }
-            }
-        } else {
-            msgEl.style.background = '#fef2f2';
-            msgEl.style.color = '#dc2626';
-            msgEl.style.border = '1px solid #fecaca';
-            msgEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS. No puede continuar.';
-            afiliadoVerificado = false;
-            document.getElementById('dni').value = '';
-            document.getElementById('dni').focus();
-        }
-    } catch(e) {
-        msgEl.style.background = '#fffbeb';
-        msgEl.style.color = '#d97706';
-        msgEl.style.border = '1px solid #fde68a';
-        msgEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá igual o consultá a IAPOS.';
-        afiliadoVerificado = true; // permitir continuar si el servicio falla
-    }
-}
 
 // ── NAVEGACIÓN DE PANTALLAS ──
 function irA(screenId) {
@@ -534,6 +482,163 @@ function iniciarFormulario() {
 }
 
 // ── NAVEGACIÓN DE PASOS ──
+// ── VERIFICACIÓN IAPOS ──
+var afiliadoVerificado = false;
+
+async function verificarDNI() {
+    var dni = document.getElementById('dni').value.trim();
+    if (dni.length < 7) return;
+
+    var msgEl = document.getElementById('dniMsg');
+    if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.id = 'dniMsg';
+        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;';
+        document.getElementById('dni').parentNode.appendChild(msgEl);
+    }
+
+    msgEl.style.background = '#f8fafc';
+    msgEl.style.color = '#64748b';
+    msgEl.style.border = '1px solid #e2e8f0';
+    msgEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
+    afiliadoVerificado = false;
+
+    try {
+        var res = await fetch('/verificar-afiliado/' + dni);
+        var data = await res.json();
+        if (data.esActivo) {
+            msgEl.style.background = '#f0fdf4';
+            msgEl.style.color = '#16a34a';
+            msgEl.style.border = '1px solid #bbf7d0';
+            msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
+            afiliadoVerificado = true;
+            if (data.nombre) {
+                var partes = data.nombre.trim().split(',');
+                if (partes.length >= 2) {
+                    if (!document.getElementById('apellido').value) document.getElementById('apellido').value = partes[0].trim();
+                    if (!document.getElementById('nombre').value) document.getElementById('nombre').value = partes[1].trim();
+                }
+            }
+        } else {
+            msgEl.style.background = '#fef2f2';
+            msgEl.style.color = '#dc2626';
+            msgEl.style.border = '1px solid #fecaca';
+            msgEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS. No puede continuar.';
+            afiliadoVerificado = false;
+            document.getElementById('dni').value = '';
+            document.getElementById('dni').focus();
+        }
+    } catch(e) {
+        msgEl.style.background = '#fffbeb';
+        msgEl.style.color = '#d97706';
+        msgEl.style.border = '1px solid #fde68a';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá igual o consultá a IAPOS.';
+        afiliadoVerificado = true;
+    }
+}
+
+// ── VALIDACIONES ──
+function validarPaso(n) {
+    if (n === 1) {
+        var dni = document.getElementById('dni').value.trim();
+        var fecha = document.getElementById('birthDate').value.trim();
+        var apellido = document.getElementById('apellido').value.trim();
+        var nombre = document.getElementById('nombre').value.trim();
+
+        if (!/^\d{7,8}$/.test(dni)) {
+            mostrarError('dni', 'El DNI debe tener 7 u 8 números.');
+            return false;
+        } else { limpiarError('dni'); }
+
+        if (!afiliadoVerificado) {
+            mostrarError('dni', 'Verificá el DNI antes de continuar.');
+            return false;
+        }
+
+        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+            mostrarError('birthDate', 'Formato inválido. Usá DD/MM/AAAA.');
+            return false;
+        } else { limpiarError('birthDate'); }
+
+        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(apellido) || apellido.length < 2) {
+            mostrarError('apellido', 'Ingresá un apellido válido (solo letras).');
+            return false;
+        } else { limpiarError('apellido'); }
+
+        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(nombre) || nombre.length < 2) {
+            mostrarError('nombre', 'Ingresá un nombre válido (solo letras).');
+            return false;
+        } else { limpiarError('nombre'); }
+    }
+
+    if (n === 2) {
+        var email = document.getElementById('email').value.trim();
+        var tel = document.getElementById('phone').value.trim();
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            mostrarError('email', 'Ingresá un correo electrónico válido.');
+            return false;
+        } else { limpiarError('email'); }
+
+        if (!/^\d{10,11}$/.test(tel.replace(/[\s()-]/g, ''))) {
+            mostrarError('phone', 'El teléfono debe tener 10 dígitos sin espacios ni guiones.');
+            return false;
+        } else { limpiarError('phone'); }
+    }
+
+    if (n === 3) {
+        var altura = document.getElementById('height').value;
+        var peso = document.getElementById('weight').value;
+
+        if (!vals['biologicalSex']) {
+            mostrarErrorTexto('sexoErr', 'Seleccioná el sexo biológico.');
+            return false;
+        } else { limpiarErrorTexto('sexoErr'); }
+
+        if (!altura || parseFloat(altura) < 50 || parseFloat(altura) > 250) {
+            mostrarError('height', 'Ingresá una altura válida (entre 50 y 250 cm).');
+            return false;
+        } else { limpiarError('height'); }
+
+        if (!peso || parseFloat(peso) < 10 || parseFloat(peso) > 300) {
+            mostrarError('weight', 'Ingresá un peso válido (entre 10 y 300 kg).');
+            return false;
+        } else { limpiarError('weight'); }
+    }
+
+    return true;
+}
+
+function mostrarError(fieldId, msg) {
+    var el = document.getElementById(fieldId);
+    el.style.borderColor = '#dc2626';
+    var err = document.getElementById('err-' + fieldId);
+    if (!err) {
+        err = document.createElement('span');
+        err.id = 'err-' + fieldId;
+        err.style.cssText = 'font-size:12px; color:#dc2626; margin-top:3px; display:block;';
+        el.parentNode.appendChild(err);
+    }
+    err.textContent = msg;
+}
+
+function limpiarError(fieldId) {
+    var el = document.getElementById(fieldId);
+    el.style.borderColor = '';
+    var err = document.getElementById('err-' + fieldId);
+    if (err) err.textContent = '';
+}
+
+function mostrarErrorTexto(id, msg) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = msg;
+}
+
+function limpiarErrorTexto(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = '';
+}
+
 function irPaso(n) {
     document.querySelectorAll('.paso').forEach(p => p.style.display = 'none');
     document.getElementById('paso' + n).style.display = 'block';
