@@ -70,21 +70,71 @@ app.get('/verificar-afiliado/:dni', async (req, res) => {
         res.status(500).json({ esActivo: false, error: e.message });
     }
 });
-
-// --- Ruta para guardar datos (CORREGIDA CON AXIOS) ---
 app.post('/saveData', async (req, res) => {
-  console.log("Recibida petición en /saveData. Enviando a Apps Script...");
+  console.log("Recibida petición en /saveData...");
+  const d = req.body;
+
   try {
-    const response = await axios.post(APPS_SCRIPT_URL, {
+    // 1. Guardar en Supabase (principal)
+    const { error } = await supabase
+      .from('afiliados')
+      .upsert({
+        dni:                    d.DNI,
+        nombre:                 d.Nombre,
+        apellido:               d.Apellido,
+        fecha_nacimiento:       d.Fecha_Nacimiento,
+        edad: parseInt(d.Edad) || null,
+        email:                  d.Email,
+        telefono:               d.Telefono,
+        sexo_biologico:         d.Sexo_biologico,
+        genero_autopercibido:   d.Genero_autopercibido,
+        altura:                 d.Altura,
+        peso:                   d.Peso,
+        bmi:                    d.BMI,
+        categoria_bmi:          d.Categoria_BMI,
+        hipertension:           d.Hipertension,
+        diabetes:               d.Diabetes,
+        colesterol:             d.Colesterol,
+        depresion:              d.Depresion,
+        actividad_fisica:       d['Actividad fisica'],
+        sedentarismo:           d.sedentarismo,
+        abuso_alcohol_drogas:   d.Abuso_alcohol_drogas,
+        stress:                 d.Stress,
+        exceso_preocupacion_salud: d.Exceso_preocupacion_salud,
+        exceso_pantalla:        d.Exceso_pantalla,
+        fuma:                   d.Fuma,
+        fumador_cronico:        d.Fumador_cronico,
+        hipertension_familiar:  d.Hipertension_familiar,
+        diabetes_familiar:      d.Diabetes_familiar,
+        adicciones_familiar:    d.Adicciones_familiar,
+        obesidad_familiar:      d['Obesidad _familiar'],
+        depresion_familiar:     d.Depresion_familiar,
+        violencia_familiar:     d.Violencia_familiar,
+        cancer_de_colon:        d.Cancer_de_colon,
+        cancer_de_mama:         d.Cancer_de_mama,
+        cancer_cuello_utero:    d.Cancer_cuello_utero,
+        cancer_de_prostata:     d.Cancer_de_prostata,
+        fecha_carga:            new Date().toISOString()
+      }, { onConflict: 'dni' });
+
+    if (error) {
+      console.error('Error Supabase:', error);
+      return res.status(500).json({ success: false, message: 'Error al guardar en base de datos.' });
+    }
+
+    console.log('✅ Guardado en Supabase:', d.DNI);
+
+    // 2. Backup en Google Sheets (no bloqueante)
+    axios.post(APPS_SCRIPT_URL, {
       action: 'guardarHojaDeVida',
       payload: req.body
-    });
-    console.log("Respuesta de Apps Script (guardar):", response.data);
-    res.json(response.data);
+    }).catch(e => console.warn('Backup Google Sheets falló:', e.message));
+
+    res.json({ success: true, message: 'Datos guardados correctamente.' });
+
   } catch (error) {
-    const errorMessage = error.response ? JSON.stringify(error.response.data) : error.message;
-    console.error('Error en /saveData:', errorMessage);
-    res.status(500).json({ success: false, message: 'Error al contactar la API de guardado.' });
+    console.error('Error en /saveData:', error.message);
+    res.status(500).json({ success: false, message: 'Error al guardar.' });
   }
 });
 app.get('/getPreventivePlan/:dni', async (req, res) => {

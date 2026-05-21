@@ -719,22 +719,6 @@ function crearChipsTabaco() {
     });
 }
 
-// Duración tabaquismo (Sí/No)
-function crearChipsDuracion() {
-    var cont = document.getElementById('g-smokingDuration');
-    [['si','Sí','sel-si'],['no','No','sel-no']].forEach(function(op) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip';
-        btn.textContent = op[1];
-        btn.dataset.grupo = 'smokingDuration';
-        btn.dataset.val = op[0];
-        btn.dataset.cls = op[2];
-        btn.onclick = function() { selSiNo(this); };
-        cont.appendChild(btn);
-    });
-}
-
 // Sexo biológico
 function selChipSexo(val) {
     document.getElementById('chip-masculino').className = 'chip';
