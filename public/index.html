@@ -11,7 +11,7 @@
         body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
         /* HEADER */
-        .iapos-header { background: #0448a2; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .iapos-header { background: #0448a2; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); max-width: 85%; margin: 0 auto; border-radius: 0 0 10px 10px; }
         .iapos-header img { height: 42px; }
         .iapos-header-right { text-align: right; }
         .iapos-header-title { font-size: 14px; font-weight: 600; color: #fff; }
@@ -51,8 +51,8 @@
         /* CHIPS */
         .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
         .chip { border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; background: #fff; transition: all 0.12s; user-select: none; font-family: 'Source Sans 3', sans-serif; }
-        .chip:hover { border-color: #003366; color: #003366; background: #f0f6ff; }
-        .chip.sel-default { border-color: #003366; background: #e6f0fb; color: #003366; }
+        .chip:hover { border-color: #0448a2; color: #0448a2; background: #f0f6ff; }
+        .chip.sel-default { border-color: #0448a2; background: #e6f0fb; color: #0448a2; }
         .chip.sel-si { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
         .chip.sel-no { border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
         .chip.sel-ns { border-color: #d97706; background: #fffbeb; color: #d97706; }
@@ -60,11 +60,11 @@
         /* IMC */
         .imc-box { border-radius: 8px; padding: 14px 16px; grid-column: 1 / -1; display: none; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; background: #f8fafc; transition: all 0.2s; }
         .imc-label { font-size: 13px; color: #64748b; font-weight: 500; }
-        .imc-value { font-size: 24px; font-weight: 600; color: #003366; }
+        .imc-value { font-size: 24px; font-weight: 600; color: #0448a2; }
         .imc-cat { font-size: 13px; padding: 4px 12px; border-radius: 20px; font-weight: 600; margin-left: 10px; }
 
         /* SUB PREGUNTA */
-        .sub-pregunta { margin-top: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #003366; display: none; }
+        .sub-pregunta { margin-top: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #0448a2; display: none; }
         .sub-label { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 10px; }
 
         /* PREGUNTAS */
@@ -78,8 +78,8 @@
         .nav-row.end { justify-content: flex-end; }
         .btn-prev { background: transparent; color: #64748b; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
         .btn-prev:hover { background: #f8fafc; }
-        .btn-next { background: #003366; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
-        .btn-next:hover { background: #00285a; }
+        .btn-next { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-next:hover { background: #033d8a; }
         .btn-guardar { background: #15803d; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
         .btn-guardar:hover { background: #166534; }
 
@@ -94,16 +94,16 @@
         .welcome-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
         .welcome-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; }
         .welcome-pill i { font-size: 12px; }
-        .welcome-card-primary { background: #fff; border: 2px solid #003366; border-radius: 12px; padding: 22px 24px; margin-bottom: 8px; }
+        .welcome-card-primary { background: #fff; border: 2px solid #0448a2; border-radius: 12px; padding: 22px 24px; margin-bottom: 8px; }
         .welcome-icon { width: 38px; height: 38px; background: #e6f0fb; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-        .welcome-icon i { color: #003366; font-size: 18px; }
+        .welcome-icon i { color: #0448a2; font-size: 18px; }
         .welcome-card-title { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
         .welcome-card-desc { font-size: 13px; color: #64748b; line-height: 1.55; margin-bottom: 16px; }
-        .btn-hoja { display: block; width: 100%; text-align: center; background: #003366; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 11px 0; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
-        .btn-hoja:hover { background: #00285a; }
+        .btn-hoja { display: block; width: 100%; text-align: center; background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 11px 0; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+        .btn-hoja:hover { background: #033d8a; }
         .welcome-nota { font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 6px 4px 10px; }
         .welcome-card-secondary { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; cursor: pointer; display: flex; align-items: center; }
-        .welcome-card-secondary:hover { border-color: #003366; }
+        .welcome-card-secondary:hover { border-color: #0448a2; }
         .secondary-banda { width: 5px; background: #16a34a; align-self: stretch; flex-shrink: 0; }
         .secondary-content { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; flex: 1; }
         .secondary-left { display: flex; align-items: center; gap: 12px; }
@@ -114,23 +114,23 @@
         .secondary-arr { color: #94a3b8; font-size: 16px; }
 
         /* CONSENT */
-        .consent-section-title { font-size: 12px; font-weight: 600; color: #003366; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+        .consent-section-title { font-size: 12px; font-weight: 600; color: #0448a2; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
         .consent-body { font-size: 14px; color: #64748b; line-height: 1.7; }
         .consent-body strong { color: #1e293b; font-weight: 600; }
         .consent-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .consent-pill { display: flex; align-items: center; gap: 5px; background: #e6f0fb; color: #003366; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; }
+        .consent-pill { display: flex; align-items: center; gap: 5px; background: #e6f0fb; color: #0448a2; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; }
         .derechos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
         .derecho { display: flex; align-items: flex-start; gap: 8px; }
         .derecho i { font-size: 15px; color: #16a34a; margin-top: 2px; flex-shrink: 0; }
         .derecho-text { font-size: 13px; color: #64748b; line-height: 1.5; }
         .derecho-text strong { color: #1e293b; font-weight: 600; }
         .checkbox-row { display: flex; align-items: flex-start; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; cursor: pointer; }
-        .checkbox-row input[type=checkbox] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: #003366; cursor: pointer; }
+        .checkbox-row input[type=checkbox] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: #0448a2; cursor: pointer; }
         .checkbox-label { font-size: 14px; color: #1e293b; line-height: 1.55; cursor: pointer; }
         .checkbox-label span { color: #64748b; font-size: 13px; display: block; margin-top: 3px; }
         .btn-continuar { display: block; width: 100%; text-align: center; background: #94a3b8; color: #fff; font-size: 15px; font-weight: 600; border: none; border-radius: 6px; padding: 13px 0; cursor: not-allowed; font-family: 'Source Sans 3', sans-serif; transition: background 0.2s; }
-        .btn-continuar.active { background: #003366; cursor: pointer; }
-        .btn-continuar.active:hover { background: #00285a; }
+        .btn-continuar.active { background: #0448a2; cursor: pointer; }
+        .btn-continuar.active:hover { background: #033d8a; }
         .ley-ref { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 10px; }
 
         /* SCREENS */
@@ -138,6 +138,11 @@
         .screen.visible { display: block; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 540px) {
+            .iapos-header { max-width: 100%; padding: 10px 16px; gap: 12px; }
+            .iapos-header img { height: 34px; }
+        }
 
         @media (max-width: 540px) {
             .grid2 { grid-template-columns: 1fr; }
@@ -419,8 +424,8 @@
 
     <!-- SPINNER DE CARGA -->
     <div id="spinnerGuardando" style="display:none; text-align:center; padding: 3rem 1rem;">
-        <div style="width:56px; height:56px; border:4px solid #e2e8f0; border-top-color:#003366; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.25rem;"></div>
-        <p style="font-size:16px; font-weight:600; color:#003366; margin-bottom:6px;">Guardando sus datos...</p>
+        <div style="width:56px; height:56px; border:4px solid #e2e8f0; border-top-color:#0448a2; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.25rem;"></div>
+        <p style="font-size:16px; font-weight:600; color:#0448a2; margin-bottom:6px;">Guardando sus datos...</p>
         <p style="font-size:13px; color:#94a3b8;">Por favor no cierre esta página.</p>
     </div>
 
@@ -439,7 +444,7 @@
                 <i class="fas fa-clock" style="color:#16a34a; font-size:15px; flex-shrink:0;"></i>
                 <span style="font-size:13px; color:#166534;" id="cuentaRegresiva">Redirigiendo en 10 segundos...</span>
             </div>
-            <button onclick="window.location.href='index.html'" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
+            <button onclick="window.location.href='index.html'" style="background:#0448a2; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
                 Ir al inicio ahora <i class="fas fa-arrow-right"></i>
             </button>
         </div>
@@ -451,7 +456,7 @@
             </div>
             <h2 style="font-size:22px; font-weight:600; color:#1e293b; margin-bottom:8px;">No se pudo guardar</h2>
             <p style="font-size:15px; color:#64748b; line-height:1.6; max-width:380px; margin:0 auto 1.5rem;" id="errorMsg">Ocurrió un error al guardar sus datos. Por favor intente nuevamente o comuníquese con IAPOS.</p>
-            <button onclick="irPasoDesdeError()" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
+            <button onclick="irPasoDesdeError()" style="background:#0448a2; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
                 <i class="fas fa-arrow-left"></i> Volver e intentar de nuevo
             </button>
         </div>
