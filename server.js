@@ -126,6 +126,46 @@ app.post('/saveData', async (req, res) => {
 
     console.log('✅ Guardado en Supabase:', d.DNI);
 
+    // Guardar copia histórica
+await supabase.from('historial_hoja_de_vida').insert({
+    dni:                       d.DNI,
+    nombre:                    d.Nombre,
+    apellido:                  d.Apellido,
+    fecha_nacimiento:          d.Fecha_Nacimiento,
+    edad:                      parseInt(d.Edad) || null,
+    email:                     d.Email,
+    telefono:                  d.Telefono,
+    sexo_biologico:            d.Sexo_biologico,
+    genero_autopercibido:      d.Genero_autopercibido,
+    altura:                    d.Altura,
+    peso:                      d.Peso,
+    bmi:                       d.BMI,
+    categoria_bmi:             d.Categoria_BMI,
+    hipertension:              d.Hipertension,
+    diabetes:                  d.Diabetes,
+    colesterol:                d.Colesterol,
+    depresion:                 d.Depresion,
+    actividad_fisica:          d['Actividad fisica'],
+    sedentarismo:              d.sedentarismo,
+    abuso_alcohol_drogas:      d.Abuso_alcohol_drogas,
+    stress:                    d.Stress,
+    exceso_preocupacion_salud: d.Exceso_preocupacion_salud,
+    exceso_pantalla:           d.Exceso_pantalla,
+    fuma:                      d.Fuma,
+    fumador_cronico:           d.Fumador_cronico,
+    hipertension_familiar:     d.Hipertension_familiar,
+    diabetes_familiar:         d.Diabetes_familiar,
+    adicciones_familiar:       d.Adicciones_familiar,
+    obesidad_familiar:         d['Obesidad _familiar'],
+    depresion_familiar:        d.Depresion_familiar,
+    violencia_familiar:        d.Violencia_familiar,
+    cancer_de_colon:           d.Cancer_de_colon,
+    cancer_de_mama:            d.Cancer_de_mama,
+    cancer_cuello_utero:       d.Cancer_cuello_utero,
+    cancer_de_prostata:        d.Cancer_de_prostata
+});
+console.log('✅ Historial guardado:', d.DNI);
+
     // 2. Backup en Google Sheets (no bloqueante)
     axios.post(APPS_SCRIPT_URL, {
       action: 'guardarHojaDeVida',
@@ -721,6 +761,42 @@ app.get('/getDatosAfiliado/:dni', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error de conexión.' });
   }
+});
+
+app.get('/verificar-elegibilidad/:dni', async (req, res) => {
+    const dni = req.params.dni;
+    try {
+        const { data: cierres } = await supabase
+            .from('historial_dia_preventivo')
+            .select('fechax')
+            .eq('dni', dni)
+            .order('fechax', { ascending: false })
+            .limit(1);
+
+        if (!cierres || cierres.length === 0) {
+            return res.json({ elegible: true, mensaje: null });
+        }
+
+        const ultimoCierre = new Date(cierres[0].fechax);
+        const hoy = new Date();
+        const diasTranscurridos = (hoy - ultimoCierre) / (1000 * 60 * 60 * 24);
+
+        if (diasTranscurridos < 365) {
+            const diasRestantes = Math.ceil(365 - diasTranscurridos);
+            const fechaHabilitacion = new Date(ultimoCierre);
+            fechaHabilitacion.setFullYear(fechaHabilitacion.getFullYear() + 1);
+            const fechaStr = fechaHabilitacion.toLocaleDateString('es-AR');
+            return res.json({
+                elegible: false,
+                mensaje: `Ya realizó un Día Preventivo el ${ultimoCierre.toLocaleDateString('es-AR')}. Podrá realizar uno nuevo a partir del ${fechaStr} (faltan ${diasRestantes} días).`
+            });
+        }
+
+        res.json({ elegible: true, mensaje: null });
+    } catch(e) {
+        console.error('Error verificar elegibilidad:', e.message);
+        res.json({ elegible: true, mensaje: null }); // en caso de error dejamos pasar
+    }
 });
 
 const PORT = process.env.PORT || 3000;

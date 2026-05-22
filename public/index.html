@@ -486,6 +486,7 @@ function iniciarFormulario() {
 var afiliadoVerificado = false;
 
 async function verificarDNI() {
+    console.log('Verificando elegibilidad para DNI:', dni);
     var dni = document.getElementById('dni').value.trim();
     if (dni.length < 7) return;
 
@@ -507,18 +508,32 @@ async function verificarDNI() {
         var res = await fetch('/verificar-afiliado/' + dni);
         var data = await res.json();
         if (data.esActivo) {
-            msgEl.style.background = '#f0fdf4';
-            msgEl.style.color = '#16a34a';
-            msgEl.style.border = '1px solid #bbf7d0';
-            msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
-            afiliadoVerificado = true;
-            if (data.nombre) {
-                var partes = data.nombre.trim().split(',');
-                if (partes.length >= 2) {
-                    if (!document.getElementById('apellido').value) document.getElementById('apellido').value = partes[0].trim();
-                    if (!document.getElementById('nombre').value) document.getElementById('nombre').value = partes[1].trim();
-                }
+    // Verificar elegibilidad (último DP)
+    const eligRes = await fetch('/verificar-elegibilidad/' + dni);
+    const eligData = await eligRes.json();
+
+        if (!eligData.elegible) {
+            msgEl.style.background = '#fffbeb';
+            msgEl.style.color = '#d97706';
+            msgEl.style.border = '1px solid #fde68a';
+            msgEl.innerHTML = '<i class="fas fa-calendar-times" style="margin-right:6px"></i>' + eligData.mensaje;
+            afiliadoVerificado = false;
+            return;
+        }
+
+        msgEl.style.background = '#f0fdf4';
+        msgEl.style.color = '#16a34a';
+        msgEl.style.border = '1px solid #bbf7d0';
+        msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
+        afiliadoVerificado = true;
+        if (data.nombre) {
+            var partes = data.nombre.trim().split(',');
+            if (partes.length >= 2) {
+                if (!document.getElementById('apellido').value) document.getElementById('apellido').value = partes[0].trim();
+                if (!document.getElementById('nombre').value) document.getElementById('nombre').value = partes[1].trim();
             }
+        }
+
         } else {
             msgEl.style.background = '#fef2f2';
             msgEl.style.color = '#dc2626';
@@ -877,7 +892,6 @@ function irPasoDesdeError() {
 // ── INICIALIZACIÓN ──
 grupos.forEach(function(g) { crearChipsSiNo(g); });
 crearChipsTabaco();
-crearChipsDuracion();
 </script>
 
 </body>
