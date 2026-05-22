@@ -11,14 +11,14 @@
         body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
         /* HEADER */
-        .iapos-header { background: #003366; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .iapos-header { background: #0448a2; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .iapos-header img { height: 42px; }
         .iapos-header-right { text-align: right; }
         .iapos-header-title { font-size: 14px; font-weight: 600; color: #fff; }
         .iapos-header-sub { font-size: 12px; color: rgba(255,255,255,0.6); }
 
         /* PROGRESS */
-        .progress-outer { background: #003366; padding: 0 24px 12px; display: none; }
+        .progress-outer { background: #0448a2; padding: 0 24px 12px; display: none; }
         .progress-steps { display: flex; gap: 5px; max-width: 720px; margin: 0 auto 5px; }
         .progress-step { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.2); transition: background 0.3s; }
         .progress-step.done { background: #fff; }
@@ -31,8 +31,8 @@
 
         /* CARDS */
         .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 14px; }
-        .step-title { font-size: 17px; font-weight: 600; color: #003366; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .step-num { width: 28px; height: 28px; background: #003366; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        .step-title { font-size: 17px; font-weight: 600; color: #0448a2; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .step-num { width: 28px; height: 28px; background: #0448a2; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
         .step-intro { font-size: 15px; color: #475569; margin: -12px 0 18px; line-height: 1.65; font-weight: 500; }
 
         /* FIELDS */
@@ -43,7 +43,7 @@
         .req { color: #dc2626; margin-left: 2px; }
         .opt { color: #94a3b8; font-weight: 400; font-size: 12px; margin-left: 4px; }
         .field input, .field select { font-family: 'Source Sans 3', sans-serif; font-size: 15px; color: #1e293b; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
-        .field input:focus, .field select:focus { border-color: #003366; box-shadow: 0 0 0 3px rgba(0,51,102,0.08); }
+        .field input:focus, .field select:focus { border-color: #0448a2; box-shadow: 0 0 0 3px rgba(0,51,102,0.08); }
         .field input[readonly] { background: #f8fafc; color: #94a3b8; cursor: default; }
         .field-hint { font-size: 12px; color: #94a3b8; }
         .error-msg { font-size: 12px; color: #dc2626; margin-top: 2px; display: none; }
@@ -84,7 +84,7 @@
         .btn-guardar:hover { background: #166534; }
 
         /* WELCOME */
-        .welcome-header { background: #003366; border-radius: 12px; padding: 28px 28px 32px; margin-bottom: 16px; }
+        .welcome-header { background: #0448a2; border-radius: 12px; padding: 28px 28px 32px; margin-bottom: 16px; }
         .welcome-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
         .welcome-logo-circle { width: 38px; height: 38px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .welcome-logo-circle i { font-size: 18px; color: #fff; }
@@ -149,10 +149,21 @@
 
 <header class="iapos-header">
     <img src="images/logo_iapos.png" alt="Logo IAPOS" style="height:42px; display:block;">
-    <div class="iapos-header-right">
-        <p class="iapos-header-title">Hoja de Vida</p>
-        <p class="iapos-header-sub">Día Preventivo</p>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DÍA</span>
+        <div style="display:flex; align-items:center;">
+            <span style="font-size:20px; font-weight:700; color:#ff2020; letter-spacing:0.04em; text-transform:uppercase; line-height:1;">PREVENTIV</span>
+            <svg width="20" height="24" viewBox="0 0 22 28" style="margin-left:-1px; flex-shrink:0;">
+                <path d="M13,2.5 A9,9 0 1,1 9,2.5" fill="none" stroke="#ff2020" 
+                        stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="11" cy="11" r="3" fill="#ffffff"/>
+                <polygon points="11,15 8.5,21 11,27 13.5,21" fill="#4a9fd4"/>
+            </svg>
+        </div>
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DE LA SALUD</span>
+        <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.5); letter-spacing:0.05em;">Hoja de Vida</span>
     </div>
+    <div style="width:80px"></div>
 </header>
 
 <div class="progress-outer" id="progressBar">
@@ -172,10 +183,6 @@
 <!-- PANTALLA 1: BIENVENIDA -->
 <div id="screenWelcome" class="screen visible">
     <div class="welcome-header">
-        <div class="welcome-logo-row">
-            <div class="welcome-logo-circle"><i class="fas fa-shield-heart"></i></div>
-            <span class="welcome-logo-text">IAPOS · Día Preventivo</span>
-        </div>
         <h1 class="welcome-headline">Bienvenido a Día Preventivo</h1>
         <p class="welcome-sub">Este programa le permitirá conocer qué estudios preventivos son recomendables para usted según su edad, sexo y factores de riesgo.</p>
         <div class="welcome-pills">
