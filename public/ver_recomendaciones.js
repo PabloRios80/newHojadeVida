@@ -2,9 +2,120 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultadosDiv = document.getElementById('resultadosRecomendaciones');
   const LINK_RESULTADOS = "https://portal-afiliado-iapos.onrender.com/";
 
+  const GRUPOS = [
+    {
+      id: 'cardiovascular',
+      titulo: 'Cardiovascular',
+      subtitulo: 'Presión arterial, colesterol, riesgo cardíaco',
+      icono: 'fas fa-heart-pulse',
+      color: '#fee2e2', colorIcono: '#dc2626', colorTitulo: '#991b1b',
+      practicas: ['tomar ta ambos brazos personal capacitado','colesterol total, hdl/colesterol, ldl/colesterol, trigliceridos','ldl/colesterol','estratificacion riesgo cv','aspirina']
+    },
+    {
+      id: 'metabolico',
+      titulo: 'Metabólico',
+      subtitulo: 'Glucemia, diabetes, dislipemias',
+      icono: 'fas fa-droplet',
+      color: '#fef3c7', colorIcono: '#d97706', colorTitulo: '#92400e',
+      practicas: ['glucemia en ayunas','dislipemias','diabetes','imc','calcular imc']
+    },
+    {
+      id: 'oncologico',
+      titulo: 'Oncológico',
+      subtitulo: 'Detección temprana de cáncer',
+      icono: 'fas fa-ribbon',
+      color: '#fce7f3', colorIcono: '#db2777', colorTitulo: '#9d174d',
+      practicas: ['papanicolau','test hpv','mamografia','ecografia mamaria','antigeno prostatico especifico total - psa','sangre oculta en materia fecal - somf','videocolonoscopia - vcc','cancer piel','control piel']
+    },
+    {
+      id: 'infeccioso',
+      titulo: 'Infeccioso',
+      subtitulo: 'Detección de infecciones',
+      icono: 'fas fa-virus',
+      color: '#dcfce7', colorIcono: '#16a34a', colorTitulo: '#166534',
+      practicas: ['anticuerpos anti_vih','hepatitis b antigeno de superficie_aghb','hepatitis c _hcv_ac_igg','vdrl','test chagas']
+    },
+    {
+      id: 'vacunas',
+      titulo: 'Vacunas',
+      subtitulo: 'Inmunizaciones recomendadas',
+      icono: 'fas fa-syringe',
+      color: '#e0e7ff', colorIcono: '#4f46e5', colorTitulo: '#3730a3',
+      practicas: ['vacunas','inmunizaciones']
+    },
+    {
+      id: 'respiratorio',
+      titulo: 'Respiratorio',
+      subtitulo: 'Pulmones y circulación',
+      icono: 'fas fa-lungs',
+      color: '#e0f2fe', colorIcono: '#0284c7', colorTitulo: '#0c4a6e',
+      practicas: ['espirometria','epoc','ecografia abdominal','aneurisma aorta']
+    },
+    {
+      id: 'renal',
+      titulo: 'Salud Renal',
+      subtitulo: 'Función renal',
+      icono: 'fas fa-flask',
+      color: '#f0fdf4', colorIcono: '#059669', colorTitulo: '#065f46',
+      practicas: ['creatinina, formula filtrado glomerular','filtrado glomerular','creatinina']
+    },
+    {
+      id: 'habitos',
+      titulo: 'Hábitos',
+      subtitulo: 'IMC, tabaco, actividad física',
+      icono: 'fas fa-person-running',
+      color: '#fff7ed', colorIcono: '#ea580c', colorTitulo: '#7c2d12',
+      practicas: ['calcular imc','imc','consejeria/tratamiento tabaquismo','consejeria actividad fisica','sedentarismo']
+    },
+    {
+      id: 'bucal',
+      titulo: 'Salud Bucal',
+      subtitulo: 'Control odontológico',
+      icono: 'fas fa-tooth',
+      color: '#f0f9ff', colorIcono: '#0369a1', colorTitulo: '#0c4a6e',
+      practicas: ['control odontologico']
+    },
+    {
+      id: 'tercera_edad',
+      titulo: 'Cuidado de la tercera edad',
+      subtitulo: 'Osteoporosis y prevención de caídas',
+      icono: 'fas fa-person-cane',
+      color: '#faf5ff', colorIcono: '#7c3aed', colorTitulo: '#4c1d95',
+      practicas: ['densitometria osea','consejeria/tratamiento caida adultos mayores','caidas']
+    },
+    {
+      id: 'mental',
+      titulo: 'Salud Mental',
+      subtitulo: 'Depresión, violencia, adicciones',
+      icono: 'fas fa-brain',
+      color: '#fdf4ff', colorIcono: '#a21caf', colorTitulo: '#701a75',
+      practicas: ['consejeria/tratamiento depresion','consejeria/tratamiento alcohol y/o drogas','consejeria/tratamiento violencia familiar']
+    },
+    {
+      id: 'vision',
+      titulo: 'Visión',
+      subtitulo: 'Control visual',
+      icono: 'fas fa-eye',
+      color: '#f0fdfa', colorIcono: '#0d9488', colorTitulo: '#134e4a',
+      practicas: ['control vision','agudeza visual']
+    }
+  ];
+
+  const normalizar = t => (t||'').toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+  function asignarGrupo(practica) {
+    const norm = normalizar(practica);
+    for (const g of GRUPOS) {
+      if (g.practicas.some(p => norm.includes(normalizar(p)) || normalizar(p).includes(norm))) {
+        return g.id;
+      }
+    }
+    return 'otros';
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const dniUrl = urlParams.get('dni');
-
   if (dniUrl) {
     document.getElementById('dniBuscar').value = dniUrl;
     buscarRecomendaciones(dniUrl);
@@ -16,228 +127,226 @@ document.addEventListener('DOMContentLoaded', function () {
     buscarRecomendaciones(dni);
   });
 
+  document.getElementById('dniBuscar').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const dni = this.value.trim();
+      if (dni) buscarRecomendaciones(dni);
+    }
+  });
+
   async function buscarRecomendaciones(dni) {
     resultadosDiv.innerHTML = `
-      <div style="text-align:center; padding:2rem;">
-        <i class="fas fa-spinner fa-spin fa-2x" style="color:#003366;"></i>
-        <p style="margin-top:1rem; color:#666;">Buscando tus recomendaciones...</p>
+      <div class="spinner-box">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Buscando tus recomendaciones...</p>
       </div>`;
 
     try {
-      const response = await fetch(`/getPracticasGuardadas/${dni}`);
+      const response = await fetch('/getPracticasGuardadas/' + dni);
       const data = await response.json();
 
       if (data.success) {
-        mostrarRecomendacionesPaciente(data, dni);
+        mostrarRecomendaciones(data, dni);
       } else {
         resultadosDiv.innerHTML = `
-          <div style="background:#fff3cd; border-left:4px solid #ffc107; padding:1.5rem; border-radius:8px; text-align:center;">
-            <p style="font-size:1.1rem; color:#856404; margin-bottom:1rem;">
-              <i class="fas fa-info-circle"></i> No encontramos recomendaciones guardadas para tu DNI.
-            </p>
-            <p style="color:#666; margin-bottom:1.5rem;">
-              Si ya completaste tu Hoja de Vida, podés generar tus recomendaciones ahora.
-            </p>
-            <button onclick="generarNuevas('${dni}')"
-              style="background:#003366; color:white; padding:12px 28px; border-radius:8px; border:none; font-weight:bold; cursor:pointer; font-size:1rem;">
-              <i class="fas fa-sync-alt"></i> Generar Recomendaciones
+          <div class="card" style="text-align:center;">
+            <i class="fas fa-info-circle" style="font-size:2rem; color:#f59e0b; margin-bottom:12px; display:block;"></i>
+            <p style="font-size:16px; color:#92400e; font-weight:600; margin-bottom:8px;">No encontramos recomendaciones para tu DNI.</p>
+            <p style="font-size:14px; color:#64748b; margin-bottom:20px;">Si completaste tu Hoja de Vida podés generar tus recomendaciones ahora.</p>
+            <button onclick="generarNuevas('${dni}')" class="btn-buscar" style="margin:0 auto;">
+              <i class="fas fa-sync-alt"></i> Generar recomendaciones
             </button>
           </div>`;
       }
     } catch (error) {
       resultadosDiv.innerHTML = `
-        <div style="background:#fee2e2; border-left:4px solid #ef4444; padding:1rem; border-radius:8px;">
-          <p style="color:#991b1b;">Error de conexión. Intentá de nuevo en unos minutos.</p>
+        <div class="card" style="border-left: 4px solid #ef4444;">
+          <p style="color:#991b1b; font-size:14px;"><i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>Error de conexión. Intentá de nuevo en unos minutos.</p>
         </div>`;
     }
   }
 
-  function mostrarRecomendacionesPaciente(data, dni) {
+  function mostrarRecomendaciones(data, dni) {
+    const nombre = (data.nombre || '').trim();
+    const pendientes = data.pendientes || [];
+    const alDia = data.alDia || [];
+    const total = pendientes.length + alDia.length;
+
     let html = '';
 
-    // --- SALUDO ---
-    if (data.nombre && data.nombre.trim()) {
-      html += `
-        <div style="margin-bottom:1.5rem; padding:1rem 1.5rem; background:#f0f7ff; border-radius:10px;">
-          <p style="font-size:1.2rem; color:#003366; font-weight:bold; margin:0;">
-            <i class="fas fa-user-circle" style="margin-right:8px;"></i>
-            Hola, ${data.nombre.trim()}
-          </p>
-          <p style="color:#555; margin:4px 0 0 0; font-size:0.95rem;">
-            Este es tu resumen personalizado del Día Preventivo IAPOS.
-          </p>
-        </div>`;
-    }
-
-    // --- SECCIÓN 1: PENDIENTES ---
-    if (data.pendientes && data.pendientes.length > 0) {
-
-      // Agrupamos por subcategoría
-      const grupos = {};
-      data.pendientes.forEach(p => {
-        const grupo = p.subcategoria || 'General';
-        if (!grupos[grupo]) grupos[grupo] = [];
-        grupos[grupo].push(p);
-      });
-
-      html += `
-        <div style="margin-bottom:2rem;">
-          <h3 style="font-size:1.2rem; font-weight:bold; color:#003366; margin-bottom:1rem; 
-                     display:flex; align-items:center; gap:8px; padding-bottom:8px; 
-                     border-bottom:2px solid #003366;">
-            <i class="fas fa-clipboard-list" style="color:#003366;"></i>
-            Te recomendamos realizar
-          </h3>`;
-
-      for (const [grupo, practicas] of Object.entries(grupos)) {
-        html += `
-          <div style="margin-bottom:1rem;">
-            <p style="font-size:0.8rem; font-weight:bold; color:#888; text-transform:uppercase; 
-                      letter-spacing:1px; margin-bottom:8px;">${grupo}</p>`;
-
-        practicas.forEach(p => {
-          const textoUltimaVez = p.ultimaVez 
-            ? `<span style="font-size:0.8rem; color:#f59e0b; margin-left:8px;">
-                <i class="fas fa-clock"></i> Última vez: ${p.ultimaVez} — venció
-               </span>` 
-            : '';
-
-          html += `
-            <div style="background:white; border-radius:10px; padding:14px 18px; 
-                        border-left:5px solid #3b82f6; box-shadow:0 2px 6px rgba(0,0,0,0.07); 
-                        margin-bottom:8px; display:flex; align-items:center; gap:12px;">
-              <div style="background:#dbeafe; border-radius:50%; width:36px; height:36px; 
-                          display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                <i class="fas fa-stethoscope" style="color:#2563eb; font-size:0.9rem;"></i>
-              </div>
-              <div>
-                <p style="font-weight:600; color:#1e3a8a; margin:0; font-size:0.95rem;">
-                  ${p.practica}
-                </p>
-                ${textoUltimaVez}
-              </div>
-            </div>`;
-        });
-
-        html += `</div>`;
-      }
-
-      html += `</div>`;
-    }
-
-    // --- SECCIÓN 2: AL DÍA ---
-    if (data.alDia && data.alDia.length > 0) {
-      html += `
-        <div style="margin-bottom:2rem;">
-          <h3 style="font-size:1.2rem; font-weight:bold; color:#166534; margin-bottom:1rem;
-                     display:flex; align-items:center; gap:8px; padding-bottom:8px;
-                     border-bottom:2px solid #22c55e;">
-            <i class="fas fa-check-circle" style="color:#22c55e;"></i>
-            ¡Estás al día con estas prácticas!
-          </h3>
-          <div style="display:grid; gap:10px;">`;
-
-      data.alDia.forEach(p => {
-        html += `
-          <div style="background:white; border-radius:10px; padding:14px 18px;
-                      border-left:5px solid #22c55e; box-shadow:0 2px 6px rgba(0,0,0,0.07);">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
-              <div style="background:#dcfce7; border-radius:50%; width:36px; height:36px;
-                          display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                <i class="fas fa-check-circle" style="color:#16a34a; font-size:0.9rem;"></i>
-              </div>
-              <p style="font-weight:600; color:#166534; margin:0; font-size:0.95rem;">
-                ${p.practica}
-              </p>
-            </div>
-            <div style="display:flex; gap:20px; padding-left:48px; flex-wrap:wrap;">
-              <span style="font-size:0.82rem; color:#555;">
-                <i class="fas fa-calendar-check" style="color:#16a34a; margin-right:4px;"></i>
-                Realizada: <strong>${p.fechaRealizacion}</strong>
-              </span>
-              <span style="font-size:0.82rem; color:#555;">
-                <i class="fas fa-calendar-alt" style="color:#f59e0b; margin-right:4px;"></i>
-                Repetir a partir de: <strong>${p.fechaVencimiento}</strong>
-              </span>
-            </div>
-          </div>`;
-      });
-
-      html += `</div></div>`;
-    }
-
-    // --- SECCIÓN 3: TUS RESULTADOS ---
+    // BIENVENIDA
     html += `
-      <div style="margin-bottom:2rem; background:linear-gradient(135deg, #f0f9ff, #e0f2fe); 
-                  border:1px solid #bae6fd; border-radius:12px; padding:1.5rem; text-align:center;">
-        <i class="fas fa-file-medical-alt" style="font-size:2rem; color:#0284c7; margin-bottom:8px; display:block;"></i>
-        <h3 style="color:#0369a1; font-weight:bold; margin:0 0 6px 0; font-size:1.1rem;">
-          Tus Resultados Completos
-        </h3>
-        <p style="color:#555; margin-bottom:1rem; font-size:0.9rem; line-height:1.5;">
-          En el Portal del Afiliado podés ver el detalle de todos tus estudios realizados, 
-          informes médicos y resultados con sus conclusiones.
-        </p>
-        <a href="${LINK_RESULTADOS}" target="_blank"
-          style="display:inline-block; background:#0284c7; color:white; padding:10px 28px; 
-                 border-radius:8px; text-decoration:none; font-weight:bold; font-size:0.95rem;
-                 transition:background 0.2s;">
-          <i class="fas fa-external-link-alt" style="margin-right:6px;"></i> 
-          Ver mis resultados en el Portal
+      <div class="welcome-box">
+        <p class="welcome-name"><i class="fas fa-user-circle" style="margin-right:8px; opacity:0.8;"></i>${nombre || 'Afiliado/a'}</p>
+        <p class="welcome-sub">Este es tu resumen personalizado del Día Preventivo IAPOS.</p>
+      </div>`;
+
+    // EXPLICACIÓN
+    html += `
+      <div class="explicacion-box">
+        <p>Las prácticas que ves a continuación fueron seleccionadas <strong>especialmente para vos</strong> en base a tu edad, sexo biológico y antecedentes personales y familiares. Todas están <strong>basadas en la evidencia médica más reciente</strong> y se encuentran en este momento <strong>autorizadas sin cargo</strong> para que las realices en el marco del Día Preventivo a la brevedad.</p>
+      </div>`;
+
+    // CHIPS RESUMEN
+    html += `<div class="resumen-row">`;
+    if (pendientes.length > 0) {
+      html += `<div class="resumen-chip chip-pendiente"><i class="fas fa-clipboard-list"></i> ${pendientes.length} práctica${pendientes.length > 1 ? 's' : ''} recomendada${pendientes.length > 1 ? 's' : ''}</div>`;
+    }
+    if (alDia.length > 0) {
+      html += `<div class="resumen-chip chip-aldia"><i class="fas fa-check-circle"></i> ${alDia.length} al día</div>`;
+    }
+    html += `</div>`;
+
+    // AGRUPAR PENDIENTES
+    if (pendientes.length > 0) {
+      html += `<h3 style="font-size:17px; font-weight:700; color:#0448a2; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-clipboard-list"></i> Te recomendamos realizar
+      </h3>`;
+
+      const porGrupo = {};
+      pendientes.forEach(p => {
+        const gid = asignarGrupo(p.practica);
+        if (!porGrupo[gid]) porGrupo[gid] = [];
+        porGrupo[gid].push(p);
+      });
+
+      GRUPOS.forEach(g => {
+        if (!porGrupo[g.id]) return;
+        html += renderGrupo(g, porGrupo[g.id], false);
+      });
+
+      if (porGrupo['otros']) {
+        html += renderGrupoOtros(porGrupo['otros'], false);
+      }
+    }
+
+    // AGRUPAR AL DÍA
+    if (alDia.length > 0) {
+      html += `<h3 style="font-size:17px; font-weight:700; color:#166534; margin: 24px 0 14px; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-check-circle" style="color:#16a34a;"></i> ¡Estás al día con estas prácticas!
+      </h3>`;
+
+      const porGrupoAD = {};
+      alDia.forEach(p => {
+        const gid = asignarGrupo(p.practica);
+        if (!porGrupoAD[gid]) porGrupoAD[gid] = [];
+        porGrupoAD[gid].push(p);
+      });
+
+      GRUPOS.forEach(g => {
+        if (!porGrupoAD[g.id]) return;
+        html += renderGrupo(g, porGrupoAD[g.id], true);
+      });
+    }
+
+    // PORTAL
+    html += `
+      <div class="portal-box">
+        <i class="fas fa-file-medical-alt" style="font-size:2rem; color:#0448a2; margin-bottom:10px; display:block;"></i>
+        <h3>Tus resultados completos</h3>
+        <p>En el Portal del Afiliado podés ver el detalle de todos tus estudios, informes médicos y resultados con sus conclusiones.</p>
+        <a href="${LINK_RESULTADOS}" target="_blank" class="btn-portal">
+          <i class="fas fa-external-link-alt"></i> Ver mis resultados en el Portal
         </a>
       </div>`;
 
-    // --- BOTÓN ACTUALIZAR ---
+    // ACTUALIZAR
     html += `
-      <div style="text-align:center; padding-top:1rem; border-top:1px solid #e5e7eb;">
-        <p style="color:#888; font-size:0.82rem; margin-bottom:10px;">
-          ¿Actualizaste tus datos de salud recientemente?
-        </p>
-        <button onclick="generarNuevas('${dni}')"
-          style="background:white; color:#003366; border:2px solid #003366; padding:9px 22px; 
-                 border-radius:8px; font-weight:bold; cursor:pointer; font-size:0.88rem;">
-          <i class="fas fa-sync-alt" style="margin-right:6px;"></i> Actualizar recomendaciones
+      <div class="actualizar-row">
+        <p style="font-size:13px; color:#94a3b8; margin-bottom:10px;">¿Actualizaste tus datos de salud recientemente?</p>
+        <button onclick="generarNuevas('${dni}')" class="btn-actualizar">
+          <i class="fas fa-sync-alt"></i> Actualizar recomendaciones
         </button>
       </div>`;
 
     resultadosDiv.innerHTML = html;
   }
 
-  // --- REGENERAR ---
+  function renderGrupo(g, practicas, esAlDia) {
+    let html = `
+      <div class="card" style="margin-bottom:14px;">
+        <div class="grupo-header">
+          <div class="grupo-icon" style="background:${g.color};">
+            <i class="${g.icono}" style="color:${g.colorIcono};"></i>
+          </div>
+          <div>
+            <p class="grupo-titulo" style="color:${g.colorTitulo};">${g.titulo}</p>
+            <p class="grupo-subtitulo">${g.subtitulo}</p>
+          </div>
+        </div>`;
+
+    practicas.forEach(p => {
+      if (esAlDia) {
+        html += `
+          <div class="practica-item item-aldia">
+            <div class="practica-badge"><i class="fas fa-check-circle"></i></div>
+            <div class="practica-texto">
+              <p class="practica-nombre">${p.practica}</p>
+              <div class="practica-detalle">
+                <span><i class="fas fa-calendar-check" style="color:#16a34a;"></i> Realizada: <strong>${p.fechaRealizacion}</strong></span>
+                <span><i class="fas fa-calendar-alt" style="color:#f59e0b;"></i> Repetir a partir de: <strong>${p.fechaVencimiento}</strong></span>
+              </div>
+            </div>
+          </div>`;
+      } else if (p.ultimaVez) {
+        html += `
+          <div class="practica-item item-vencido">
+            <div class="practica-badge"><i class="fas fa-clock"></i></div>
+            <div class="practica-texto">
+              <p class="practica-nombre">${p.practica}</p>
+              <div class="practica-detalle">
+                <span><i class="fas fa-calendar-times" style="color:#d97706;"></i> Última vez: ${p.ultimaVez} — venció</span>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        html += `
+          <div class="practica-item item-pendiente">
+            <div class="practica-badge"><i class="fas fa-stethoscope"></i></div>
+            <div class="practica-texto">
+              <p class="practica-nombre">${p.practica}</p>
+              <div class="practica-detalle">
+                <span style="color:#0448a2;"><i class="fas fa-circle-check"></i> Autorizada sin cargo en el Día Preventivo</span>
+              </div>
+            </div>
+          </div>`;
+      }
+    });
+
+    html += `</div>`;
+    return html;
+  }
+
+  function renderGrupoOtros(practicas, esAlDia) {
+    const g = { titulo: 'Otros', subtitulo: 'Prácticas adicionales', icono: 'fas fa-notes-medical', color: '#f1f5f9', colorIcono: '#64748b', colorTitulo: '#475569' };
+    return renderGrupo(g, practicas, esAlDia);
+  }
+
   window.generarNuevas = async function (dni) {
     resultadosDiv.innerHTML = `
-      <div style="text-align:center; padding:2rem;">
-        <i class="fas fa-spinner fa-spin fa-2x" style="color:#003366;"></i>
-        <p style="margin-top:1rem; color:#666;">Generando tus recomendaciones personalizadas...</p>
+      <div class="spinner-box">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Generando tus recomendaciones personalizadas...</p>
       </div>`;
 
     try {
-      const response = await fetch(`/getPreventivePlan/${dni}`);
+      const response = await fetch('/getPreventivePlan/' + dni);
       const data = await response.json();
 
-      if (data.success && !data.anioNoCumplido) {
-        const response2 = await fetch(`/getPracticasGuardadas/${dni}`);
-        const data2 = await response2.json();
-        if (data2.success) {
-          mostrarRecomendacionesPaciente(data2, dni);
-        }
-      } else if (data.anioNoCumplido) {
-        // No pasó un año — mostramos igual lo que hay guardado
-        const response2 = await fetch(`/getPracticasGuardadas/${dni}`);
-        const data2 = await response2.json();
-        if (data2.success) {
-          mostrarRecomendacionesPaciente(data2, dni);
-        }
+      const response2 = await fetch('/getPracticasGuardadas/' + dni);
+      const data2 = await response2.json();
+      if (data2.success) {
+        mostrarRecomendaciones(data2, dni);
       } else {
         resultadosDiv.innerHTML = `
-          <div style="background:#fee2e2; border-left:4px solid #ef4444; padding:1rem; border-radius:8px;">
-            <p style="color:#991b1b;">${data.mensaje || 'No se pudieron generar las recomendaciones.'}</p>
+          <div class="card" style="border-left:4px solid #ef4444;">
+            <p style="color:#991b1b;">${data.message || 'No se pudieron generar las recomendaciones.'}</p>
           </div>`;
       }
     } catch (error) {
       resultadosDiv.innerHTML = `
-        <div style="background:#fee2e2; border-left:4px solid #ef4444; padding:1rem; border-radius:8px;">
-          <p style="color:#991b1b;">Error de conexión. Intentá de nuevo.</p>
+        <div class="card" style="border-left:4px solid #ef4444;">
+          <p style="color:#991b1b; font-size:14px;">Error de conexión. Intentá de nuevo.</p>
         </div>`;
     }
   };

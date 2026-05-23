@@ -501,18 +501,151 @@ app.post('/savePracticeResult', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al guardar.' });
   }
 });
-// --- Ruta para obtener prácticas guardadas (rápido, sin regenerar) ---
 app.get('/getPracticasGuardadas/:dni', async (req, res) => {
-  console.log(`Consulta de prácticas guardadas para DNI: ${req.params.dni}`);
+  const dni = req.params.dni;
+  console.log(`Obteniendo prácticas para DNI: ${dni}`);
+
   try {
-    const response = await axios.post(APPS_SCRIPT_URL, {
-      action: 'obtenerPracticasGuardadas',
-      payload: { dni: req.params.dni }
+    // 1. Buscar afiliado
+    const { data: afiliado } = await supabase
+      .from('afiliados').select('*').eq('dni', dni).single();
+
+    if (!afiliado) return res.json({ success: false, message: 'Afiliado no encontrado.' });
+
+    // 2. Buscar último historial DP
+    const { data: historial } = await supabase
+      .from('historial_dia_preventivo')
+      .select('*').eq('dni', dni)
+      .order('fechax', { ascending: false }).limit(1);
+
+    const ultimoDP = historial?.[0] || null;
+
+    // 3. Leer reglas
+    const { data: reglas } = await supabase
+      .from('reglas_preventivas').select('*');
+
+    const EQUIVALENCIAS = {
+      'glucemia en ayunas': 'diabetes',
+      'colesterol total, hdl/colesterol, ldl/colesterol, trigliceridos': 'dislipemias',
+      'ldl/colesterol': 'dislipemias',
+      'tomar ta ambos brazos personal capacitado': 'presion_arterial',
+      'creatinina, formula filtrado glomerular': 'erc',
+      'espirometria': 'epoc',
+      'calcular imc': 'imc',
+      'ecografia abdominal': 'aneurisma_aorta',
+      'densitometria osea': 'osteoporosis',
+      'papanicolau': 'cancer_cervico_pap',
+      'test hpv': 'cancer_cervico_hpv',
+      'sangre oculta en materia fecal - somf': 'somf',
+      'videocolonoscopia - vcc': 'cancer_colon_colonoscopia',
+      'mamografia': 'cancer_mama_mamografia',
+      'ecografia mamaria': 'cancer_mama_eco_mamaria',
+      'antigeno prostatico especifico total - psa': 'prostata_psa',
+      'anticuerpos anti_vih': 'vih',
+      'hepatitis b antigeno de superficie_aghb': 'hepatitis_b',
+      'hepatitis c _hcv_ac_igg': 'hepatitis_c',
+      'vdrl': 'vdrl',
+      'test chagas': 'chagas',
+      'vacunas': 'inmunizaciones',
+      'control odontologico': 'control_odontologico_adultos',
+      'control vision': 'agudeza_visual',
+      'consejeria/tratamiento tabaquismo': 'tabaco',
+      'consejeria/tratamiento alcohol y/o drogas': 'abuso_alcohol',
+      'consejeria/tratamiento violencia familiar': 'violencia',
+      'consejeria/tratamiento depresion': 'depresion',
+      'consejeria/tratamiento caida adultos mayores': 'caidas_adultos_mayores',
+      'consejeria actividad fisica': 'actividad_fisica'
+    };
+
+    const VALORES_REALIZADOS = [
+      'normal','control normal','no presenta','no se verifica','negativo',
+      'bajo','cumple','completo','si realiza','no abusa','no fuma',
+      'riesgo bajo','adecuada','conservada','presenta'
+    ];
+
+    const VALORES_NO_APLICA = ['no aplica','no indicado','no corresponde'];
+
+    const normalizar = (t) => (t||'').toString().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+    const edad = parseInt(afiliado.edad) || 0;
+    const sexo = normalizar(afiliado.sexo_biologico || '');
+    const pendientes = [];
+    const alDia = [];
+    const procesadas = new Set();
+
+    for (const regla of (reglas || [])) {
+      if (!regla.practica) continue;
+      const practicaNorm = normalizar(regla.practica);
+      if (procesadas.has(practicaNorm)) continue;
+
+      const sexoRegla = normalizar(regla.sexo_aplica || 'ambos');
+      if (sexoRegla !== 'ambos' && sexoRegla !== sexo) continue;
+
+      const edadDesde = parseInt(regla.edad_desde) || 0;
+      const edadHasta = parseInt(regla.edad_hasta) || 120;
+      if (edad < edadDesde || edad > edadHasta) continue;
+
+      procesadas.add(practicaNorm);
+
+      // ── VERIFICAR CONDICIÓN EN HOJA DE VIDA ──
+      if (regla.condicion_campo && regla.condicion_valor) {
+          const campoAfiliado = regla.condicion_campo.toLowerCase();
+          const valorAfiliado = (afiliado[campoAfiliado] || '').toString().toLowerCase();
+          const valoresAceptados = regla.condicion_valor.toLowerCase().split(',').map(v => v.trim());
+          if (!valoresAceptados.some(v => valorAfiliado.includes(v))) continue;
+      }
+
+      const campoDP = EQUIVALENCIAS[practicaNorm];
+
+      if (!ultimoDP || !campoDP) {
+        pendientes.push({ practica: regla.practica, subcategoria: regla.subcategoria || '' });
+        continue;
+      }
+
+      const valorCrudo = ultimoDP[campoDP] || '';
+      const valorNorm = normalizar(valorCrudo);
+
+      if (VALORES_NO_APLICA.some(v => valorNorm.includes(v))) continue;
+
+      if (!valorNorm || valorNorm.includes('no se realiza') || valorNorm.includes('no se realizo')) {
+        pendientes.push({ practica: regla.practica, subcategoria: regla.subcategoria || '' });
+        continue;
+      }
+
+      const frecuencia = parseFloat(regla.frecuencia_anios) || 1;
+      const fechaVisita = new Date(ultimoDP.fechax);
+      const fechaVencimiento = new Date(fechaVisita);
+      fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + frecuencia);
+      const hoy = new Date();
+
+      if (fechaVencimiento > hoy) {
+        alDia.push({
+          practica: regla.practica,
+          subcategoria: regla.subcategoria || '',
+          resultado: valorCrudo,
+          fechaRealizacion: fechaVisita.toLocaleDateString('es-AR'),
+          fechaVencimiento: fechaVencimiento.toLocaleDateString('es-AR')
+        });
+      } else {
+        pendientes.push({
+          practica: regla.practica,
+          subcategoria: regla.subcategoria || '',
+          ultimaVez: fechaVisita.toLocaleDateString('es-AR')
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      nombre: `${afiliado.nombre || ''} ${afiliado.apellido || ''}`.trim(),
+      pendientes,
+      alDia
     });
-    res.json(response.data);
+
   } catch (error) {
     console.error('Error en /getPracticasGuardadas:', error.message);
-    res.status(500).json({ success: false, message: 'Error al obtener prácticas.' });
+    res.status(500).json({ success: false, message: 'Error de conexión.' });
   }
 });
 // --- Ruta para login de prestadores ---

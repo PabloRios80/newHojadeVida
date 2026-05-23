@@ -3,47 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recomendaciones de Salud</title>
+    <title>Mis Recomendaciones - Día Preventivo IAPOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; }
 
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        /* HEADER */
+        .iapos-header { background: #0448a2; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); max-width: 85%; margin: 0 auto; border-radius: 0 0 10px 10px; }
+        .iapos-header img { height: 42px; display: block; }
+        @media (max-width: 540px) {
+            .iapos-header { max-width: 100%; padding: 10px 16px; gap: 12px; }
+            .iapos-header img { height: 34px; }
+        }
+
+        /* MAIN */
+        main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+
+        /* BUSCAR */
+        .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+        .search-title { font-size: 20px; font-weight: 600; color: #0448a2; margin-bottom: 6px; }
+        .search-sub { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.6; }
+        .search-row { display: flex; gap: 10px; }
+        .search-row input { flex: 1; font-family: 'Source Sans 3', sans-serif; font-size: 15px; color: #1e293b; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; outline: none; }
+        .search-row input:focus { border-color: #0448a2; box-shadow: 0 0 0 3px rgba(4,72,162,0.08); }
+        .btn-buscar { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+        .btn-buscar:hover { background: #033d8a; }
+
+        /* BIENVENIDA */
+        .welcome-box { background: #0448a2; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+        .welcome-name { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .welcome-sub { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+
+        /* EXPLICACION */
+        .explicacion-box { background: #e8f0fb; border-left: 4px solid #0448a2; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+        .explicacion-box p { font-size: 14px; color: #1e3a5f; line-height: 1.7; }
+        .explicacion-box strong { color: #0448a2; }
+
+        /* GRUPOS */
+        .grupo-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid #e2e8f0; }
+        .grupo-icon { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .grupo-icon i { font-size: 22px; }
+        .grupo-titulo { font-size: 17px; font-weight: 700; }
+        .grupo-subtitulo { font-size: 12px; color: #64748b; margin-top: 1px; }
+
+        /* PRÁCTICA ITEM */
+        .practica-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-radius: 8px; margin-bottom: 8px; }
+        .practica-item:last-child { margin-bottom: 0; }
+        .practica-badge { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .practica-badge i { font-size: 17px; }
+        .practica-texto { flex: 1; }
+        .practica-nombre { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+        .practica-detalle { font-size: 13px; color: #64748b; display: flex; gap: 14px; flex-wrap: wrap; }
+        .practica-detalle span { display: flex; align-items: center; gap: 4px; }
+
+        /* PENDIENTE */
+        .item-pendiente { background: #f0f6ff; border-left: 4px solid #0448a2; }
+        .item-pendiente .practica-badge { background: #dbeafe; }
+        .item-pendiente .practica-badge i { color: #0448a2; }
+        .item-pendiente .practica-nombre { color: #1e3a8a; }
+        .item-vencido { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        .item-vencido .practica-badge { background: #fef3c7; }
+        .item-vencido .practica-badge i { color: #d97706; }
+        .item-vencido .practica-nombre { color: #92400e; }
+
+        /* AL DÍA */
+        .item-aldia { background: #f0fdf4; border-left: 4px solid #16a34a; }
+        .item-aldia .practica-badge { background: #dcfce7; }
+        .item-aldia .practica-badge i { color: #16a34a; }
+        .item-aldia .practica-nombre { color: #166534; }
+
+        /* RESUMEN CHIPS */
+        .resumen-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .resumen-chip { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .chip-pendiente { background: #dbeafe; color: #1e3a8a; }
+        .chip-aldia { background: #dcfce7; color: #166534; }
+
+        /* PORTAL */
+        .portal-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; text-align: center; margin-bottom: 16px; }
+        .portal-box h3 { font-size: 16px; font-weight: 600; color: #0448a2; margin-bottom: 6px; }
+        .portal-box p { font-size: 13px; color: #64748b; margin-bottom: 14px; line-height: 1.6; }
+        .btn-portal { display: inline-flex; align-items: center; gap: 7px; background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 8px; padding: 10px 22px; cursor: pointer; text-decoration: none; font-family: 'Source Sans 3', sans-serif; }
+        .btn-portal:hover { background: #033d8a; }
+
+        /* ACTUALIZAR */
+        .actualizar-row { text-align: center; padding-top: 8px; }
+        .btn-actualizar { background: #fff; color: #0448a2; border: 1.5px solid #0448a2; font-size: 14px; font-weight: 600; border-radius: 8px; padding: 9px 22px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: inline-flex; align-items: center; gap: 7px; }
+        .btn-actualizar:hover { background: #f0f6ff; }
+
+        /* SPINNER */
+        .spinner-box { text-align: center; padding: 3rem 1rem; }
+        .spinner-box i { font-size: 2rem; color: #0448a2; }
+        .spinner-box p { margin-top: 1rem; color: #64748b; font-size: 15px; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 20px; font-size: 12px; color: #94a3b8; }
+
+        /* SIN GRUPO */
+        .sin-datos { text-align: center; padding: 2rem; color: #94a3b8; font-size: 14px; }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo-area">
-                <img src="images/logo_iapos.png" alt="Logo IAPOS" class="logo" />
-                <h1 class="text-xl">Recomendaciones de Salud</h1>
-            </div>
+
+<header class="iapos-header">
+    <img src="images/logo_iapos.png" alt="IAPOS">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DÍA</span>
+        <div style="display:flex; align-items:center;">
+            <span style="font-size:20px; font-weight:700; color:#ff2020; letter-spacing:0.04em; text-transform:uppercase; line-height:1;">PREVENTIV</span>
+            <svg width="20" height="24" viewBox="0 0 22 28" style="margin-left:-1px; flex-shrink:0;">
+                <path d="M13,2.5 A9,9 0 1,1 9,2.5" fill="none" stroke="#ff2020" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="11" cy="11" r="3" fill="#ffffff"/>
+                <polygon points="11,14 7,20 11,26 15,20" fill="#4a9fd4"/>
+            </svg>
         </div>
-    </header>
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DE LA SALUD</span>
+        <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.5);">Mis Recomendaciones</span>
+    </div>
+    <div style="width:80px"></div>
+</header>
 
-    <main>
-        <div id="formSection">
-            <h2 class="text-2xl text-center">
-                <i class="fas fa-heartbeat"></i> ¡Consulta tus recomendaciones!
-            </h2>
-
-            <div class="mb-4">
-                <label for="dniBuscar">DNI:</label>
-                <input type="text" id="dniBuscar" class="input-field" placeholder="Ingresa tu DNI">
-            </div>
-
-            <div class="flex justify-center">
-                <button id="buscarRecomendacionesBtn" class="primary-button">
-                    <i class="fas fa-search mr-2"></i> Buscar
-                </button>
-            </div>
-
-            <div id="resultadosRecomendaciones" class="mt-8"></div>
+<main>
+    <div class="card" id="sectionBuscar">
+        <p class="search-title"><i class="fas fa-heartbeat" style="margin-right:8px; color:#0448a2;"></i>Tus recomendaciones preventivas</p>
+        <p class="search-sub">Ingresá tu DNI para ver las prácticas de salud recomendadas para vos, basadas en tu perfil personal.</p>
+        <div class="search-row">
+            <input type="text" id="dniBuscar" placeholder="Ingresá tu DNI" maxlength="8">
+            <button class="btn-buscar" id="buscarRecomendacionesBtn">
+                <i class="fas fa-search"></i> Buscar
+            </button>
         </div>
-    </main>
+    </div>
 
-    <footer class="text-center text-sm">
-        <p>&copy; 2025 IAPOS. Todos los derechos reservados.</p>
-    </footer>
+    <div id="resultadosRecomendaciones"></div>
+</main>
 
-    <script src="/ver_recomendaciones.js"></script>
+<footer>
+    <p>&copy; 2025 IAPOS. Programa Día Preventivo de la Salud.</p>
+</footer>
 
+<script src="/ver_recomendaciones.js"></script>
 </body>
 </html>
