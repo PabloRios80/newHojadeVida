@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Vida — Adolescencia | Día Preventivo IAPOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; }
+
+        .iapos-header { background: #0448a2; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .iapos-header img { height: 42px; display: block; }
+        @media (max-width: 540px) { .iapos-header { padding: 10px 16px; gap: 12px; } .iapos-header img { height: 34px; } }
+
+        .progress-outer { background: #0448a2; padding: 0 20px 12px; }
+        .progress-steps { display: flex; gap: 5px; max-width: 720px; margin: 0 auto 5px; }
+        .progress-step { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.2); transition: background 0.3s; }
+        .progress-step.done { background: #fff; }
+        .progress-step.active { background: rgba(255,255,255,0.6); }
+        .progress-label { font-size: 11px; color: rgba(255,255,255,0.6); max-width: 720px; margin: 0 auto; }
+        .progress-label strong { color: #fff; }
+
+        main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+
+        .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 22px 24px; margin-bottom: 14px; }
+        .step-title { font-size: 17px; font-weight: 600; color: #0448a2; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+        .step-num { width: 28px; height: 28px; background: #0448a2; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+        .step-num-gray { background: #64748b; }
+        .step-intro { font-size: 14px; color: #475569; margin: -10px 0 18px; line-height: 1.65; font-weight: 500; }
+
+        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field.full { grid-column: 1 / -1; }
+        .field label { font-size: 13px; font-weight: 500; color: #64748b; }
+        .req { color: #dc2626; margin-left: 2px; }
+        .field input, .field select, .field textarea {
+            font-family: 'Source Sans 3', sans-serif; font-size: 15px; color: #1e293b;
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 8px;
+            padding: 10px 12px; outline: none; transition: border-color 0.15s;
+            width: 100%;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus {
+            border-color: #0448a2; box-shadow: 0 0 0 3px rgba(4,72,162,0.08);
+        }
+        .field input[readonly] { background: #f8fafc; color: #94a3b8; cursor: default; }
+        .field-hint { font-size: 12px; color: #94a3b8; }
+
+        .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .chip { border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; background: #fff; transition: all 0.12s; user-select: none; font-family: 'Source Sans 3', sans-serif; }
+        .chip:hover { border-color: #0448a2; color: #0448a2; background: #f0f6ff; }
+        .chip.sel { border-color: #0448a2; background: #e6f0fb; color: #0448a2; }
+        .chip.si { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
+        .chip.no { border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
+        .chip.ns { border-color: #d97706; background: #fffbeb; color: #d97706; }
+
+        .pregunta { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid #f1f5f9; }
+        .pregunta:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .pregunta-label { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 10px; }
+        .pregunta-hint { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+
+        .alerta-box { background: #fffbeb; border-left: 3px solid #d97706; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #92400e; line-height: 1.5; }
+
+        .seccion-fem { background: #fdf4ff; border: 0.5px solid #e9d5ff; border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+        .seccion-fem-title { font-size: 13px; font-weight: 600; color: #7c3aed; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+
+        .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .nav-row.end { justify-content: flex-end; }
+        .btn-prev { background: transparent; color: #64748b; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-prev:hover { background: #f8fafc; }
+        .btn-next { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-next:hover { background: #033d8a; }
+        .btn-guardar { background: #15803d; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-guardar:hover { background: #166534; }
+
+        .paso { display: none; }
+        .paso.activo { display: block; }
+
+        /* SPINNER */
+        .spinner-box { text-align: center; padding: 2rem; display: none; }
+        .spinner-box i { font-size: 2rem; color: #0448a2; }
+        .spinner-box p { margin-top: 1rem; color: #64748b; }
+
+        /* RESULTADO */
+        .result-box { display: none; }
+        .result-ok { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 2rem; text-align: center; }
+        .result-ok i { font-size: 3rem; color: #16a34a; margin-bottom: 1rem; display: block; }
+        .result-ok h2 { font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 8px; }
+        .result-ok p { font-size: 14px; color: #64748b; margin-bottom: 1.5rem; }
+        .countdown { font-size: 13px; color: #16a34a; font-weight: 600; }
+
+        footer { text-align: center; padding: 20px; font-size: 12px; color: #94a3b8; }
+
+        @media (max-width: 540px) { .grid2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header class="iapos-header">
+    <img src="images/logo_iapos.png" alt="IAPOS">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DÍA</span>
+        <div style="display:flex; align-items:center;">
+            <span style="font-size:20px; font-weight:700; color:#ff2020; letter-spacing:0.04em; text-transform:uppercase; line-height:1;">PREVENTIV</span>
+            <svg width="20" height="24" viewBox="0 0 22 28" style="margin-left:-1px; flex-shrink:0;">
+                <path d="M13,2.5 A9,9 0 1,1 9,2.5" fill="none" stroke="#ff2020" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="11" cy="11" r="3" fill="#ffffff"/>
+                <polygon points="11,14 7,20 11,26 15,20" fill="#4a9fd4"/>
+            </svg>
+        </div>
+        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DE LA SALUD</span>
+        <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.5);">Hoja de Vida — Adolescencia</span>
+    </div>
+    <div style="width:80px"></div>
+</header>
+
+<div class="progress-outer" id="progressBar">
+    <div class="progress-steps">
+        <div class="progress-step active" id="ps1"></div>
+        <div class="progress-step" id="ps2"></div>
+        <div class="progress-step" id="ps3"></div>
+        <div class="progress-step" id="ps4"></div>
+        <div class="progress-step" id="ps5"></div>
+        <div class="progress-step" id="ps6"></div>
+    </div>
+    <p class="progress-label"><strong id="progressText">Paso 1 de 6</strong> — <span id="progressSubtext">Identificación</span></p>
+</div>
+
+<main>
+
+    <!-- SPINNER -->
+    <div class="spinner-box" id="spinnerBox">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Guardando datos...</p>
+    </div>
+
+    <!-- RESULTADO -->
+    <div class="result-box" id="resultBox">
+        <div class="result-ok">
+            <i class="fas fa-check-circle"></i>
+            <h2>¡Hoja de Vida guardada!</h2>
+            <p>Los datos fueron recibidos correctamente. En breve podrá ver las recomendaciones preventivas.</p>
+            <p class="countdown" id="countdown">Redirigiendo en 10 segundos...</p>
+            <button onclick="window.location.href='index.html'" class="btn-next" style="margin: 1rem auto 0; display:inline-flex;">
+                Ir al inicio <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- PASO 1: IDENTIFICACIÓN -->
+    <div class="paso activo" id="paso1">
+        <div class="card">
+            <p class="step-title"><span class="step-num">1</span> Identificación del/la adolescente</p>
+            <div class="grid2">
+                <div class="field">
+                    <label for="dni">DNI <span class="req">*</span></label>
+                    <input type="text" id="dni" placeholder="Ej: 45678901" maxlength="8" onblur="verificarDNI()">
+                    <span class="field-hint">Al salir del campo se verificará la afiliación</span>
+                </div>
+                <div class="field">
+                    <label for="birthDate">Fecha de nacimiento <span class="req">*</span></label>
+                    <input type="text" id="birthDate" placeholder="DD/MM/AAAA" maxlength="10">
+                </div>
+                <div class="field">
+                    <label for="age">Edad calculada</label>
+                    <input type="text" id="age" readonly placeholder="Se calcula automáticamente">
+                </div>
+                <div class="field">
+                    <label for="apellido">Apellido <span class="req">*</span></label>
+                    <input type="text" id="apellido" placeholder="Ej: González">
+                </div>
+                <div class="field full">
+                    <label for="nombre">Nombre/s <span class="req">*</span></label>
+                    <input type="text" id="nombre" placeholder="Ej: Valentina">
+                </div>
+                <div class="field full">
+                    <label>Sexo biológico <span class="req">*</span></label>
+                    <div class="chips-row">
+                        <span class="chip" id="chip-masculino" onclick="selChipSexo('masculino')"><i class="fas fa-mars" style="margin-right:5px"></i>Masculino</span>
+                        <span class="chip" id="chip-femenino" onclick="selChipSexo('femenino')"><i class="fas fa-venus" style="margin-right:5px"></i>Femenino</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <p class="step-title"><span class="step-num step-num-gray">R</span> Datos del adulto responsable</p>
+            <div class="grid2">
+                <div class="field full">
+                    <label for="nombre_responsable">Nombre completo del responsable <span class="req">*</span></label>
+                    <input type="text" id="nombre_responsable" placeholder="Nombre y apellido">
+                </div>
+                <div class="field">
+                    <label for="relacion_responsable">Relación con el/la adolescente</label>
+                    <select id="relacion_responsable">
+                        <option value="">Seleccionar</option>
+                        <option value="madre">Madre</option>
+                        <option value="padre">Padre</option>
+                        <option value="tutor">Tutora/Tutor</option>
+                        <option value="otro">Otro familiar</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="telefono">Teléfono de contacto <span class="req">*</span></label>
+                    <input type="tel" id="telefono" placeholder="Ej: 3424567890" maxlength="11">
+                </div>
+                <div class="field full">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Ej: familia@gmail.com">
+                </div>
+            </div>
+        </div>
+        <div class="nav-row end">
+            <button class="btn-next" onclick="irPaso(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- PASO 2: ANTECEDENTES FAMILIARES -->
+    <div class="paso" id="paso2">
+        <div class="card">
+            <p class="step-title"><span class="step-num">2</span> Antecedentes familiares</p>
+            <p class="step-intro">Respecto a abuelos/as, madre, padre y hermanos/as: ¿alguno tiene o tuvo estas condiciones?</p>
+
+            <div class="pregunta">
+                <p class="pregunta-label">Hipertensión arterial (presión alta)</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_hipertension','si')">Sí</span><span class="chip" onclick="sel(this,'fam_hipertension','no')">No</span><span class="chip" onclick="sel(this,'fam_hipertension','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Diabetes</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_diabetes','si')">Sí</span><span class="chip" onclick="sel(this,'fam_diabetes','no')">No</span><span class="chip" onclick="sel(this,'fam_diabetes','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Obesidad</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_obesidad','si')">Sí</span><span class="chip" onclick="sel(this,'fam_obesidad','no')">No</span><span class="chip" onclick="sel(this,'fam_obesidad','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Enfermedades del corazón o ACV antes de los 55 años</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_cardio','si')">Sí</span><span class="chip" onclick="sel(this,'fam_cardio','no')">No</span><span class="chip" onclick="sel(this,'fam_cardio','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Depresión u otros trastornos de salud mental</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_mental','si')">Sí</span><span class="chip" onclick="sel(this,'fam_mental','no')">No</span><span class="chip" onclick="sel(this,'fam_mental','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Adicciones (alcohol, drogas, tabaco, juego)</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_adicciones','si')">Sí</span><span class="chip" onclick="sel(this,'fam_adicciones','no')">No</span><span class="chip" onclick="sel(this,'fam_adicciones','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">Cáncer (cualquier tipo)</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'fam_cancer','si')">Sí</span><span class="chip" onclick="sel(this,'fam_cancer','no')">No</span><span class="chip" onclick="sel(this,'fam_cancer','ns')">No lo sé</span></div>
+            </div>
+        </div>
+        <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(1)"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <button class="btn-next" onclick="irPaso(3)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- PASO 3: HÁBITOS -->
+    <div class="paso" id="paso3">
+        <div class="card">
+            <p class="step-title"><span class="step-num">3</span> Hábitos y vida cotidiana</p>
+
+            <div class="pregunta">
+                <p class="pregunta-label">¿Realiza actividad física o deporte de forma regular?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'act_fisica','si')">Sí</span><span class="chip" onclick="sel(this,'act_fisica','no')">No</span><span class="chip" onclick="sel(this,'act_fisica','ns')">A veces</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Cuántas horas por día usa pantallas fuera del horario escolar?</p>
+                <div class="chips-row">
+                    <span class="chip" onclick="selChipSingle(this,'pantallas')">Menos de 2 hs</span>
+                    <span class="chip" onclick="selChipSingle(this,'pantallas')">2 a 4 hs</span>
+                    <span class="chip" onclick="selChipSingle(this,'pantallas')">Más de 4 hs</span>
+                </div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Come frutas y/o verduras habitualmente?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'alimentacion','si')">Sí</span><span class="chip" onclick="sel(this,'alimentacion','no')">No</span><span class="chip" onclick="sel(this,'alimentacion','ns')">A veces</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Duerme aproximadamente 8 horas por noche?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'suenio','si')">Sí</span><span class="chip" onclick="sel(this,'suenio','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Asiste regularmente a la escuela?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'escuela','si')">Sí</span><span class="chip" onclick="sel(this,'escuela','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha tenido dificultades de aprendizaje o rendimiento escolar?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'aprendizaje','si')">Sí</span><span class="chip" onclick="sel(this,'aprendizaje','no')">No</span><span class="chip" onclick="sel(this,'aprendizaje','ns')">No lo sé</span></div>
+            </div>
+        </div>
+        <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(2)"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <button class="btn-next" onclick="irPaso(4)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- PASO 4: SALUD GENERAL -->
+    <div class="paso" id="paso4">
+        <div class="card">
+            <p class="step-title"><span class="step-num">4</span> Salud general</p>
+
+            <div class="pregunta">
+                <p class="pregunta-label">¿Tiene vacunas del calendario al día?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'vacunas','si')">Sí</span><span class="chip" onclick="sel(this,'vacunas','no')">No</span><span class="chip" onclick="sel(this,'vacunas','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Usa anteojos o ha referido dificultad para ver?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'vision','si')">Sí</span><span class="chip" onclick="sel(this,'vision','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha tenido dificultad para escuchar?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'audicion','si')">Sí</span><span class="chip" onclick="sel(this,'audicion','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Algún médico le mencionó escoliosis o problemas de columna?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'escoliosis','si')">Sí</span><span class="chip" onclick="sel(this,'escoliosis','no')">No</span><span class="chip" onclick="sel(this,'escoliosis','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha habido preocupación por su peso o alimentación? ¿Ha notado conductas de restricción alimentaria o atracones?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'alim_trastorno','si')">Sí</span><span class="chip" onclick="sel(this,'alim_trastorno','no')">No</span><span class="chip" onclick="sel(this,'alim_trastorno','ns')">No lo sé</span></div>
+            </div>
+
+            <div class="seccion-fem" id="secFem" style="display:none">
+                <p class="seccion-fem-title"><i class="fas fa-venus"></i> Salud reproductiva (sexo femenino)</p>
+                <div class="pregunta" style="border:none; padding-bottom:0; margin-bottom:14px;">
+                    <p class="pregunta-label">¿Ya tuvo su primera menstruación (menarca)?</p>
+                    <div class="chips-row"><span class="chip" onclick="sel(this,'menarca','si')">Sí</span><span class="chip" onclick="sel(this,'menarca','no')">No</span></div>
+                </div>
+                <div class="pregunta" style="border:none; padding-bottom:0; margin-bottom:0;">
+                    <p class="pregunta-label">¿Sus ciclos menstruales son regulares?</p>
+                    <p class="pregunta-hint">Solo si respondió "Sí" arriba</p>
+                    <div class="chips-row"><span class="chip" onclick="sel(this,'ciclos','si')">Sí</span><span class="chip" onclick="sel(this,'ciclos','no')">No</span><span class="chip" onclick="sel(this,'ciclos','ns')">Irregulares</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(3)"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <button class="btn-next" onclick="irPaso(5)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- PASO 5: SALUD MENTAL -->
+    <div class="paso" id="paso5">
+        <div class="card">
+            <p class="step-title"><span class="step-num">5</span> Salud mental y entorno</p>
+            <div class="alerta-box">Esta información es confidencial y sirve para orientar mejor la atención del/la adolescente.</div>
+
+            <div class="pregunta">
+                <p class="pregunta-label">¿Se relaciona bien con sus pares y tiene vínculos de amistad?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'vinculos','si')">Sí</span><span class="chip" onclick="sel(this,'vinculos','no')">No</span><span class="chip" onclick="sel(this,'vinculos','ns')">A veces</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha tenido episodios de tristeza, aislamiento o decaimiento prolongados?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'tristeza','si')">Sí</span><span class="chip" onclick="sel(this,'tristeza','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha recibido atención psicológica o psiquiátrica?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'atencion_mental','si')">Sí</span><span class="chip" onclick="sel(this,'atencion_mental','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha tenido situaciones de violencia o abuso en el entorno familiar o social?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'violencia','si')">Sí</span><span class="chip" onclick="sel(this,'violencia','no')">No</span><span class="chip" onclick="sel(this,'violencia','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Consume o ha consumido tabaco?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'tabaco','si')">Sí</span><span class="chip" onclick="sel(this,'tabaco','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Consume o ha consumido alcohol?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'alcohol','si')">Sí</span><span class="chip" onclick="sel(this,'alcohol','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Consume o ha consumido otras sustancias (marihuana, pasta base, u otras)?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'sustancias','si')">Sí</span><span class="chip" onclick="sel(this,'sustancias','no')">No</span></div>
+            </div>
+        </div>
+        <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(4)"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <button class="btn-next" onclick="irPaso(6)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- PASO 6: EDUCACIÓN SEXUAL -->
+    <div class="paso" id="paso6">
+        <div class="card">
+            <p class="step-title"><span class="step-num">6</span> Educación sexual integral</p>
+            <p class="step-intro">Estas preguntas nos permiten orientar mejor la consejería durante el Día Preventivo.</p>
+
+            <div class="pregunta">
+                <p class="pregunta-label">¿Ha recibido educación sexual en la escuela o en el hogar?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'educ_sexual','si')">Sí</span><span class="chip" onclick="sel(this,'educ_sexual','no')">No</span><span class="chip" onclick="sel(this,'educ_sexual','ns')">No lo sé</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Tiene dudas sobre su cuerpo o desarrollo que le gustaría consultar con un médico?</p>
+                <div class="chips-row"><span class="chip" onclick="sel(this,'dudas','si')">Sí</span><span class="chip" onclick="sel(this,'dudas','no')">No</span></div>
+            </div>
+            <div class="pregunta">
+                <p class="pregunta-label">¿Desea agregar alguna observación adicional para el equipo de salud?</p>
+                <textarea id="observaciones" placeholder="Observaciones opcionales..." rows="3" style="resize:vertical;"></textarea>
+            </div>
+        </div>
+        <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(5)"><i class="fas fa-arrow-left"></i> Anterior</button>
+            <button class="btn-guardar" onclick="guardar()"><i class="fas fa-save"></i> Guardar Hoja de Vida</button>
+        </div>
+    </div>
+
+</main>
+
+<footer><p>&copy; 2025 IAPOS. Programa Día Preventivo de la Salud.</p></footer>
+
+<script>
+var vals = {};
+var pasoActual = 1;
+var afiliadoVerificado = false;
+var stepNames = ['','Identificación','Antecedentes familiares','Hábitos','Salud general','Salud mental','Educación sexual'];
+var urlParams = new URLSearchParams(window.location.search);
+var dniUrl = urlParams.get('dni');
+if (dniUrl) {
+    document.getElementById('dni').value = dniUrl;
+    verificarDNI();
+}
+function irPaso(n) {
+    document.getElementById('paso' + pasoActual).classList.remove('activo');
+    document.getElementById('paso' + n).classList.add('activo');
+    pasoActual = n;
+    actualizarProgress(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function actualizarProgress(n) {
+    for (var i = 1; i <= 6; i++) {
+        var el = document.getElementById('ps' + i);
+        el.className = 'progress-step';
+        if (i < n) el.classList.add('done');
+        else if (i === n) el.classList.add('active');
+    }
+    document.getElementById('progressText').textContent = 'Paso ' + n + ' de 6';
+    document.getElementById('progressSubtext').textContent = stepNames[n];
+}
+
+function sel(el, grupo, val) {
+    el.closest('.chips-row').querySelectorAll('.chip').forEach(c => { c.className = 'chip'; });
+    el.classList.add(val);
+    vals[grupo] = val;
+}
+
+function selChipSingle(el, grupo) {
+    el.closest('.chips-row').querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    vals[grupo] = el.textContent.trim();
+}
+
+function selChipSexo(val) {
+    document.getElementById('chip-masculino').className = 'chip';
+    document.getElementById('chip-femenino').className = 'chip';
+    document.getElementById('chip-' + val).classList.add('sel');
+    vals['sexo_biologico'] = val;
+    document.getElementById('secFem').style.display = val === 'femenino' ? 'block' : 'none';
+}
+
+// ── FECHA → EDAD ──
+document.getElementById('birthDate').addEventListener('input', function() {
+    var v = this.value.replace(/\D/g, '');
+    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    if (v.length >= 6) v = v.slice(0,5) + '/' + v.slice(5,9);
+    this.value = v;
+    if (v.length === 10) {
+        var p = v.split('/');
+        var born = new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
+        var today = new Date();
+        var age = today.getFullYear() - born.getFullYear();
+        var mo = today.getMonth() - born.getMonth();
+        if (mo < 0 || (mo === 0 && today.getDate() < born.getDate())) age--;
+        if (age > 0 && age < 120) document.getElementById('age').value = age + ' años';
+    } else {
+        document.getElementById('age').value = '';
+    }
+});
+
+// ── VERIFICAR DNI ──
+async function verificarDNI() {
+    var dni = document.getElementById('dni').value.trim();
+    if (!/^\d{7,8}$/.test(dni)) return;
+
+    var msgEl = document.getElementById('dniMsg');
+    if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.id = 'dniMsg';
+        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;';
+        document.getElementById('dni').parentNode.appendChild(msgEl);
+    }
+    msgEl.style.cssText += 'background:#f8fafc; color:#64748b; border:1px solid #e2e8f0;';
+    msgEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
+    afiliadoVerificado = false;
+
+    try {
+        var res = await fetch('/verificar-afiliado/' + dni);
+        var data = await res.json();
+
+        // Verificar elegibilidad
+        var eligRes = await fetch('/verificar-elegibilidad/' + dni);
+        var eligData = await eligRes.json();
+
+        if (!data.esActivo) {
+            msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;';
+            msgEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS.';
+            return;
+        }
+
+        if (!eligData.elegible) {
+            msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500; background:#fffbeb; color:#d97706; border:1px solid #fde68a;';
+            msgEl.innerHTML = '<i class="fas fa-calendar-times" style="margin-right:6px"></i>' + eligData.mensaje;
+            return;
+        }
+
+        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;';
+        msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
+        afiliadoVerificado = true;
+
+        if (data.nombre) {
+            var partes = data.nombre.trim().split(',');
+            if (partes.length >= 2) {
+                if (!document.getElementById('apellido').value) document.getElementById('apellido').value = partes[0].trim();
+                if (!document.getElementById('nombre').value) document.getElementById('nombre').value = partes[1].trim();
+            }
+        }
+    } catch(e) {
+        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500; background:#fffbeb; color:#d97706; border:1px solid #fde68a;';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá o consultá a IAPOS.';
+        afiliadoVerificado = true;
+    }
+}
+
+// ── GUARDAR ──
+async function guardar() {
+    var formData = {
+        dni:                document.getElementById('dni').value.trim(),
+        nombre:             document.getElementById('nombre').value.trim(),
+        apellido:           document.getElementById('apellido').value.trim(),
+        fecha_nacimiento:   document.getElementById('birthDate').value.trim(),
+        edad:               parseInt(document.getElementById('age').value) || null,
+        sexo_biologico:     vals['sexo_biologico'] || '',
+        perfil:             'C',
+        nombre_responsable: document.getElementById('nombre_responsable').value.trim(),
+        relacion_responsable: document.getElementById('relacion_responsable').value,
+        telefono:           document.getElementById('telefono').value.trim(),
+        email:              document.getElementById('email').value.trim(),
+        fam_hipertension:   vals['fam_hipertension'] || '',
+        fam_diabetes:       vals['fam_diabetes'] || '',
+        fam_obesidad:       vals['fam_obesidad'] || '',
+        fam_cardio:         vals['fam_cardio'] || '',
+        fam_mental:         vals['fam_mental'] || '',
+        fam_adicciones:     vals['fam_adicciones'] || '',
+        fam_cancer:         vals['fam_cancer'] || '',
+        act_fisica:         vals['act_fisica'] || '',
+        pantallas:          vals['pantallas'] || '',
+        alimentacion:       vals['alimentacion'] || '',
+        suenio:             vals['suenio'] || '',
+        escuela:            vals['escuela'] || '',
+        aprendizaje:        vals['aprendizaje'] || '',
+        vacunas:            vals['vacunas'] || '',
+        vision:             vals['vision'] || '',
+        audicion:           vals['audicion'] || '',
+        escoliosis:         vals['escoliosis'] || '',
+        alim_trastorno:     vals['alim_trastorno'] || '',
+        menarca:            vals['menarca'] || '',
+        ciclos:             vals['ciclos'] || '',
+        vinculos:           vals['vinculos'] || '',
+        tristeza:           vals['tristeza'] || '',
+        atencion_mental:    vals['atencion_mental'] || '',
+        violencia:          vals['violencia'] || '',
+        tabaco:             vals['tabaco'] || '',
+        alcohol:            vals['alcohol'] || '',
+        sustancias:         vals['sustancias'] || '',
+        educ_sexual:        vals['educ_sexual'] || '',
+        dudas:              vals['dudas'] || '',
+        observaciones:      document.getElementById('observaciones').value.trim()
+    };
+
+    document.getElementById('paso' + pasoActual).style.display = 'none';
+    document.getElementById('spinnerBox').style.display = 'block';
+
+    try {
+        var response = await fetch('/saveDataMenores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        var resultado = await response.json();
+
+        document.getElementById('spinnerBox').style.display = 'none';
+
+        if (resultado.success) {
+            document.getElementById('resultBox').style.display = 'block';
+            var seg = 10;
+            var el = document.getElementById('countdown');
+            var timer = setInterval(function() {
+                seg--;
+                if (seg <= 0) { clearInterval(timer); window.location.href = 'index.html'; }
+                else el.textContent = 'Redirigiendo en ' + seg + ' segundo' + (seg === 1 ? '...' : 's...');
+            }, 1000);
+        } else {
+            document.getElementById('paso' + pasoActual).style.display = 'block';
+            alert('Error al guardar: ' + (resultado.message || 'Intentá de nuevo.'));
+        }
+    } catch(e) {
+        document.getElementById('spinnerBox').style.display = 'none';
+        document.getElementById('paso' + pasoActual).style.display = 'block';
+        alert('Error de conexión. Verificá tu conexión e intentá de nuevo.');
+    }
+}
+</script>
+
+</body>
+</html>

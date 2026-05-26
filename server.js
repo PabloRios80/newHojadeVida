@@ -932,5 +932,99 @@ app.get('/verificar-elegibilidad/:dni', async (req, res) => {
     }
 });
 
+app.post('/saveDataMenores', async (req, res) => {
+    const d = req.body;
+    try {
+        const { error } = await supabase
+            .from('afiliados_menores')
+            .insert({
+                dni: d.dni, nombre: d.nombre, apellido: d.apellido,
+                fecha_nacimiento: d.fecha_nacimiento, edad: d.edad,
+                sexo_biologico: d.sexo_biologico, perfil: d.perfil,
+                nombre_responsable: d.nombre_responsable,
+                relacion_responsable: d.relacion_responsable,
+                telefono: d.telefono, email: d.email,
+                fam_hipertension: d.fam_hipertension, fam_diabetes: d.fam_diabetes,
+                fam_obesidad: d.fam_obesidad, fam_cardio: d.fam_cardio,
+                fam_mental: d.fam_mental, fam_adicciones: d.fam_adicciones,
+                fam_cancer: d.fam_cancer, act_fisica: d.act_fisica,
+                pantallas: d.pantallas, alimentacion: d.alimentacion,
+                suenio: d.suenio, escuela: d.escuela, aprendizaje: d.aprendizaje,
+                vacunas: d.vacunas, vision: d.vision, audicion: d.audicion,
+                escoliosis: d.escoliosis, alim_trastorno: d.alim_trastorno,
+                menarca: d.menarca, ciclos: d.ciclos, vinculos: d.vinculos,
+                tristeza: d.tristeza, atencion_mental: d.atencion_mental,
+                violencia: d.violencia, tabaco: d.tabaco, alcohol: d.alcohol,
+                sustancias: d.sustancias, educ_sexual: d.educ_sexual,
+                dudas: d.dudas, observaciones: d.observaciones
+            });
+
+        if (error) {
+            console.error('Error Supabase menores:', error);
+            return res.json({ success: false, message: error.message });
+        }
+
+        // Backup Google Sheets
+        axios.post(APPS_SCRIPT_URL, {
+            action: 'guardarHojaDeVidaMenor',
+            payload: req.body
+        }).catch(e => console.warn('Backup Google Sheets menores falló:', e.message));
+
+        console.log('✅ Hoja de vida menor guardada:', d.dni);
+        res.json({ success: true });
+    } catch(e) {
+        console.error('Error saveDataMenores:', e.message);
+        res.status(500).json({ success: false, message: 'Error al guardar.' });
+    }
+});
+
+app.post('/saveDataMenoresA', async (req, res) => {
+    const d = req.body;
+    try {
+        const { error } = await supabase
+            .from('afiliados_menores')
+            .insert({
+                dni: d.dni, nombre: d.nombre, apellido: d.apellido,
+                fecha_nacimiento: d.fecha_nacimiento, edad: d.edad,
+                sexo_biologico: d.sexo_biologico, perfil: d.perfil,
+                nombre_responsable: d.nombre_responsable,
+                relacion_responsable: d.relacion_responsable,
+                telefono: d.telefono, email: d.email,
+                termino: d.termino, tipo_parto: d.tipo_parto,
+                neonatologia: d.neonatologia,
+                complicacion_nacer: d.complicacion_nacer,
+                lactancia: d.lactancia,
+                lactancia_duracion: d.lactancia_duracion,
+                alimentacion: d.alimentacion,
+                alim_trastorno: d.alim_trastorno,
+                suenio: d.suenio, pantallas: d.pantallas,
+                lenguaje: d.lenguaje, motricidad: d.motricidad,
+                interaccion: d.interaccion, esfinteres: d.esfinteres,
+                escuela: d.escuela, vacunas: d.vacunas,
+                controles_pediatricos: d.controles_pediatricos,
+                vision: d.vision, audicion: d.audicion,
+                condicion_salud: d.condicion_salud,
+                condicion_detalle: d.condicion_detalle,
+                observaciones: d.observaciones
+            });
+
+        if (error) {
+            console.error('Error Supabase menores A:', error);
+            return res.json({ success: false, message: error.message });
+        }
+
+        axios.post(APPS_SCRIPT_URL, {
+            action: 'guardarHojaDeVidaMenorA',
+            payload: req.body
+        }).catch(e => console.warn('Backup Google Sheets menores A falló:', e.message));
+
+        console.log('✅ Hoja de vida perfil A guardada:', d.dni);
+        res.json({ success: true });
+    } catch(e) {
+        console.error('Error saveDataMenoresA:', e.message);
+        res.status(500).json({ success: false, message: 'Error al guardar.' });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en http://localhost:${PORT}`));

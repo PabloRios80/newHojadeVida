@@ -538,6 +538,17 @@ async function verificarDNI() {
         msgEl.style.border = '1px solid #bbf7d0';
         msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
         afiliadoVerificado = true;
+        // Detectar perfil por edad y redirigir
+        var edad = parseInt(data.edad) || 0;
+        if (edad >= 2 && edad <= 17) {
+            var perfil = edad <= 11 ? 'b' : 'c';
+            if (edad <= 5) perfil = 'a';
+            setTimeout(function() {
+                window.location.href = 'hoja_vida_perfil_' + perfil + '.html?dni=' + dni;
+            }, 1500);
+            msgEl.innerHTML += '<br><small style="color:#0448a2;">Redirigiendo al formulario correspondiente...</small>';
+            return;
+        }
         if (data.nombre) {
             var partes = data.nombre.trim().split(',');
             if (partes.length >= 2) {
