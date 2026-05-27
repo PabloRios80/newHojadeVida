@@ -507,11 +507,26 @@ app.get('/getPracticasGuardadas/:dni', async (req, res) => {
 
   try {
     // 1. Buscar afiliado
-    const { data: afiliado } = await supabase
-      .from('afiliados').select('*').eq('dni', dni).single();
+    // Buscar en adultos primero, luego en menores
+    let afiliado = null;
+    let esMenor = false;
 
-    if (!afiliado) return res.json({ success: false, message: 'Afiliado no encontrado.' });
+    const { data: afiliadoAdulto } = await supabase
+        .from('afiliados').select('*').eq('dni', dni).single();
 
+    if (afiliadoAdulto) {
+        afiliado = afiliadoAdulto;
+    } else {
+    const { data: afiliadoMenor } = await supabase
+        .from('afiliados_menores').select('*').eq('dni', dni)
+        .order('fecha_carga', { ascending: false }).limit(1).single();
+    if (afiliadoMenor) {
+        afiliado = afiliadoMenor;
+        esMenor = true;
+    }
+}
+
+if (!afiliado) return res.json({ success: false, message: 'Afiliado no encontrado.' });
     // 2. Buscar último historial DP
     const { data: historial } = await supabase
       .from('historial_dia_preventivo')

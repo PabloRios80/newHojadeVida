@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Reglas Preventivas — IAPOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; }
+
+        .header { background: #0448a2; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .header h1 { font-size: 18px; font-weight: 700; color: #fff; }
+        .header-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+        .header-badge { background: rgba(255,255,255,0.15); color: #fff; font-size: 11px; padding: 4px 12px; border-radius: 20px; }
+
+        main { max-width: 1400px; margin: 0 auto; padding: 24px 16px 48px; }
+
+        /* FILTROS */
+        .filtros { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .filtro-group { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+        .filtro-group label { font-size: 12px; font-weight: 500; color: #64748b; }
+        .filtro-group select, .filtro-group input { font-family: 'Source Sans 3', sans-serif; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 7px 10px; outline: none; color: #1e293b; background: #fff; }
+        .filtro-group select:focus, .filtro-group input:focus { border-color: #0448a2; }
+        .btn-nueva { background: #0448a2; color: #fff; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .btn-nueva:hover { background: #033d8a; }
+        .stats-row { display: flex; gap: 10px; margin-left: auto; align-items: center; }
+        .stat-chip { background: #f0f6ff; color: #0448a2; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+
+        /* TABLA */
+        .tabla-wrap { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+        .tabla-header { display: grid; grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.7fr 1.5fr 0.8fr; gap: 0; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .th { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 14px; cursor: pointer; user-select: none; display: flex; align-items: center; gap: 4px; }
+        .th:hover { color: #0448a2; }
+        .th i { font-size: 10px; }
+
+        .tabla-body { max-height: 70vh; overflow-y: auto; }
+        .fila { display: grid; grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr 1fr 1fr 0.7fr 1.5fr 0.8fr; gap: 0; border-bottom: 0.5px solid #f1f5f9; transition: background 0.1s; }
+        .fila:hover { background: #f8fafc; }
+        .td { font-size: 13px; color: #1e293b; padding: 11px 14px; display: flex; align-items: center; overflow: hidden; }
+        .td-small { font-size: 12px; color: #64748b; }
+
+        /* BADGES */
+        .badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+        .badge-ambos { background: #e0f2fe; color: #0369a1; }
+        .badge-femenino { background: #fce7f3; color: #be185d; }
+        .badge-masculino { background: #e0e7ff; color: #3730a3; }
+        .badge-cond { background: #fef3c7; color: #92400e; font-size: 10px; }
+
+        .frecuencia { font-weight: 700; color: #0448a2; }
+        .frecuencia-inmediata { color: #dc2626; }
+
+        .perfil-a { background: #fef3c7; color: #92400e; }
+        .perfil-b { background: #e0f2fe; color: #0369a1; }
+        .perfil-c { background: #fce7f3; color: #be185d; }
+        .perfil-adulto { background: #dcfce7; color: #166534; }
+
+        /* ACCIONES */
+        .btn-editar { background: transparent; border: 0.5px solid #cbd5e1; border-radius: 5px; padding: 4px 10px; cursor: pointer; font-size: 12px; color: #64748b; font-family: 'Source Sans 3', sans-serif; }
+        .btn-editar:hover { border-color: #0448a2; color: #0448a2; }
+        .btn-borrar { background: transparent; border: 0.5px solid #fecaca; border-radius: 5px; padding: 4px 8px; cursor: pointer; font-size: 12px; color: #dc2626; font-family: 'Source Sans 3', sans-serif; margin-left: 4px; }
+        .btn-borrar:hover { background: #fef2f2; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.visible { display: flex; }
+        .modal { background: #fff; border-radius: 12px; padding: 28px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 17px; font-weight: 700; color: #0448a2; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .modal-field { display: flex; flex-direction: column; gap: 5px; }
+        .modal-field.full { grid-column: 1/-1; }
+        .modal-field label { font-size: 12px; font-weight: 500; color: #64748b; }
+        .modal-field input, .modal-field select, .modal-field textarea { font-family: 'Source Sans 3', sans-serif; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 12px; outline: none; color: #1e293b; width: 100%; }
+        .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: #0448a2; box-shadow: 0 0 0 3px rgba(4,72,162,0.08); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 0.5px solid #e2e8f0; }
+        .btn-cancelar { background: transparent; color: #64748b; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 9px 20px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+        .btn-guardar-modal { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 9px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+        .btn-guardar-modal:hover { background: #033d8a; }
+
+        /* SPINNER */
+        .spinner { text-align: center; padding: 3rem; color: #64748b; font-size: 14px; }
+        .spinner i { font-size: 2rem; color: #0448a2; display: block; margin-bottom: 10px; }
+
+        /* VACÍO */
+        .vacio { text-align: center; padding: 3rem; color: #94a3b8; font-size: 14px; }
+
+        /* NOTAS TOOLTIP */
+        .nota-icon { color: #94a3b8; cursor: help; font-size: 13px; margin-left: 4px; }
+        .nota-icon:hover { color: #0448a2; }
+        [title] { position: relative; }
+
+        footer { text-align: center; padding: 20px; font-size: 12px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1><i class="fas fa-table" style="margin-right:8px; opacity:0.8;"></i>Tablero de Reglas Preventivas</h1>
+        <p class="header-sub">IAPOS · Día Preventivo de la Salud — Administración</p>
+    </div>
+    <span class="header-badge">Solo administrador</span>
+</div>
+
+<main>
+    <div class="filtros">
+        <div class="filtro-group">
+            <label>Buscar práctica</label>
+            <input type="text" id="filtroTexto" placeholder="Ej: mamografia, HPV..." oninput="aplicarFiltros()">
+        </div>
+        <div class="filtro-group">
+            <label>Perfil / Edad</label>
+            <select id="filtroPerfil" onchange="aplicarFiltros()">
+                <option value="">Todos</option>
+                <option value="adulto">Adultos (18+)</option>
+                <option value="c">Perfil C (12-17)</option>
+                <option value="b">Perfil B (6-11)</option>
+                <option value="a">Perfil A (2-5)</option>
+            </select>
+        </div>
+        <div class="filtro-group">
+            <label>Sexo</label>
+            <select id="filtroSexo" onchange="aplicarFiltros()">
+                <option value="">Todos</option>
+                <option value="ambos">Ambos</option>
+                <option value="femenino">Femenino</option>
+                <option value="masculino">Masculino</option>
+            </select>
+        </div>
+        <div class="filtro-group">
+            <label>Categoría</label>
+            <select id="filtroCategoria" onchange="aplicarFiltros()">
+                <option value="">Todas</option>
+            </select>
+        </div>
+        <div class="stats-row">
+            <span class="stat-chip" id="statTotal">Cargando...</span>
+            <button class="btn-nueva" onclick="abrirModalNueva()">
+                <i class="fas fa-plus"></i> Nueva regla
+            </button>
+        </div>
+    </div>
+
+    <div class="tabla-wrap">
+        <div class="tabla-header">
+            <div class="th" onclick="ordenarPor('practica')">Práctica <i class="fas fa-sort"></i></div>
+            <div class="th" onclick="ordenarPor('subcategoria')">Subcategoría <i class="fas fa-sort"></i></div>
+            <div class="th" onclick="ordenarPor('edad_desde')">Edad <i class="fas fa-sort"></i></div>
+            <div class="th">Sexo</div>
+            <div class="th">Condición</div>
+            <div class="th">Condición historial</div>
+            <div class="th" onclick="ordenarPor('frecuencia_anios')">Frec. (años) <i class="fas fa-sort"></i></div>
+            <div class="th">Notas / Repetición</div>
+            <div class="th">Acciones</div>
+        </div>
+        <div class="tabla-body" id="tablaBody">
+            <div class="spinner"><i class="fas fa-spinner fa-spin"></i>Cargando reglas...</div>
+        </div>
+    </div>
+</main>
+
+<!-- MODAL EDITAR / NUEVA -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <p class="modal-title" id="modalTitle"><i class="fas fa-edit"></i> Editar regla</p>
+        <input type="hidden" id="modalId">
+        <div class="modal-grid">
+            <div class="modal-field full">
+                <label>Práctica <span style="color:#dc2626">*</span></label>
+                <input type="text" id="mPractica" placeholder="Ej: mamografia">
+            </div>
+            <div class="modal-field">
+                <label>Categoría</label>
+                <input type="text" id="mCategoria" placeholder="Ej: Prevencion Cancer">
+            </div>
+            <div class="modal-field">
+                <label>Subcategoría</label>
+                <input type="text" id="mSubcategoria" placeholder="Ej: rastreo cancer de mama">
+            </div>
+            <div class="modal-field">
+                <label>Edad desde</label>
+                <input type="number" id="mEdadDesde" placeholder="Ej: 40" min="0" max="120">
+            </div>
+            <div class="modal-field">
+                <label>Edad hasta</label>
+                <input type="number" id="mEdadHasta" placeholder="Ej: 90" min="0" max="120">
+            </div>
+            <div class="modal-field">
+                <label>Sexo aplica</label>
+                <select id="mSexo">
+                    <option value="ambos">Ambos</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="masculino">Masculino</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Frecuencia (años)</label>
+                <input type="number" id="mFrecuencia" placeholder="Ej: 2 (0 = inmediata)" min="0" step="0.5">
+            </div>
+            <div class="modal-field">
+                <label>Condición campo (hoja de vida)</label>
+                <input type="text" id="mCondCampo" placeholder="Ej: fuma, cancer_de_mama">
+            </div>
+            <div class="modal-field">
+                <label>Condición valor</label>
+                <input type="text" id="mCondValor" placeholder="Ej: si, menos_de_10">
+            </div>
+            <div class="modal-field">
+                <label>Historial condición campo</label>
+                <input type="text" id="mHistCampo" placeholder="Ej: Cáncer cérvico uterino - HPV">
+            </div>
+            <div class="modal-field">
+                <label>Historial condición valor</label>
+                <input type="text" id="mHistValor" placeholder="Ej: Patológico,Pendiente">
+            </div>
+            <div class="modal-field">
+                <label>Excluir si historial es</label>
+                <input type="text" id="mExcluir" placeholder="Ej: Positivo">
+            </div>
+            <div class="modal-field full">
+                <label>Notas / Regla de repetición</label>
+                <textarea id="mNotas" rows="3" placeholder="Ej: Si resultado normal, no repetir por 3 años. Si patológico, repetir inmediatamente."></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn-guardar-modal" onclick="guardarRegla()"><i class="fas fa-save" style="margin-right:6px"></i>Guardar</button>
+        </div>
+    </div>
+</div>
+
+<footer><p>IAPOS · Tablero de Administración de Reglas Preventivas · Acceso restringido</p></footer>
+
+<script>
+const SUPABASE_URL = 'https://vuxgpjidublqkyaqdnjz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1eGdwamlkdWJscWt5YXFkbmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTY2ODEsImV4cCI6MjA5MzQ5MjY4MX0.IFxhEJTjrZGO8-vj7ngtgTkD05m-LGVV9XHHxTE7O64';
+
+var todasReglas = [];
+var reglasFiltradas = [];
+var ordenActual = 'practica';
+var ordenAsc = true;
+
+async function cargarReglas() {
+    try {
+        const res = await fetch(SUPABASE_URL + '/rest/v1/reglas_preventivas?select=*&order=edad_desde.asc,practica.asc&limit=500', {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        todasReglas = await res.json();
+        llenarFiltroCategoria();
+        aplicarFiltros();
+    } catch(e) {
+        document.getElementById('tablaBody').innerHTML = '<div class="vacio"><i class="fas fa-exclamation-triangle" style="display:block;font-size:2rem;margin-bottom:10px;color:#f59e0b;"></i>Error al cargar reglas. Verificá la conexión.</div>';
+    }
+}
+
+function llenarFiltroCategoria() {
+    var cats = [...new Set(todasReglas.map(r => r.categoria).filter(Boolean))].sort();
+    var sel = document.getElementById('filtroCategoria');
+    cats.forEach(c => {
+        var opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        sel.appendChild(opt);
+    });
+}
+
+function aplicarFiltros() {
+    var texto = document.getElementById('filtroTexto').value.toLowerCase().trim();
+    var perfil = document.getElementById('filtroPerfil').value;
+    var sexo = document.getElementById('filtroSexo').value;
+    var categoria = document.getElementById('filtroCategoria').value;
+
+    reglasFiltradas = todasReglas.filter(r => {
+        if (texto && !((r.practica||'').toLowerCase().includes(texto) || (r.subcategoria||'').toLowerCase().includes(texto) || (r.notas||'').toLowerCase().includes(texto))) return false;
+        if (sexo && (r.sexo_aplica||'').toLowerCase() !== sexo) return false;
+        if (categoria && r.categoria !== categoria) return false;
+        if (perfil) {
+            var ed = parseInt(r.edad_desde) || 0;
+            if (perfil === 'adulto' && ed < 18) return false;
+            if (perfil === 'c' && (ed < 12 || ed > 17)) return false;
+            if (perfil === 'b' && (ed < 6 || ed > 11)) return false;
+            if (perfil === 'a' && (ed < 2 || ed > 5)) return false;
+        }
+        return true;
+    });
+
+    ordenarYRenderizar();
+}
+
+function ordenarPor(campo) {
+    if (ordenActual === campo) ordenAsc = !ordenAsc;
+    else { ordenActual = campo; ordenAsc = true; }
+    ordenarYRenderizar();
+}
+
+function ordenarYRenderizar() {
+    var sorted = [...reglasFiltradas].sort((a, b) => {
+        var va = a[ordenActual] ?? '';
+        var vb = b[ordenActual] ?? '';
+        if (typeof va === 'number') return ordenAsc ? va - vb : vb - va;
+        return ordenAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+    });
+    renderTabla(sorted);
+}
+
+function getPerfilBadge(edadd, edadh) {
+    var ed = parseInt(edadd) || 0;
+    if (ed >= 18) return '<span class="badge perfil-adulto">Adulto</span>';
+    if (ed >= 12) return '<span class="badge perfil-c">Perfil C</span>';
+    if (ed >= 6) return '<span class="badge perfil-b">Perfil B</span>';
+    if (ed >= 2) return '<span class="badge perfil-a">Perfil A</span>';
+    return '<span class="badge" style="background:#f1f5f9;color:#64748b;">0-1</span>';
+}
+
+function getSexoBadge(sexo) {
+    if (sexo === 'femenino') return '<span class="badge badge-femenino"><i class="fas fa-venus" style="margin-right:3px"></i>F</span>';
+    if (sexo === 'masculino') return '<span class="badge badge-masculino"><i class="fas fa-mars" style="margin-right:3px"></i>M</span>';
+    return '<span class="badge badge-ambos">Ambos</span>';
+}
+
+function getFrecuencia(f) {
+    if (f === null || f === undefined || f === '') return '<span style="color:#94a3b8">—</span>';
+    if (f == 0) return '<span class="badge" style="background:#fef2f2;color:#dc2626;font-size:11px;">Inmediata</span>';
+    if (f < 1) return '<span class="frecuencia">' + (f * 12) + ' meses</span>';
+    return '<span class="frecuencia">' + f + ' año' + (f > 1 ? 's' : '') + '</span>';
+}
+
+function renderTabla(reglas) {
+    document.getElementById('statTotal').textContent = reglas.length + ' reglas';
+    if (reglas.length === 0) {
+        document.getElementById('tablaBody').innerHTML = '<div class="vacio"><i class="fas fa-search" style="display:block;font-size:2rem;margin-bottom:10px;"></i>No se encontraron reglas con esos filtros.</div>';
+        return;
+    }
+    var html = reglas.map(r => {
+        var condicion = r.condicion_campo ? '<span class="badge badge-cond">' + r.condicion_campo + ' = ' + (r.condicion_valor||'') + '</span>' : '<span style="color:#94a3b8;font-size:12px;">—</span>';
+        var histCond = r.historial_condicion_campo ? '<span class="badge badge-cond" style="background:#f0fdf4;color:#166534;">' + r.historial_condicion_campo.substring(0,20) + '...</span>' : '<span style="color:#94a3b8;font-size:12px;">—</span>';
+        var notas = r.notas ? '<span title="' + r.notas.replace(/"/g,'&quot;') + '" style="cursor:help;color:#0448a2;font-size:12px;">' + r.notas.substring(0,45) + (r.notas.length > 45 ? '...' : '') + '</span>' : '<span style="color:#94a3b8;font-size:12px;">—</span>';
+        var edadStr = (r.edad_desde !== null ? r.edad_desde : '—') + ' a ' + (r.edad_hasta !== null ? r.edad_hasta : '—');
+        return '<div class="fila">' +
+            '<div class="td"><strong>' + (r.practica||'') + '</strong>&nbsp;' + getPerfilBadge(r.edad_desde, r.edad_hasta) + '</div>' +
+            '<div class="td td-small">' + (r.subcategoria||'<span style="color:#94a3b8">—</span>') + '</div>' +
+            '<div class="td td-small">' + edadStr + '</div>' +
+            '<div class="td">' + getSexoBadge(r.sexo_aplica) + '</div>' +
+            '<div class="td">' + condicion + '</div>' +
+            '<div class="td">' + histCond + '</div>' +
+            '<div class="td">' + getFrecuencia(r.frecuencia_anios) + '</div>' +
+            '<div class="td">' + notas + '</div>' +
+            '<div class="td" style="gap:4px;">' +
+                '<button class="btn-editar" onclick="abrirModalEditar(' + r.id + ')"><i class="fas fa-pen"></i></button>' +
+                '<button class="btn-borrar" onclick="borrarRegla(' + r.id + ', \'' + (r.practica||'').replace(/'/g,"\\'") + '\')"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+    document.getElementById('tablaBody').innerHTML = html;
+}
+
+function abrirModalEditar(id) {
+    var r = todasReglas.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar regla';
+    document.getElementById('modalId').value = r.id;
+    document.getElementById('mPractica').value = r.practica || '';
+    document.getElementById('mCategoria').value = r.categoria || '';
+    document.getElementById('mSubcategoria').value = r.subcategoria || '';
+    document.getElementById('mEdadDesde').value = r.edad_desde ?? '';
+    document.getElementById('mEdadHasta').value = r.edad_hasta ?? '';
+    document.getElementById('mSexo').value = r.sexo_aplica || 'ambos';
+    document.getElementById('mFrecuencia').value = r.frecuencia_anios ?? '';
+    document.getElementById('mCondCampo').value = r.condicion_campo || '';
+    document.getElementById('mCondValor').value = r.condicion_valor || '';
+    document.getElementById('mHistCampo').value = r.historial_condicion_campo || '';
+    document.getElementById('mHistValor').value = r.historial_condicion_valor || '';
+    document.getElementById('mExcluir').value = r.excluir_si_historial_es || '';
+    document.getElementById('mNotas').value = r.notas || '';
+    document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function abrirModalNueva() {
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Nueva regla';
+    document.getElementById('modalId').value = '';
+    ['mPractica','mCategoria','mSubcategoria','mEdadDesde','mEdadHasta','mFrecuencia','mCondCampo','mCondValor','mHistCampo','mHistValor','mExcluir','mNotas'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mSexo').value = 'ambos';
+    document.getElementById('modalOverlay').classList.add('visible');
+}
+
+function cerrarModal() {
+    document.getElementById('modalOverlay').classList.remove('visible');
+}
+
+async function guardarRegla() {
+    var id = document.getElementById('modalId').value;
+    var practica = document.getElementById('mPractica').value.trim();
+    if (!practica) { alert('La práctica es obligatoria.'); return; }
+
+    var datos = {
+        practica: practica,
+        categoria: document.getElementById('mCategoria').value.trim() || null,
+        subcategoria: document.getElementById('mSubcategoria').value.trim() || null,
+        edad_desde: document.getElementById('mEdadDesde').value !== '' ? parseInt(document.getElementById('mEdadDesde').value) : null,
+        edad_hasta: document.getElementById('mEdadHasta').value !== '' ? parseInt(document.getElementById('mEdadHasta').value) : null,
+        sexo_aplica: document.getElementById('mSexo').value,
+        frecuencia_anios: document.getElementById('mFrecuencia').value !== '' ? parseFloat(document.getElementById('mFrecuencia').value) : null,
+        condicion_campo: document.getElementById('mCondCampo').value.trim() || null,
+        condicion_valor: document.getElementById('mCondValor').value.trim() || null,
+        historial_condicion_campo: document.getElementById('mHistCampo').value.trim() || null,
+        historial_condicion_valor: document.getElementById('mHistValor').value.trim() || null,
+        excluir_si_historial_es: document.getElementById('mExcluir').value.trim() || null,
+        notas: document.getElementById('mNotas').value.trim() || null
+    };
+
+    var url = SUPABASE_URL + '/rest/v1/reglas_preventivas';
+    var method = 'POST';
+    var headers = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+    if (id) {
+        url += '?id=eq.' + id;
+        method = 'PATCH';
+    }
+
+    try {
+        var res = await fetch(url, { method: method, headers: headers, body: JSON.stringify(datos) });
+        if (res.ok) {
+            cerrarModal();
+            await cargarReglas();
+        } else {
+            var err = await res.json();
+            alert('Error: ' + JSON.stringify(err));
+        }
+    } catch(e) {
+        alert('Error de conexión: ' + e.message);
+    }
+}
+
+async function borrarRegla(id, practica) {
+    if (!confirm('¿Borrar la regla "' + practica + '"? Esta acción no se puede deshacer.')) return;
+    try {
+        var res = await fetch(SUPABASE_URL + '/rest/v1/reglas_preventivas?id=eq.' + id, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+        });
+        if (res.ok) await cargarReglas();
+        else alert('Error al borrar.');
+    } catch(e) {
+        alert('Error de conexión.');
+    }
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+});
+
+cargarReglas();
+</script>
+</body>
+</html>
