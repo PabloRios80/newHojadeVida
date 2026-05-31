@@ -126,6 +126,11 @@ app.post('/saveData', async (req, res) => {
 
     console.log('✅ Guardado en Supabase:', d.DNI);
 
+    // Generar plan preventivo automáticamente
+axios.get(`http://localhost:${PORT}/getPreventivePlan/${d.DNI}`)
+    .then(r => console.log(`✅ Plan generado para ${d.DNI}: ${r.data.autorizadas || 0} prácticas`))
+    .catch(e => console.warn('Plan preventivo no generado:', e.message));
+
     // Guardar copia histórica
 await supabase.from('historial_hoja_de_vida').insert({
     dni:                       d.DNI,
@@ -477,6 +482,7 @@ app.post('/savePracticeResult', async (req, res) => {
       .ilike('descripcion_practica', `%${descripcion}%`)
       .eq('estado', 'AUTORIZADA')
       .single();
+      console.log('Buscando práctica:', practica.descripcion, 'para DNI:', dni);
 
     if (existente) {
       await supabase
@@ -541,7 +547,10 @@ if (!afiliado) return res.json({ success: false, message: 'Afiliado no encontrad
 
     const EQUIVALENCIAS = {
       'glucemia en ayunas': 'diabetes',
-      'colesterol total, hdl/colesterol, ldl/colesterol, trigliceridos': 'dislipemias',
+      'colesterol total': 'dislipemias',
+      'hdl/colesterol': 'dislipemias',
+      'ldl/colesterol': 'dislipemias',
+      'trigliceridos': 'dislipemias',
       'ldl/colesterol': 'dislipemias',
       'tomar ta ambos brazos personal capacitado': 'presion_arterial',
       'creatinina, formula filtrado glomerular': 'erc',
@@ -844,22 +853,38 @@ Para valores negativos usá "NEGATIVO", para valores numéricos incluí la unida
     });
   }
 });
+
 app.post('/savePracticasLaboratorio', async (req, res) => {
   try {
     const { dni, practicas, idPrestador, nombrePrestador } = req.body;
+    console.log('Guardando prácticas de laboratorio para DNI:', dni);
 
-    // 1. Guardamos en Google Sheets (mantenemos el flujo actual)
-    const response = await axios.post(APPS_SCRIPT_URL, {
+    // 1. Backup Google Sheets (no bloqueante)
+    axios.post(APPS_SCRIPT_URL, {
       action: 'guardarPracticasLaboratorio',
       payload: req.body
-    });
+    }).catch(e => console.warn('Backup Google Sheets falló:', e.message));
 
-    // 2. Actualizamos practicas_autorizadas en Supabase
+    // 2. Deduplicar — para prácticas repetidas quedarse con el valor más relevante
+    const practicasDedup = {};
+    for (const p of practicas) {
+        const key = p.descripcion.toLowerCase().trim();
+        if (!practicasDedup[key]) {
+            practicasDedup[key] = p;
+        } else {
+            const vNuevo = (p.valor || '').toUpperCase();
+            if (vNuevo.includes('DETECTABLE') && !vNuevo.includes('NO DETECTABLE')) practicasDedup[key] = p;
+            if (vNuevo.includes('POSITIVO')) practicasDedup[key] = p;
+        }
+    }
+    const practicasUnicas = Object.values(practicasDedup);
+    console.log('Prácticas únicas a guardar:', practicasUnicas.length);
+
+    // 3. Actualizar practicas_autorizadas en Supabase
     let guardadas = 0;
     let noAutorizadas = 0;
 
-    for (const practica of practicas) {
-      // Buscamos si existe la práctica autorizada
+    for (const practica of practicasUnicas) {
       const { data: existente } = await supabase
         .from('practicas_autorizadas')
         .select('id')
@@ -869,7 +894,6 @@ app.post('/savePracticasLaboratorio', async (req, res) => {
         .single();
 
       if (existente) {
-        // Actualizamos a REALIZADA
         await supabase
           .from('practicas_autorizadas')
           .update({
@@ -898,7 +922,6 @@ app.post('/savePracticasLaboratorio', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error de conexión.' });
   }
 });
-
 app.get('/getDatosAfiliado/:dni', async (req, res) => {
   try {
     const response = await axios.post(APPS_SCRIPT_URL, {
