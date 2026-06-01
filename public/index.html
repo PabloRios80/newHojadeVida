@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Día Preventivo - IAPOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Source Sans 3', sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
+        body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
 
         /* HEADER */
         .iapos-header { background: #0448a2; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); max-width: 85%; margin: 0 auto; border-radius: 0 0 10px 10px; }
@@ -42,7 +43,7 @@
         .field label { font-size: 13px; font-weight: 500; color: #64748b; }
         .req { color: #dc2626; margin-left: 2px; }
         .opt { color: #94a3b8; font-weight: 400; font-size: 12px; margin-left: 4px; }
-        .field input, .field select { font-family: 'Source Sans 3', sans-serif; font-size: 15px; color: #1e293b; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
+        .field input, .field select { font-family: 'Montserrat', sans-serif; font-size: 15px; color: #1e293b; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
         .field input:focus, .field select:focus { border-color: #0448a2; box-shadow: 0 0 0 3px rgba(0,51,102,0.08); }
         .field input[readonly] { background: #f8fafc; color: #94a3b8; cursor: default; }
         .field-hint { font-size: 12px; color: #94a3b8; }
@@ -50,7 +51,7 @@
 
         /* CHIPS */
         .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .chip { border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; background: #fff; transition: all 0.12s; user-select: none; font-family: 'Source Sans 3', sans-serif; }
+        .chip { border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; background: #fff; transition: all 0.12s; user-select: none; font-family: 'Montserrat', sans-serif; }
         .chip:hover { border-color: #0448a2; color: #0448a2; background: #f0f6ff; }
         .chip.sel-default { border-color: #0448a2; background: #e6f0fb; color: #0448a2; }
         .chip.sel-si { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
@@ -76,11 +77,11 @@
         /* NAV */
         .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
         .nav-row.end { justify-content: flex-end; }
-        .btn-prev { background: transparent; color: #64748b; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-prev { background: transparent; color: #64748b; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
         .btn-prev:hover { background: #f8fafc; }
-        .btn-next { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-next { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
         .btn-next:hover { background: #033d8a; }
-        .btn-guardar { background: #15803d; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; display: flex; align-items: center; gap: 7px; }
+        .btn-guardar { background: #15803d; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
         .btn-guardar:hover { background: #166534; }
 
         /* WELCOME */
@@ -99,7 +100,7 @@
         .welcome-icon i { color: #0448a2; font-size: 18px; }
         .welcome-card-title { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
         .welcome-card-desc { font-size: 13px; color: #64748b; line-height: 1.55; margin-bottom: 16px; }
-        .btn-hoja { display: block; width: 100%; text-align: center; background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 11px 0; cursor: pointer; font-family: 'Source Sans 3', sans-serif; }
+        .btn-hoja { display: block; width: 100%; text-align: center; background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 11px 0; cursor: pointer; font-family: 'Montserrat', sans-serif; }
         .btn-hoja:hover { background: #033d8a; }
         .welcome-nota { font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 6px 4px 10px; }
         .welcome-card-secondary { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; cursor: pointer; display: flex; align-items: center; }
@@ -128,7 +129,7 @@
         .checkbox-row input[type=checkbox] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: #0448a2; cursor: pointer; }
         .checkbox-label { font-size: 14px; color: #1e293b; line-height: 1.55; cursor: pointer; }
         .checkbox-label span { color: #64748b; font-size: 13px; display: block; margin-top: 3px; }
-        .btn-continuar { display: block; width: 100%; text-align: center; background: #94a3b8; color: #fff; font-size: 15px; font-weight: 600; border: none; border-radius: 6px; padding: 13px 0; cursor: not-allowed; font-family: 'Source Sans 3', sans-serif; transition: background 0.2s; }
+        .btn-continuar { display: block; width: 100%; text-align: center; background: #94a3b8; color: #fff; font-size: 15px; font-weight: 600; border: none; border-radius: 6px; padding: 13px 0; cursor: not-allowed; font-family: 'Montserrat', sans-serif; transition: background 0.2s; }
         .btn-continuar.active { background: #0448a2; cursor: pointer; }
         .btn-continuar.active:hover { background: #033d8a; }
         .ley-ref { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 10px; }
@@ -151,24 +152,21 @@
     </style>
 </head>
 <body>
-
-<header class="iapos-header">
-    <img src="images/logo_iapos.png" alt="Logo IAPOS" style="height:42px; display:block;">
-    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DÍA</span>
-        <div style="display:flex; align-items:center;">
-            <span style="font-size:20px; font-weight:700; color:#ff2020; letter-spacing:0.04em; text-transform:uppercase; line-height:1;">PREVENTIV</span>
-            <svg width="20" height="24" viewBox="0 0 22 28" style="margin-left:-1px; flex-shrink:0;">
-                <path d="M13,2.5 A9,9 0 1,1 9,2.5" fill="none" stroke="#ff2020" 
-                        stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="11" cy="11" r="3" fill="#ffffff"/>
-                <polygon points="11,15 8.5,21 11,27 13.5,21" fill="#4a9fd4"/>
-            </svg>
+<header style="background-color:#014189; padding:0; margin:0;">
+    <div style="background-color:#014189; padding:12px 20px; display:flex; align-items:center; gap:16px; max-width:1080px; margin:0 auto;">
+        <a href="index.html">
+            <img src="images/logo_iapos.png" alt="Logo IAPOS" style="height:50px; display:block;">
+        </a>
+        <div>
+            <div style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#fff; letter-spacing:0.02em;">
+                Hoja de Vida — Día Preventivo
+            </div>
+            <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#00A8E7; font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">
+                Instituto Autárquico Provincial de Obra Social
+            </div>
         </div>
-        <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); letter-spacing:0.2em; text-transform:uppercase;">DE LA SALUD</span>
-        <span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.5); letter-spacing:0.05em;">Hoja de Vida</span>
     </div>
-    <div style="width:80px"></div>
+    <div style="background-color:#00A8E7; height:4px;"></div>
 </header>
 
 <div class="progress-outer" id="progressBar">
@@ -196,11 +194,12 @@
             <span class="welcome-pill"><i class="fas fa-mobile-alt"></i> Fácil desde el celular</span>
         </div>
     </div>
-    <div class="welcome-card-primary">
-        <div class="welcome-icon"><i class="fas fa-file-medical"></i></div>
-        <p class="welcome-card-title">Hoja de Vida</p>
-        <p class="welcome-card-desc">Completá tu información de salud para que podamos preparar las recomendaciones preventivas personalizadas para vos.</p>
-        <button class="btn-hoja" onclick="irA('screenConsent')">Completar Hoja de Vida</button>
+    <div class="welcome-card-primary" style="background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 100%); border: 2px solid #014189; border-radius: 12px; padding: 28px 24px; margin-bottom: 8px;">
+        <p class="welcome-card-title" style="font-size:22px; font-weight:700; color:#014189; margin-bottom:8px;">📋 Hoja de Vida</p>
+        <p class="welcome-card-desc" style="font-size:15px; color:#334e6e; line-height:1.6; margin-bottom:20px;">Completá tu información de salud para que podamos preparar las recomendaciones preventivas personalizadas para vos.</p>
+        <button class="btn-hoja" onclick="irA('screenConsent')" style="background: linear-gradient(135deg, #014189 0%, #0160c4 100%); color:#fff; font-size:16px; font-weight:700; border:none; border-radius:8px; padding:14px 0; width:100%; cursor:pointer; font-family:'Montserrat',sans-serif; letter-spacing:0.03em; box-shadow: 0 4px 12px rgba(1,65,137,0.4);">
+            ✅ Completar mi Hoja de Vida
+        </button>
     </div>
     <p class="welcome-nota">Para iniciar el Día Preventivo es indispensable completar la Hoja de Vida. Puede hacerse en cualquier momento antes del turno.</p>
     <div class="welcome-card-secondary" onclick="window.location.href='ver_recomendaciones.html'">
