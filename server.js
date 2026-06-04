@@ -72,6 +72,7 @@ app.get('/verificar-afiliado/:dni', async (req, res) => {
         res.status(500).json({ esActivo: false, error: e.message });
     }
 });
+
 app.post('/saveData', async (req, res) => {
   console.log("Recibida petición en /saveData...");
   const d = req.body;
@@ -174,7 +175,9 @@ console.log('✅ Historial guardado:', d.DNI);
     // 2. Backup en Google Sheets (no bloqueante)
     axios.post(APPS_SCRIPT_URL, {
       action: 'guardarHojaDeVida',
-      payload: req.body
+      payload: { ...req.body, Fecha_Carga: new Date().toLocaleDateString('es-AR'),
+      Edad: parseInt(d.Edad) || d.Edad
+      }
     }).catch(e => console.warn('Backup Google Sheets falló:', e.message));
 
     res.json({ success: true, message: 'Datos guardados correctamente.' });
