@@ -499,7 +499,7 @@ var afiliadoVerificado = false;
 async function verificarDNI() {
     console.log('Verificando elegibilidad para DNI:', dni);
     var dni = document.getElementById('dni').value.trim();
-    if (dni.length < 7) return;
+    if (dni.length < 6) return;
 
     var msgEl = document.getElementById('dniMsg');
     if (!msgEl) {
@@ -582,8 +582,8 @@ function validarPaso(n) {
         var apellido = document.getElementById('apellido').value.trim();
         var nombre = document.getElementById('nombre').value.trim();
 
-        if (!/^\d{7,8}$/.test(dni)) {
-            mostrarError('dni', 'El DNI debe tener 7 u 8 números.');
+        if (!/^\d{6,8}[a-zA-Z]?$/.test(dni)) {
+            mostrarError('dni', 'El DNI debe tener entre 6 y 8 números, con letra opcional al inicio.');
             return false;
         } else { limpiarError('dni'); }
 
