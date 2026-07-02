@@ -582,7 +582,7 @@ function validarPaso(n) {
         var apellido = document.getElementById('apellido').value.trim();
         var nombre = document.getElementById('nombre').value.trim();
 
-        if (!/^\d{6,8}[a-zA-Z]?$/.test(dni)) {
+        if (!/^[a-zA-Z]?\d{6,8}$/.test(dni)) {
             mostrarError('dni', 'El DNI debe tener entre 6 y 8 números, con letra opcional al inicio.');
             return false;
         } else { limpiarError('dni'); }
