@@ -581,7 +581,8 @@ async function guardar() {
         audicion:               vals['audicion'] || '',
         condicion_salud:        vals['condicion_salud'] || '',
         condicion_detalle:      document.getElementById('condicion_detalle').value.trim(),
-        observaciones:          document.getElementById('observaciones').value.trim()
+        observaciones:          document.getElementById('observaciones').value.trim(),
+        origen_carga:           new URLSearchParams(window.location.search).get('origen') || nul
     };
 
     document.getElementById('paso' + pasoActual).style.display = 'none';
