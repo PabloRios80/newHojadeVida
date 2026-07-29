@@ -117,6 +117,7 @@ app.post('/saveData', async (req, res) => {
         cancer_de_mama:         d.Cancer_de_mama,
         cancer_cuello_utero:    d.Cancer_cuello_utero,
         cancer_de_prostata:     d.Cancer_de_prostata,
+        origen_carga: d.Origen_Carga || null,
         fecha_carga:            new Date().toISOString()
       }, { onConflict: 'dni' });
 
@@ -168,7 +169,8 @@ await supabase.from('historial_hoja_de_vida').insert({
     cancer_de_colon:           d.Cancer_de_colon,
     cancer_de_mama:            d.Cancer_de_mama,
     cancer_cuello_utero:       d.Cancer_cuello_utero,
-    cancer_de_prostata:        d.Cancer_de_prostata
+    cancer_de_prostata:        d.Cancer_de_prostata,
+    origen_carga: d.Origen_Carga || null,
 });
 console.log('✅ Historial guardado:', d.DNI);
 
@@ -997,6 +999,7 @@ app.post('/saveDataMenores', async (req, res) => {
                 tristeza: d.tristeza, atencion_mental: d.atencion_mental,
                 violencia: d.violencia, tabaco: d.tabaco, alcohol: d.alcohol,
                 sustancias: d.sustancias, educ_sexual: d.educ_sexual,
+                origen_carga: d.origen_carga || null,
                 dudas: d.dudas, observaciones: d.observaciones
             });
 
@@ -1046,6 +1049,7 @@ app.post('/saveDataMenoresA', async (req, res) => {
                 vision: d.vision, audicion: d.audicion,
                 condicion_salud: d.condicion_salud,
                 condicion_detalle: d.condicion_detalle,
+                origen_carga: d.origen_carga || null,
                 observaciones: d.observaciones
             });
 

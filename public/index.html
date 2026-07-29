@@ -1,920 +1,2109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Día Preventivo - IAPOS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Montserrat', sans-serif; background: #f0f4f8; color: #333; min-height: 100vh; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Montserrat", sans-serif;
+        background: #f0f4f8;
+        color: #333;
+        min-height: 100vh;
+      }
 
-        /* HEADER */
-        .iapos-header { background: #0448a2; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); max-width: 85%; margin: 0 auto; border-radius: 0 0 10px 10px; }
-        .iapos-header img { height: 42px; }
-        .iapos-header-right { text-align: right; }
-        .iapos-header-title { font-size: 14px; font-weight: 600; color: #fff; }
-        .iapos-header-sub { font-size: 12px; color: rgba(255,255,255,0.6); }
+      /* HEADER */
+      .iapos-header {
+        background: #0448a2;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        max-width: 85%;
+        margin: 0 auto;
+        border-radius: 0 0 10px 10px;
+      }
+      .iapos-header img {
+        height: 42px;
+      }
+      .iapos-header-right {
+        text-align: right;
+      }
+      .iapos-header-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .iapos-header-sub {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
 
-        /* PROGRESS */
-        .progress-outer { background: #0448a2; padding: 0 24px 12px; display: none; }
-        .progress-steps { display: flex; gap: 5px; max-width: 720px; margin: 0 auto 5px; }
-        .progress-step { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.2); transition: background 0.3s; }
-        .progress-step.done { background: #fff; }
-        .progress-step.active { background: rgba(255,255,255,0.6); }
-        .progress-label { font-size: 11px; color: rgba(255,255,255,0.6); max-width: 720px; margin: 0 auto; }
-        .progress-label strong { color: #fff; }
+      /* PROGRESS */
+      .progress-outer {
+        background: #0448a2;
+        padding: 0 24px 12px;
+        display: none;
+      }
+      .progress-steps {
+        display: flex;
+        gap: 5px;
+        max-width: 720px;
+        margin: 0 auto 5px;
+      }
+      .progress-step {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.2);
+        transition: background 0.3s;
+      }
+      .progress-step.done {
+        background: #fff;
+      }
+      .progress-step.active {
+        background: rgba(255, 255, 255, 0.6);
+      }
+      .progress-label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      .progress-label strong {
+        color: #fff;
+      }
 
-        /* MAIN */
-        main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+      /* MAIN */
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
 
-        /* CARDS */
-        .card { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 14px; }
-        .step-title { font-size: 17px; font-weight: 600; color: #0448a2; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .step-num { width: 28px; height: 28px; background: #0448a2; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-        .step-intro { font-size: 15px; color: #475569; margin: -12px 0 18px; line-height: 1.65; font-weight: 500; }
+      /* CARDS */
+      .card {
+        background: #fff;
+        border: 0.5px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 14px;
+      }
+      .step-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #0448a2;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .step-num {
+        width: 28px;
+        height: 28px;
+        background: #0448a2;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .step-intro {
+        font-size: 15px;
+        color: #475569;
+        margin: -12px 0 18px;
+        line-height: 1.65;
+        font-weight: 500;
+      }
 
-        /* FIELDS */
-        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        .field.full { grid-column: 1 / -1; }
-        .field label { font-size: 13px; font-weight: 500; color: #64748b; }
-        .req { color: #dc2626; margin-left: 2px; }
-        .opt { color: #94a3b8; font-weight: 400; font-size: 12px; margin-left: 4px; }
-        .field input, .field select { font-family: 'Montserrat', sans-serif; font-size: 15px; color: #1e293b; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
-        .field input:focus, .field select:focus { border-color: #0448a2; box-shadow: 0 0 0 3px rgba(0,51,102,0.08); }
-        .field input[readonly] { background: #f8fafc; color: #94a3b8; cursor: default; }
-        .field-hint { font-size: 12px; color: #94a3b8; }
-        .error-msg { font-size: 12px; color: #dc2626; margin-top: 2px; display: none; }
+      /* FIELDS */
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
+      .field label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+      }
+      .req {
+        color: #dc2626;
+        margin-left: 2px;
+      }
+      .opt {
+        color: #94a3b8;
+        font-weight: 400;
+        font-size: 12px;
+        margin-left: 4px;
+      }
+      .field input,
+      .field select {
+        font-family: "Montserrat", sans-serif;
+        font-size: 15px;
+        color: #1e293b;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 12px;
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        width: 100%;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: #0448a2;
+        box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.08);
+      }
+      .field input[readonly] {
+        background: #f8fafc;
+        color: #94a3b8;
+        cursor: default;
+      }
+      .field-hint {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      .error-msg {
+        font-size: 12px;
+        color: #dc2626;
+        margin-top: 2px;
+        display: none;
+      }
 
-        /* CHIPS */
-        .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .chip { border: 1px solid #cbd5e1; border-radius: 7px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 500; color: #64748b; background: #fff; transition: all 0.12s; user-select: none; font-family: 'Montserrat', sans-serif; }
-        .chip:hover { border-color: #0448a2; color: #0448a2; background: #f0f6ff; }
-        .chip.sel-default { border-color: #0448a2; background: #e6f0fb; color: #0448a2; }
-        .chip.sel-si { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
-        .chip.sel-no { border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
-        .chip.sel-ns { border-color: #d97706; background: #fffbeb; color: #d97706; }
+      /* CHIPS */
+      .chips-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        padding: 9px 18px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #64748b;
+        background: #fff;
+        transition: all 0.12s;
+        user-select: none;
+        font-family: "Montserrat", sans-serif;
+      }
+      .chip:hover {
+        border-color: #0448a2;
+        color: #0448a2;
+        background: #f0f6ff;
+      }
+      .chip.sel-default {
+        border-color: #0448a2;
+        background: #e6f0fb;
+        color: #0448a2;
+      }
+      .chip.sel-si {
+        border-color: #dc2626;
+        background: #fef2f2;
+        color: #dc2626;
+      }
+      .chip.sel-no {
+        border-color: #16a34a;
+        background: #f0fdf4;
+        color: #16a34a;
+      }
+      .chip.sel-ns {
+        border-color: #d97706;
+        background: #fffbeb;
+        color: #d97706;
+      }
 
-        /* IMC */
-        .imc-box { border-radius: 8px; padding: 14px 16px; grid-column: 1 / -1; display: none; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; background: #f8fafc; transition: all 0.2s; }
-        .imc-label { font-size: 13px; color: #64748b; font-weight: 500; }
-        .imc-value { font-size: 24px; font-weight: 600; color: #0448a2; }
-        .imc-cat { font-size: 13px; padding: 4px 12px; border-radius: 20px; font-weight: 600; margin-left: 10px; }
+      /* IMC */
+      .imc-box {
+        border-radius: 8px;
+        padding: 14px 16px;
+        grid-column: 1 / -1;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        transition: all 0.2s;
+      }
+      .imc-label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+      }
+      .imc-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: #0448a2;
+      }
+      .imc-cat {
+        font-size: 13px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-left: 10px;
+      }
 
-        /* SUB PREGUNTA */
-        .sub-pregunta { margin-top: 12px; padding: 12px 14px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #0448a2; display: none; }
-        .sub-label { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 10px; }
+      /* SUB PREGUNTA */
+      .sub-pregunta {
+        margin-top: 12px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 3px solid #0448a2;
+        display: none;
+      }
+      .sub-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+      }
 
-        /* PREGUNTAS */
-        .pregunta { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 0.5px solid #f1f5f9; }
-        .pregunta:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .pregunta-label { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 10px; }
-        .pregunta-hint { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+      /* PREGUNTAS */
+      .pregunta {
+        margin-bottom: 18px;
+        padding-bottom: 18px;
+        border-bottom: 0.5px solid #f1f5f9;
+      }
+      .pregunta:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      .pregunta-label {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 10px;
+      }
+      .pregunta-hint {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-bottom: 8px;
+      }
 
-        /* NAV */
-        .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-        .nav-row.end { justify-content: flex-end; }
-        .btn-prev { background: transparent; color: #64748b; font-size: 14px; font-weight: 500; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 20px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
-        .btn-prev:hover { background: #f8fafc; }
-        .btn-next { background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
-        .btn-next:hover { background: #033d8a; }
-        .btn-guardar { background: #15803d; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 10px 24px; cursor: pointer; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 7px; }
-        .btn-guardar:hover { background: #166534; }
+      /* NAV */
+      .nav-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+      }
+      .nav-row.end {
+        justify-content: flex-end;
+      }
+      .btn-prev {
+        background: transparent;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-family: "Montserrat", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn-prev:hover {
+        background: #f8fafc;
+      }
+      .btn-next {
+        background: #0448a2;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 24px;
+        cursor: pointer;
+        font-family: "Montserrat", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn-next:hover {
+        background: #033d8a;
+      }
+      .btn-guardar {
+        background: #15803d;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 24px;
+        cursor: pointer;
+        font-family: "Montserrat", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn-guardar:hover {
+        background: #166534;
+      }
 
-        /* WELCOME */
-        .welcome-header { background: #0448a2; border-radius: 12px; padding: 28px 28px 32px; margin-bottom: 16px; }
-        .welcome-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-        .welcome-logo-circle { width: 38px; height: 38px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .welcome-logo-circle i { font-size: 18px; color: #fff; }
-        .welcome-logo-text { color: rgba(255,255,255,0.65); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
-        .welcome-headline { font-size: 24px; font-weight: 600; color: #fff; margin-bottom: 8px; }
-        .welcome-sub { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
-        .welcome-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-        .welcome-pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; }
-        .welcome-pill i { font-size: 12px; }
-        .welcome-card-primary { background: #fff; border: 2px solid #0448a2; border-radius: 12px; padding: 22px 24px; margin-bottom: 8px; }
-        .welcome-icon { width: 38px; height: 38px; background: #e6f0fb; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-        .welcome-icon i { color: #0448a2; font-size: 18px; }
-        .welcome-card-title { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
-        .welcome-card-desc { font-size: 13px; color: #64748b; line-height: 1.55; margin-bottom: 16px; }
-        .btn-hoja { display: block; width: 100%; text-align: center; background: #0448a2; color: #fff; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; padding: 11px 0; cursor: pointer; font-family: 'Montserrat', sans-serif; }
-        .btn-hoja:hover { background: #033d8a; }
-        .welcome-nota { font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 6px 4px 10px; }
-        .welcome-card-secondary { background: #fff; border: 0.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; cursor: pointer; display: flex; align-items: center; }
-        .welcome-card-secondary:hover { border-color: #0448a2; }
-        .secondary-banda { width: 5px; background: #16a34a; align-self: stretch; flex-shrink: 0; }
-        .secondary-content { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; flex: 1; }
-        .secondary-left { display: flex; align-items: center; gap: 12px; }
-        .secondary-icon { width: 32px; height: 32px; background: #f0fdf4; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-        .secondary-icon i { font-size: 16px; color: #16a34a; }
-        .secondary-title { font-size: 14px; font-weight: 500; color: #1e293b; margin-bottom: 2px; }
-        .secondary-desc { font-size: 12px; color: #94a3b8; }
-        .secondary-arr { color: #94a3b8; font-size: 16px; }
+      /* WELCOME */
+      .welcome-header {
+        background: #0448a2;
+        border-radius: 12px;
+        padding: 28px 28px 32px;
+        margin-bottom: 16px;
+      }
+      .welcome-logo-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .welcome-logo-circle {
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .welcome-logo-circle i {
+        font-size: 18px;
+        color: #fff;
+      }
+      .welcome-logo-text {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .welcome-headline {
+        font-size: 24px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 8px;
+      }
+      .welcome-sub {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.6;
+      }
+      .welcome-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .welcome-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 5px 12px;
+        border-radius: 20px;
+      }
+      .welcome-pill i {
+        font-size: 12px;
+      }
+      .welcome-card-primary {
+        background: #fff;
+        border: 2px solid #0448a2;
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 8px;
+      }
+      .welcome-icon {
+        width: 38px;
+        height: 38px;
+        background: #e6f0fb;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .welcome-icon i {
+        color: #0448a2;
+        font-size: 18px;
+      }
+      .welcome-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+      }
+      .welcome-card-desc {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.55;
+        margin-bottom: 16px;
+      }
+      .btn-hoja {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: #0448a2;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        padding: 11px 0;
+        cursor: pointer;
+        font-family: "Montserrat", sans-serif;
+      }
+      .btn-hoja:hover {
+        background: #033d8a;
+      }
+      .welcome-nota {
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin: 6px 4px 10px;
+      }
+      .welcome-card-secondary {
+        background: #fff;
+        border: 0.5px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      .welcome-card-secondary:hover {
+        border-color: #0448a2;
+      }
+      .secondary-banda {
+        width: 5px;
+        background: #16a34a;
+        align-self: stretch;
+        flex-shrink: 0;
+      }
+      .secondary-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        flex: 1;
+      }
+      .secondary-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .secondary-icon {
+        width: 32px;
+        height: 32px;
+        background: #f0fdf4;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .secondary-icon i {
+        font-size: 16px;
+        color: #16a34a;
+      }
+      .secondary-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 2px;
+      }
+      .secondary-desc {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+      .secondary-arr {
+        color: #94a3b8;
+        font-size: 16px;
+      }
 
-        /* CONSENT */
-        .consent-section-title { font-size: 12px; font-weight: 600; color: #0448a2; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
-        .consent-body { font-size: 14px; color: #64748b; line-height: 1.7; }
-        .consent-body strong { color: #1e293b; font-weight: 600; }
-        .consent-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .consent-pill { display: flex; align-items: center; gap: 5px; background: #e6f0fb; color: #0448a2; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; }
-        .derechos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
-        .derecho { display: flex; align-items: flex-start; gap: 8px; }
-        .derecho i { font-size: 15px; color: #16a34a; margin-top: 2px; flex-shrink: 0; }
-        .derecho-text { font-size: 13px; color: #64748b; line-height: 1.5; }
-        .derecho-text strong { color: #1e293b; font-weight: 600; }
-        .checkbox-row { display: flex; align-items: flex-start; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; cursor: pointer; }
-        .checkbox-row input[type=checkbox] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: #0448a2; cursor: pointer; }
-        .checkbox-label { font-size: 14px; color: #1e293b; line-height: 1.55; cursor: pointer; }
-        .checkbox-label span { color: #64748b; font-size: 13px; display: block; margin-top: 3px; }
-        .btn-continuar { display: block; width: 100%; text-align: center; background: #94a3b8; color: #fff; font-size: 15px; font-weight: 600; border: none; border-radius: 6px; padding: 13px 0; cursor: not-allowed; font-family: 'Montserrat', sans-serif; transition: background 0.2s; }
-        .btn-continuar.active { background: #0448a2; cursor: pointer; }
-        .btn-continuar.active:hover { background: #033d8a; }
-        .ley-ref { font-size: 11px; color: #94a3b8; text-align: center; margin-top: 10px; }
+      /* CONSENT */
+      .consent-section-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #0448a2;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .consent-body {
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.7;
+      }
+      .consent-body strong {
+        color: #1e293b;
+        font-weight: 600;
+      }
+      .consent-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .consent-pill {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: #e6f0fb;
+        color: #0448a2;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 5px 12px;
+        border-radius: 20px;
+      }
+      .derechos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 4px;
+      }
+      .derecho {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .derecho i {
+        font-size: 15px;
+        color: #16a34a;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+      .derecho-text {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+      }
+      .derecho-text strong {
+        color: #1e293b;
+        font-weight: 600;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        cursor: pointer;
+      }
+      .checkbox-row input[type="checkbox"] {
+        margin-top: 2px;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        accent-color: #0448a2;
+        cursor: pointer;
+      }
+      .checkbox-label {
+        font-size: 14px;
+        color: #1e293b;
+        line-height: 1.55;
+        cursor: pointer;
+      }
+      .checkbox-label span {
+        color: #64748b;
+        font-size: 13px;
+        display: block;
+        margin-top: 3px;
+      }
+      .btn-continuar {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: #94a3b8;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        padding: 13px 0;
+        cursor: not-allowed;
+        font-family: "Montserrat", sans-serif;
+        transition: background 0.2s;
+      }
+      .btn-continuar.active {
+        background: #0448a2;
+        cursor: pointer;
+      }
+      .btn-continuar.active:hover {
+        background: #033d8a;
+      }
+      .ley-ref {
+        font-size: 11px;
+        color: #94a3b8;
+        text-align: center;
+        margin-top: 10px;
+      }
 
-        /* SCREENS */
-        .screen { display: none; }
-        .screen.visible { display: block; }
+      /* SCREENS */
+      .screen {
+        display: none;
+      }
+      .screen.visible {
+        display: block;
+      }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 540px) {
-            .iapos-header { max-width: 100%; padding: 10px 16px; gap: 12px; }
-            .iapos-header img { height: 34px; }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        @media (max-width: 540px) {
-            .grid2 { grid-template-columns: 1fr; }
-            .derechos { grid-template-columns: 1fr; }
+      @media (max-width: 540px) {
+        .iapos-header {
+          max-width: 100%;
+          padding: 10px 16px;
+          gap: 12px;
         }
+        .iapos-header img {
+          height: 34px;
+        }
+      }
+
+      @media (max-width: 540px) {
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+        .derechos {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
-</head>
-<body>
-<header style="background-color:#014189; padding:0; margin:0;">
-    <div style="background-color:#014189; padding:12px 20px; display:flex; align-items:center; gap:16px; max-width:1080px; margin:0 auto;">
+  </head>
+  <body>
+    <header style="background-color: #014189; padding: 0; margin: 0">
+      <div
+        style="
+          background-color: #014189;
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          max-width: 1080px;
+          margin: 0 auto;
+        "
+      >
         <a href="index.html">
-            <img src="images/logo_iapos.png" alt="Logo IAPOS" style="height:50px; display:block;">
+          <img
+            src="images/logo_iapos.png"
+            alt="Logo IAPOS"
+            style="height: 50px; display: block"
+          />
         </a>
         <div>
-            <div style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#fff; letter-spacing:0.02em;">
-                Hoja de Vida — Día Preventivo
-            </div>
-            <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#00A8E7; font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">
-                Instituto Autárquico Provincial de Obra Social
-            </div>
+          <div
+            style="
+              font-family: &quot;Montserrat&quot;, sans-serif;
+              font-size: 22px;
+              font-weight: 700;
+              color: #fff;
+              letter-spacing: 0.02em;
+            "
+          >
+            Hoja de Vida — Día Preventivo
+          </div>
+          <div
+            style="
+              font-family: &quot;Montserrat&quot;, sans-serif;
+              font-size: 11px;
+              color: #00a8e7;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+            "
+          >
+            Instituto Autárquico Provincial de Obra Social
+          </div>
         </div>
-    </div>
-    <div style="background-color:#00A8E7; height:4px;"></div>
-</header>
+      </div>
+      <div style="background-color: #00a8e7; height: 4px"></div>
+    </header>
 
-<div class="progress-outer" id="progressBar">
-    <div class="progress-steps">
+    <div class="progress-outer" id="progressBar">
+      <div class="progress-steps">
         <div class="progress-step" id="ps1"></div>
         <div class="progress-step" id="ps2"></div>
         <div class="progress-step" id="ps3"></div>
         <div class="progress-step" id="ps4"></div>
         <div class="progress-step" id="ps5"></div>
         <div class="progress-step" id="ps6"></div>
+      </div>
+      <p class="progress-label">
+        <strong id="progressText">Paso 1 de 6</strong> —
+        <span id="progressSubtext">Identificación</span>
+      </p>
     </div>
-    <p class="progress-label"><strong id="progressText">Paso 1 de 6</strong> — <span id="progressSubtext">Identificación</span></p>
-</div>
 
-<main>
-
-<!-- PANTALLA 1: BIENVENIDA -->
-<div id="screenWelcome" class="screen visible">
-    <div class="welcome-header">
-        <h1 class="welcome-headline">Bienvenido a Día Preventivo</h1>
-        <p class="welcome-sub">Este programa le permitirá conocer qué estudios preventivos son recomendables para usted según su edad, sexo y factores de riesgo.</p>
-        <div class="welcome-pills">
-            <span class="welcome-pill"><i class="fas fa-clock"></i> 5 minutos</span>
-            <span class="welcome-pill"><i class="fas fa-lock"></i> Datos privados</span>
-            <span class="welcome-pill"><i class="fas fa-mobile-alt"></i> Fácil desde el celular</span>
+    <main>
+      <!-- PANTALLA 1: BIENVENIDA -->
+      <div id="screenWelcome" class="screen visible">
+        <div class="welcome-header">
+          <h1 class="welcome-headline">Bienvenido a Día Preventivo</h1>
+          <p class="welcome-sub">
+            Este programa le permitirá conocer qué estudios preventivos son
+            recomendables para usted según su edad, sexo y factores de riesgo.
+          </p>
+          <div class="welcome-pills">
+            <span class="welcome-pill"
+              ><i class="fas fa-clock"></i> 5 minutos</span
+            >
+            <span class="welcome-pill"
+              ><i class="fas fa-lock"></i> Datos privados</span
+            >
+            <span class="welcome-pill"
+              ><i class="fas fa-mobile-alt"></i> Fácil desde el celular</span
+            >
+          </div>
         </div>
-    </div>
-    <div class="welcome-card-primary" style="background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 100%); border: 2px solid #014189; border-radius: 12px; padding: 28px 24px; margin-bottom: 8px;">
-        <p class="welcome-card-title" style="font-size:22px; font-weight:700; color:#014189; margin-bottom:8px;">📋 Hoja de Vida</p>
-        <p class="welcome-card-desc" style="font-size:15px; color:#334e6e; line-height:1.6; margin-bottom:20px;">Completá tu información de salud para que podamos preparar las recomendaciones preventivas personalizadas para vos.</p>
-        <button class="btn-hoja" onclick="irA('screenConsent')" style="background: linear-gradient(135deg, #014189 0%, #0160c4 100%); color:#fff; font-size:16px; font-weight:700; border:none; border-radius:8px; padding:14px 0; width:100%; cursor:pointer; font-family:'Montserrat',sans-serif; letter-spacing:0.03em; box-shadow: 0 4px 12px rgba(1,65,137,0.4);">
+        <div
+          class="welcome-card-primary"
+          style="
+            background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 100%);
+            border: 2px solid #014189;
+            border-radius: 12px;
+            padding: 28px 24px;
+            margin-bottom: 8px;
+          "
+        >
+          <p
+            class="welcome-card-title"
+            style="
+              font-size: 22px;
+              font-weight: 700;
+              color: #014189;
+              margin-bottom: 8px;
+            "
+          >
+            📋 Hoja de Vida
+          </p>
+          <p
+            class="welcome-card-desc"
+            style="
+              font-size: 15px;
+              color: #334e6e;
+              line-height: 1.6;
+              margin-bottom: 20px;
+            "
+          >
+            Completá tu información de salud para que podamos preparar las
+            recomendaciones preventivas personalizadas para vos.
+          </p>
+          <button
+            class="btn-hoja"
+            onclick="irA('screenConsent')"
+            style="
+              background: linear-gradient(135deg, #014189 0%, #0160c4 100%);
+              color: #fff;
+              font-size: 16px;
+              font-weight: 700;
+              border: none;
+              border-radius: 8px;
+              padding: 14px 0;
+              width: 100%;
+              cursor: pointer;
+              font-family: &quot;Montserrat&quot;, sans-serif;
+              letter-spacing: 0.03em;
+              box-shadow: 0 4px 12px rgba(1, 65, 137, 0.4);
+            "
+          >
             ✅ Completar mi Hoja de Vida
-        </button>
-    </div>
-    <p class="welcome-nota">Para iniciar el Día Preventivo es indispensable completar la Hoja de Vida. Puede hacerse en cualquier momento antes del turno.</p>
-    <div class="welcome-card-secondary" onclick="window.location.href='ver_recomendaciones.html'">
-        <div class="secondary-banda"></div>
-        <div class="secondary-content">
+          </button>
+        </div>
+        <p class="welcome-nota">
+          Para iniciar el Día Preventivo es indispensable completar la Hoja de
+          Vida. Puede hacerse en cualquier momento antes del turno.
+        </p>
+        <div
+          class="welcome-card-secondary"
+          onclick="window.location.href = 'ver_recomendaciones.html'"
+        >
+          <div class="secondary-banda"></div>
+          <div class="secondary-content">
             <div class="secondary-left">
-                <div class="secondary-icon"><i class="fas fa-eye"></i></div>
-                <div>
-                    <p class="secondary-title">Ver mis recomendaciones</p>
-                    <p class="secondary-desc">Si ya completaste tu hoja de vida anteriormente</p>
-                </div>
+              <div class="secondary-icon"><i class="fas fa-eye"></i></div>
+              <div>
+                <p class="secondary-title">Ver mis recomendaciones</p>
+                <p class="secondary-desc">
+                  Si ya completaste tu hoja de vida anteriormente
+                </p>
+              </div>
             </div>
             <i class="fas fa-arrow-right secondary-arr"></i>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
-<!-- PANTALLA 2: CONSENTIMIENTO -->
-<div id="screenConsent" class="screen">
-    <div class="card">
-        <p class="consent-section-title"><i class="fas fa-database"></i> ¿Qué datos recopilamos?</p>
-        <p class="consent-body">Durante la Hoja de Vida recopilaremos <strong>datos de identificación</strong> (nombre, DNI, fecha de nacimiento), <strong>datos de contacto</strong> (email y teléfono) y <strong>datos sensibles de salud</strong> (condiciones médicas, hábitos y antecedentes familiares).</p>
-        <div class="consent-pills">
-            <span class="consent-pill"><i class="fas fa-clock"></i> Solo para su atención preventiva</span>
-            <span class="consent-pill"><i class="fas fa-hospital"></i> Acceso exclusivo del equipo IAPOS</span>
-            <span class="consent-pill"><i class="fas fa-ban"></i> No se comparten con terceros</span>
-        </div>
-    </div>
-    <div class="card">
-        <p class="consent-section-title"><i class="fas fa-shield-alt"></i> ¿Para qué los usamos?</p>
-        <p class="consent-body">Sus datos se utilizan <strong>exclusivamente</strong> para elaborar sus recomendaciones preventivas personalizadas y coordinar su Día Preventivo. En ningún caso serán utilizados con fines comerciales ni compartidos fuera del sistema de salud de IAPOS.</p>
-    </div>
-    <div class="card">
-        <p class="consent-section-title"><i class="fas fa-user-check"></i> Sus derechos</p>
-        <p class="consent-body" style="margin-bottom:12px">Como titular de sus datos, la Ley 25.326 le garantiza:</p>
-        <div class="derechos">
-            <div class="derecho"><i class="fas fa-check"></i><p class="derecho-text"><strong>Acceso</strong> — consultar sus datos en cualquier momento</p></div>
-            <div class="derecho"><i class="fas fa-check"></i><p class="derecho-text"><strong>Rectificación</strong> — corregir datos inexactos</p></div>
-            <div class="derecho"><i class="fas fa-check"></i><p class="derecho-text"><strong>Supresión</strong> — solicitar la eliminación de sus datos</p></div>
-            <div class="derecho"><i class="fas fa-check"></i><p class="derecho-text"><strong>Confidencialidad</strong> — sus datos de salud tienen protección especial</p></div>
-        </div>
-    </div>
-    <div class="checkbox-row">
-        <input type="checkbox" id="consentCheck" onchange="toggleConsent()">
-        <label class="checkbox-label" for="consentCheck">
-            Leí y acepto el uso de mis datos personales y de salud por parte de IAPOS con fines exclusivos de atención preventiva.
-            <span>Conforme a la Ley 25.326 de Protección de Datos Personales de la República Argentina.</span>
-        </label>
-    </div>
-    <button class="btn-continuar" id="btnContinuar" onclick="iniciarFormulario()">Continuar a la Hoja de Vida <i class="fas fa-arrow-right"></i></button>
-    <p class="ley-ref">Ley 25.326 · Dirección Nacional de Protección de Datos Personales · IAPOS Santa Fe</p>
-</div>
-
-<!-- PANTALLA 3: FORMULARIO -->
-<div id="screenForm" class="screen">
-
-    <!-- PASO 1 -->
-    <div class="paso" id="paso1">
+      <!-- PANTALLA 2: CONSENTIMIENTO -->
+      <div id="screenConsent" class="screen">
         <div class="card">
-            <p class="step-title"><span class="step-num">1</span> Identificación</p>
-            <div class="grid2">
-                <div class="field">
-                    <label for="dni">DNI <span class="req">*</span></label>
-                    <input type="text" id="dni" placeholder="Ej: 28456789" maxlength="8" onblur="verificarDNI()">
-                </div>
-                <div class="field">
-                    <label for="birthDate">Fecha de nacimiento <span class="req">*</span></label>
-                    <input type="text" id="birthDate" placeholder="DD/MM/AAAA" maxlength="10">
-                </div>
-                <div class="field">
-                    <label for="age">Edad calculada</label>
-                    <input type="text" id="age" readonly placeholder="Se calcula automáticamente">
-                </div>
-                <div class="field">
-                    <label for="apellido">Apellido <span class="req">*</span></label>
-                    <input type="text" id="apellido" placeholder="Ej: González">
-                </div>
-                <div class="field full">
-                    <label for="nombre">Nombre/s <span class="req">*</span></label>
-                    <input type="text" id="nombre" placeholder="Ej: María Eugenia">
-                </div>
+          <p class="consent-section-title">
+            <i class="fas fa-database"></i> ¿Qué datos recopilamos?
+          </p>
+          <p class="consent-body">
+            Durante la Hoja de Vida recopilaremos
+            <strong>datos de identificación</strong> (nombre, DNI, fecha de
+            nacimiento), <strong>datos de contacto</strong> (email y teléfono) y
+            <strong>datos sensibles de salud</strong> (condiciones médicas,
+            hábitos y antecedentes familiares).
+          </p>
+          <div class="consent-pills">
+            <span class="consent-pill"
+              ><i class="fas fa-clock"></i> Solo para su atención
+              preventiva</span
+            >
+            <span class="consent-pill"
+              ><i class="fas fa-hospital"></i> Acceso exclusivo del equipo
+              IAPOS</span
+            >
+            <span class="consent-pill"
+              ><i class="fas fa-ban"></i> No se comparten con terceros</span
+            >
+          </div>
+        </div>
+        <div class="card">
+          <p class="consent-section-title">
+            <i class="fas fa-shield-alt"></i> ¿Para qué los usamos?
+          </p>
+          <p class="consent-body">
+            Sus datos se utilizan <strong>exclusivamente</strong> para elaborar
+            sus recomendaciones preventivas personalizadas y coordinar su Día
+            Preventivo. En ningún caso serán utilizados con fines comerciales ni
+            compartidos fuera del sistema de salud de IAPOS.
+          </p>
+        </div>
+        <div class="card">
+          <p class="consent-section-title">
+            <i class="fas fa-user-check"></i> Sus derechos
+          </p>
+          <p class="consent-body" style="margin-bottom: 12px">
+            Como titular de sus datos, la Ley 25.326 le garantiza:
+          </p>
+          <div class="derechos">
+            <div class="derecho">
+              <i class="fas fa-check"></i>
+              <p class="derecho-text">
+                <strong>Acceso</strong> — consultar sus datos en cualquier
+                momento
+              </p>
             </div>
-        </div>
-        <div class="nav-row end">
-            <button class="btn-next" onclick="if(validarPaso(1)) irPaso(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
-        </div>
-    </div>
-
-    <!-- PASO 2 -->
-    <div class="paso" id="paso2" style="display:none">
-        <div class="card">
-            <p class="step-title"><span class="step-num">2</span> Información de contacto</p>
-            <div class="grid2">
-                <div class="field full">
-                    <label for="email">Correo electrónico <span class="req">*</span></label>
-                    <input type="email" id="email" placeholder="Ej: maria@gmail.com">
-                    <span class="field-hint">Le enviaremos sus recomendaciones a este correo.</span>
-                </div>
-                <div class="field full">
-                    <label for="phone">Teléfono / WhatsApp <span class="req">*</span></label>
-                    <input type="tel" id="phone" placeholder="Ej: 3424567890" maxlength="11">
-                    <span class="field-hint">Sin 0, sin 15, sin espacios. 10 dígitos.</span>
-                </div>
+            <div class="derecho">
+              <i class="fas fa-check"></i>
+              <p class="derecho-text">
+                <strong>Rectificación</strong> — corregir datos inexactos
+              </p>
             </div>
-        </div>
-        <div class="nav-row">
-            <button class="btn-prev" onclick="irPaso(1)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="if(validarPaso(2)) irPaso(3)">Siguiente <i class="fas fa-arrow-right"></i></button>
-        </div>
-    </div>
-
-    <!-- PASO 3 -->
-    <div class="paso" id="paso3" style="display:none">
-        <div class="card">
-            <p class="step-title"><span class="step-num">3</span> Datos personales</p>
-            <div class="grid2">
-                <div class="field full">
-                    <label>Sexo biológico <span class="req">*</span></label>
-                    <div class="chips-row">
-                        <span class="chip" id="chip-masculino" onclick="selChipSexo('masculino')"><i class="fas fa-mars" style="margin-right:5px"></i> Masculino</span>
-                        <span class="chip" id="chip-femenino" onclick="selChipSexo('femenino')"><i class="fas fa-venus" style="margin-right:5px"></i> Femenino</span>
-                    </div>
-                    <span id="sexoErr" style="font-size:12px; color:#dc2626; margin-top:3px; display:block;"></span>
-                </div>
-                <div class="field full">
-                    <label for="genderIdentity">Género autopercibido <span class="opt">(opcional)</span></label>
-                    <select id="genderIdentity">
-                        <option value="">Seleccionar</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="no-binario">No binario</option>
-                        <option value="otro">Otro</option>
-                        <option value="prefiero-no-decir">Prefiero no decir</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="height">Altura <span class="req">*</span></label>
-                    <input type="number" id="height" placeholder="Ej: 168" min="50" max="300" oninput="calcIMC()">
-                    <span class="field-hint">En centímetros</span>
-                </div>
-                <div class="field">
-                    <label for="weight">Peso <span class="req">*</span></label>
-                    <input type="number" id="weight" placeholder="Ej: 72" min="10" max="300" oninput="calcIMC()">
-                    <span class="field-hint">En kilogramos</span>
-                </div>
-                <div class="imc-box" id="imcBox">
-                    <span class="imc-label">Tu IMC</span>
-                    <div><span class="imc-value" id="bmiValue">--</span><span class="imc-cat" id="bmiCategory"></span></div>
-                </div>
+            <div class="derecho">
+              <i class="fas fa-check"></i>
+              <p class="derecho-text">
+                <strong>Supresión</strong> — solicitar la eliminación de sus
+                datos
+              </p>
             </div>
+            <div class="derecho">
+              <i class="fas fa-check"></i>
+              <p class="derecho-text">
+                <strong>Confidencialidad</strong> — sus datos de salud tienen
+                protección especial
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="nav-row">
-            <button class="btn-prev" onclick="irPaso(2)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="if(validarPaso(3)) irPaso(4)">Siguiente <i class="fas fa-arrow-right"></i></button>
+        <div class="checkbox-row">
+          <input type="checkbox" id="consentCheck" onchange="toggleConsent()" />
+          <label class="checkbox-label" for="consentCheck">
+            Leí y acepto el uso de mis datos personales y de salud por parte de
+            IAPOS con fines exclusivos de atención preventiva.
+            <span
+              >Conforme a la Ley 25.326 de Protección de Datos Personales de la
+              República Argentina.</span
+            >
+          </label>
         </div>
-    </div>
+        <button
+          class="btn-continuar"
+          id="btnContinuar"
+          onclick="iniciarFormulario()"
+        >
+          Continuar a la Hoja de Vida <i class="fas fa-arrow-right"></i>
+        </button>
+        <p class="ley-ref">
+          Ley 25.326 · Dirección Nacional de Protección de Datos Personales ·
+          IAPOS Santa Fe
+        </p>
+      </div>
 
-    <!-- PASO 4 -->
-    <div class="paso" id="paso4" style="display:none">
-        <div class="card">
-            <p class="step-title"><span class="step-num">4</span> Condiciones de salud personales</p>
-            <p class="step-intro">Indicá si tenés o tuviste alguna de las siguientes condiciones. Si nunca fuiste evaluado/a, elegí "No lo sé".</p>
-            <div class="pregunta"><p class="pregunta-label">Hipertensión arterial (presión alta)</p><div class="chips-row" id="g-hypertension"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Diabetes</p><div class="chips-row" id="g-diabetes"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Colesterol alto</p><div class="chips-row" id="g-cholesterol"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Depresión diagnosticada</p><div class="chips-row" id="g-depression"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Hago muy poca actividad física</p><div class="chips-row" id="g-physicalActivityLow"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Paso mucho tiempo sentado/a</p><div class="chips-row" id="g-sedentary"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Problemas con el consumo de alcohol y/o drogas</p><div class="chips-row" id="g-drugUseExcessive"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Estrés, ansiedad o miedos excesivos</p><div class="chips-row" id="g-stressAnxietyExcessive"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Vivo muy preocupado/a por mi salud</p><div class="chips-row" id="g-healthConcernExcessive"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Uso excesivo de pantallas fuera del trabajo</p><div class="chips-row" id="g-screenTimeExcessive"></div></div>
+      <!-- PANTALLA 3: FORMULARIO -->
+      <div id="screenForm" class="screen">
+        <!-- PASO 1 -->
+        <div class="paso" id="paso1">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">1</span> Identificación
+            </p>
+            <div class="grid2">
+              <div class="field">
+                <label for="dni">DNI <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="dni"
+                  placeholder="Ej: 28456789"
+                  maxlength="8"
+                  onblur="verificarDNI()"
+                />
+              </div>
+              <div class="field">
+                <label for="birthDate"
+                  >Fecha de nacimiento <span class="req">*</span></label
+                >
+                <input
+                  type="text"
+                  id="birthDate"
+                  placeholder="DD/MM/AAAA"
+                  maxlength="10"
+                />
+              </div>
+              <div class="field">
+                <label for="age">Edad calculada</label>
+                <input
+                  type="text"
+                  id="age"
+                  readonly
+                  placeholder="Se calcula automáticamente"
+                />
+              </div>
+              <div class="field">
+                <label for="apellido"
+                  >Apellido <span class="req">*</span></label
+                >
+                <input type="text" id="apellido" placeholder="Ej: González" />
+              </div>
+              <div class="field full">
+                <label for="nombre">Nombre/s <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="nombre"
+                  placeholder="Ej: María Eugenia"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="nav-row end">
+            <button class="btn-next" onclick="if (validarPaso(1)) irPaso(2);">
+              Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
         </div>
-        <div class="nav-row">
-            <button class="btn-prev" onclick="irPaso(3)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="irPaso(5)">Siguiente <i class="fas fa-arrow-right"></i></button>
-        </div>
-    </div>
 
-    <!-- PASO 5 -->
-    <div class="paso" id="paso5" style="display:none">
-        <div class="card">
-            <p class="step-title"><span class="step-num">5</span> Hábitos y estilo de vida</p>
+        <!-- PASO 2 -->
+        <div class="paso" id="paso2" style="display: none">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">2</span> Información de contacto
+            </p>
+            <div class="grid2">
+              <div class="field full">
+                <label for="email"
+                  >Correo electrónico <span class="req">*</span></label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Ej: maria@gmail.com"
+                />
+                <span class="field-hint"
+                  >Le enviaremos sus recomendaciones a este correo.</span
+                >
+              </div>
+              <div class="field full">
+                <label for="phone"
+                  >Teléfono / WhatsApp <span class="req">*</span></label
+                >
+                <input
+                  type="tel"
+                  id="phone"
+                  placeholder="Ej: 3424567890"
+                  maxlength="11"
+                />
+                <span class="field-hint"
+                  >Sin 0, sin 15, sin espacios. 10 dígitos.</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(1)">
+              <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button class="btn-next" onclick="if (validarPaso(2)) irPaso(3);">
+              Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 3 -->
+        <div class="paso" id="paso3" style="display: none">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">3</span> Datos personales
+            </p>
+            <div class="grid2">
+              <div class="field full">
+                <label>Sexo biológico <span class="req">*</span></label>
+                <div class="chips-row">
+                  <span
+                    class="chip"
+                    id="chip-masculino"
+                    onclick="selChipSexo('masculino')"
+                    ><i class="fas fa-mars" style="margin-right: 5px"></i>
+                    Masculino</span
+                  >
+                  <span
+                    class="chip"
+                    id="chip-femenino"
+                    onclick="selChipSexo('femenino')"
+                    ><i class="fas fa-venus" style="margin-right: 5px"></i>
+                    Femenino</span
+                  >
+                </div>
+                <span
+                  id="sexoErr"
+                  style="
+                    font-size: 12px;
+                    color: #dc2626;
+                    margin-top: 3px;
+                    display: block;
+                  "
+                ></span>
+              </div>
+              <div class="field full">
+                <label for="genderIdentity"
+                  >Género autopercibido
+                  <span class="opt">(opcional)</span></label
+                >
+                <select id="genderIdentity">
+                  <option value="">Seleccionar</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="femenino">Femenino</option>
+                  <option value="no-binario">No binario</option>
+                  <option value="otro">Otro</option>
+                  <option value="prefiero-no-decir">Prefiero no decir</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="height">Altura <span class="req">*</span></label>
+                <input
+                  type="number"
+                  id="height"
+                  placeholder="Ej: 168"
+                  min="50"
+                  max="300"
+                  oninput="calcIMC()"
+                />
+                <span class="field-hint">En centímetros</span>
+              </div>
+              <div class="field">
+                <label for="weight">Peso <span class="req">*</span></label>
+                <input
+                  type="number"
+                  id="weight"
+                  placeholder="Ej: 72"
+                  min="10"
+                  max="300"
+                  oninput="calcIMC()"
+                />
+                <span class="field-hint">En kilogramos</span>
+              </div>
+              <div class="imc-box" id="imcBox">
+                <span class="imc-label">Tu IMC</span>
+                <div>
+                  <span class="imc-value" id="bmiValue">--</span
+                  ><span class="imc-cat" id="bmiCategory"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(2)">
+              <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button class="btn-next" onclick="if (validarPaso(3)) irPaso(4);">
+              Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 4 -->
+        <div class="paso" id="paso4" style="display: none">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">4</span> Condiciones de salud personales
+            </p>
+            <p class="step-intro">
+              Indicá si tenés o tuviste alguna de las siguientes condiciones. Si
+              nunca fuiste evaluado/a, elegí "No lo sé".
+            </p>
             <div class="pregunta">
-                <p class="pregunta-label">Tabaquismo</p>
-                <p class="pregunta-hint">Elegí la opción que mejor te describe actualmente.</p>
-                <div class="chips-row" id="g-smokingStatus"></div>
-                <div class="sub-pregunta" id="subTabaco">
-                    <p class="sub-label">¿Fumó por más de 20 años?</p>
-                    <div class="chips-row" id="g-smokingDuration"></div>
-                </div>
+              <p class="pregunta-label">Hipertensión arterial (presión alta)</p>
+              <div class="chips-row" id="g-hypertension"></div>
             </div>
-        </div>
-        <div class="nav-row">
-            <button class="btn-prev" onclick="irPaso(4)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-next" onclick="irPaso(6)">Siguiente <i class="fas fa-arrow-right"></i></button>
-        </div>
-    </div>
-
-    <!-- PASO 6 -->
-    <div class="paso" id="paso6" style="display:none">
-        <div class="card">
-            <p class="step-title"><span class="step-num">6</span> Antecedentes familiares</p>
-            <p class="step-intro">Respecto a sus familiares cercanos (abuelos/as, madre, padre, hermanos/as): ¿alguno tiene o tuvo alguna de estas condiciones?</p>
-            <div class="pregunta"><p class="pregunta-label">Hipertensión arterial</p><div class="chips-row" id="g-familiarHipertension"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Diabetes</p><div class="chips-row" id="g-familiarDiabetes"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Adicciones (alcohol, drogas, tabaco, juego)</p><div class="chips-row" id="g-familiarAdicciones"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Obesidad</p><div class="chips-row" id="g-familiarObesidad"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Depresión</p><div class="chips-row" id="g-familiarDepresion"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Violencia familiar o abusos de cualquier tipo</p><div class="chips-row" id="g-familiarViolenciaAbuso"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Cáncer de colon</p><div class="chips-row" id="g-colonCancer"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Cáncer de mama</p><div class="chips-row" id="g-breastCancer"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Cáncer de cuello uterino</p><div class="chips-row" id="g-cervicalCancer"></div></div>
-            <div class="pregunta"><p class="pregunta-label">Cáncer de próstata</p><div class="chips-row" id="g-prostateCancer"></div></div>
-        </div>
-        <div class="nav-row">
-            <button class="btn-prev" onclick="irPaso(5)"><i class="fas fa-arrow-left"></i> Anterior</button>
-            <button class="btn-guardar" onclick="guardar()"><i class="fas fa-save"></i> Guardar y continuar</button>
-        </div>
-    </div>
-
-    <!-- SPINNER DE CARGA -->
-    <div id="spinnerGuardando" style="display:none; text-align:center; padding: 3rem 1rem;">
-        <div style="width:56px; height:56px; border:4px solid #e2e8f0; border-top-color:#0448a2; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1.25rem;"></div>
-        <p style="font-size:16px; font-weight:600; color:#0448a2; margin-bottom:6px;">Guardando sus datos...</p>
-        <p style="font-size:13px; color:#94a3b8;">Por favor no cierre esta página.</p>
-    </div>
-
-</div><!-- fin screenForm -->
-
-<!-- PANTALLA 4: RESULTADO -->
-<div id="screenResult" class="screen">
-    <div id="resultOk" style="display:none">
-        <div style="text-align:center; padding: 2rem 1rem 1rem;">
-            <div style="width:72px; height:72px; background:#f0fdf4; border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1.25rem;">
-                <i class="fas fa-check" style="font-size:32px; color:#16a34a;"></i>
+            <div class="pregunta">
+              <p class="pregunta-label">Diabetes</p>
+              <div class="chips-row" id="g-diabetes"></div>
             </div>
-            <h2 style="font-size:22px; font-weight:600; color:#1e293b; margin-bottom:8px;">¡Hoja de Vida guardada!</h2>
-            <p style="font-size:15px; color:#64748b; line-height:1.6; max-width:380px; margin:0 auto 1.5rem;">Sus datos fueron recibidos correctamente. En breve lo redirigiremos al inicio donde podrá ver sus recomendaciones preventivas.</p>
-            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px; max-width:380px; margin:0 auto 2rem;">
-                <i class="fas fa-clock" style="color:#16a34a; font-size:15px; flex-shrink:0;"></i>
-                <span style="font-size:13px; color:#166534;" id="cuentaRegresiva">Redirigiendo en 10 segundos...</span>
+            <div class="pregunta">
+              <p class="pregunta-label">Colesterol alto</p>
+              <div class="chips-row" id="g-cholesterol"></div>
             </div>
-            <button onclick="window.location.href='index.html'" style="background:#0448a2; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
-                Ir al inicio ahora <i class="fas fa-arrow-right"></i>
+            <div class="pregunta">
+              <p class="pregunta-label">Depresión diagnosticada</p>
+              <div class="chips-row" id="g-depression"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Hago muy poca actividad física</p>
+              <div class="chips-row" id="g-physicalActivityLow"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Paso mucho tiempo sentado/a</p>
+              <div class="chips-row" id="g-sedentary"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">
+                Problemas con el consumo de alcohol y/o drogas
+              </p>
+              <div class="chips-row" id="g-drugUseExcessive"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Estrés, ansiedad o miedos excesivos</p>
+              <div class="chips-row" id="g-stressAnxietyExcessive"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Vivo muy preocupado/a por mi salud</p>
+              <div class="chips-row" id="g-healthConcernExcessive"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">
+                Uso excesivo de pantallas fuera del trabajo
+              </p>
+              <div class="chips-row" id="g-screenTimeExcessive"></div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(3)">
+              <i class="fas fa-arrow-left"></i> Anterior
             </button>
-        </div>
-    </div>
-    <div id="resultError" style="display:none">
-        <div style="text-align:center; padding: 2rem 1rem 1rem;">
-            <div style="width:72px; height:72px; background:#fef2f2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 1.25rem;">
-                <i class="fas fa-times" style="font-size:32px; color:#dc2626;"></i>
-            </div>
-            <h2 style="font-size:22px; font-weight:600; color:#1e293b; margin-bottom:8px;">No se pudo guardar</h2>
-            <p style="font-size:15px; color:#64748b; line-height:1.6; max-width:380px; margin:0 auto 1.5rem;" id="errorMsg">Ocurrió un error al guardar sus datos. Por favor intente nuevamente o comuníquese con IAPOS.</p>
-            <button onclick="irPasoDesdeError()" style="background:#0448a2; color:#fff; border:none; border-radius:6px; padding:11px 28px; font-size:14px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif;">
-                <i class="fas fa-arrow-left"></i> Volver e intentar de nuevo
+            <button class="btn-next" onclick="irPaso(5)">
+              Siguiente <i class="fas fa-arrow-right"></i>
             </button>
+          </div>
         </div>
-    </div>
-</div>
 
-</main>
+        <!-- PASO 5 -->
+        <div class="paso" id="paso5" style="display: none">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">5</span> Hábitos y estilo de vida
+            </p>
+            <div class="pregunta">
+              <p class="pregunta-label">Tabaquismo</p>
+              <p class="pregunta-hint">
+                Elegí la opción que mejor te describe actualmente.
+              </p>
+              <div class="chips-row" id="g-smokingStatus"></div>
+              <div class="sub-pregunta" id="subTabaco">
+                <p class="sub-label">¿Fumó por más de 20 años?</p>
+                <div class="chips-row" id="g-smokingDuration"></div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(4)">
+              <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button class="btn-next" onclick="irPaso(6)">
+              Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
 
-<script>
+        <!-- PASO 6 -->
+        <div class="paso" id="paso6" style="display: none">
+          <div class="card">
+            <p class="step-title">
+              <span class="step-num">6</span> Antecedentes familiares
+            </p>
+            <p class="step-intro">
+              Respecto a sus familiares cercanos (abuelos/as, madre, padre,
+              hermanos/as): ¿alguno tiene o tuvo alguna de estas condiciones?
+            </p>
+            <div class="pregunta">
+              <p class="pregunta-label">Hipertensión arterial</p>
+              <div class="chips-row" id="g-familiarHipertension"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Diabetes</p>
+              <div class="chips-row" id="g-familiarDiabetes"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">
+                Adicciones (alcohol, drogas, tabaco, juego)
+              </p>
+              <div class="chips-row" id="g-familiarAdicciones"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Obesidad</p>
+              <div class="chips-row" id="g-familiarObesidad"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Depresión</p>
+              <div class="chips-row" id="g-familiarDepresion"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">
+                Violencia familiar o abusos de cualquier tipo
+              </p>
+              <div class="chips-row" id="g-familiarViolenciaAbuso"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Cáncer de colon</p>
+              <div class="chips-row" id="g-colonCancer"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Cáncer de mama</p>
+              <div class="chips-row" id="g-breastCancer"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Cáncer de cuello uterino</p>
+              <div class="chips-row" id="g-cervicalCancer"></div>
+            </div>
+            <div class="pregunta">
+              <p class="pregunta-label">Cáncer de próstata</p>
+              <div class="chips-row" id="g-prostateCancer"></div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-prev" onclick="irPaso(5)">
+              <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button class="btn-guardar" onclick="guardar()">
+              <i class="fas fa-save"></i> Guardar y continuar
+            </button>
+          </div>
+        </div>
 
-// ── ESTADO GLOBAL ──
-var vals = {};
-var pasoActual = 1;
-var stepNames = ['','Identificación','Contacto','Datos personales','Condiciones de salud','Hábitos','Antecedentes familiares'];
+        <!-- SPINNER DE CARGA -->
+        <div
+          id="spinnerGuardando"
+          style="display: none; text-align: center; padding: 3rem 1rem"
+        >
+          <div
+            style="
+              width: 56px;
+              height: 56px;
+              border: 4px solid #e2e8f0;
+              border-top-color: #0448a2;
+              border-radius: 50%;
+              animation: spin 0.8s linear infinite;
+              margin: 0 auto 1.25rem;
+            "
+          ></div>
+          <p
+            style="
+              font-size: 16px;
+              font-weight: 600;
+              color: #0448a2;
+              margin-bottom: 6px;
+            "
+          >
+            Guardando sus datos...
+          </p>
+          <p style="font-size: 13px; color: #94a3b8">
+            Por favor no cierre esta página.
+          </p>
+        </div>
+      </div>
+      <!-- fin screenForm -->
 
-// ── NAVEGACIÓN DE PANTALLAS ──
-function irA(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
-    document.getElementById(screenId).classList.add('visible');
-    if (screenId === 'screenForm') {
-        document.getElementById('progressBar').style.display = 'block';
-        irPaso(1);
-    }
-    window.scrollTo({top:0, behavior:'smooth'});
-}
+      <!-- PANTALLA 4: RESULTADO -->
+      <div id="screenResult" class="screen">
+        <div id="resultOk" style="display: none">
+          <div style="text-align: center; padding: 2rem 1rem 1rem">
+            <div
+              style="
+                width: 72px;
+                height: 72px;
+                background: #f0fdf4;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.25rem;
+              "
+            >
+              <i
+                class="fas fa-check"
+                style="font-size: 32px; color: #16a34a"
+              ></i>
+            </div>
+            <h2
+              style="
+                font-size: 22px;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 8px;
+              "
+            >
+              ¡Hoja de Vida guardada!
+            </h2>
+            <p
+              style="
+                font-size: 15px;
+                color: #64748b;
+                line-height: 1.6;
+                max-width: 380px;
+                margin: 0 auto 1.5rem;
+              "
+            >
+              Sus datos fueron recibidos correctamente. En breve lo
+              redirigiremos al inicio donde podrá ver sus recomendaciones
+              preventivas.
+            </p>
+            <div
+              style="
+                background: #f0fdf4;
+                border: 1px solid #bbf7d0;
+                border-radius: 8px;
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                max-width: 380px;
+                margin: 0 auto 2rem;
+              "
+            >
+              <i
+                class="fas fa-clock"
+                style="color: #16a34a; font-size: 15px; flex-shrink: 0"
+              ></i>
+              <span style="font-size: 13px; color: #166534" id="cuentaRegresiva"
+                >Redirigiendo en 10 segundos...</span
+              >
+            </div>
+            <button
+              onclick="window.location.href = 'index.html'"
+              style="
+                background: #0448a2;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 11px 28px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                font-family: &quot;Source Sans 3&quot;, sans-serif;
+              "
+            >
+              Ir al inicio ahora <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        <div id="resultError" style="display: none">
+          <div style="text-align: center; padding: 2rem 1rem 1rem">
+            <div
+              style="
+                width: 72px;
+                height: 72px;
+                background: #fef2f2;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.25rem;
+              "
+            >
+              <i
+                class="fas fa-times"
+                style="font-size: 32px; color: #dc2626"
+              ></i>
+            </div>
+            <h2
+              style="
+                font-size: 22px;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 8px;
+              "
+            >
+              No se pudo guardar
+            </h2>
+            <p
+              style="
+                font-size: 15px;
+                color: #64748b;
+                line-height: 1.6;
+                max-width: 380px;
+                margin: 0 auto 1.5rem;
+              "
+              id="errorMsg"
+            >
+              Ocurrió un error al guardar sus datos. Por favor intente
+              nuevamente o comuníquese con IAPOS.
+            </p>
+            <button
+              onclick="irPasoDesdeError()"
+              style="
+                background: #0448a2;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 11px 28px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                font-family: &quot;Source Sans 3&quot;, sans-serif;
+              "
+            >
+              <i class="fas fa-arrow-left"></i> Volver e intentar de nuevo
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
 
-function toggleConsent() {
-    var cb = document.getElementById('consentCheck');
-    document.getElementById('btnContinuar').classList.toggle('active', cb.checked);
-}
+    <script>
+      // ── ESTADO GLOBAL ──
+      var vals = {};
+      var pasoActual = 1;
+      var stepNames = [
+        "",
+        "Identificación",
+        "Contacto",
+        "Datos personales",
+        "Condiciones de salud",
+        "Hábitos",
+        "Antecedentes familiares",
+      ];
+      // ── ORIGEN DE CARGA (grupo/institución) ──
+      var origenCarga =
+        new URLSearchParams(window.location.search).get("origen") || null;
 
-function iniciarFormulario() {
-    if (!document.getElementById('consentCheck').checked) return;
-    irA('screenForm');
-}
+      // ── NAVEGACIÓN DE PANTALLAS ──
+      function irA(screenId) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("visible"));
+        document.getElementById(screenId).classList.add("visible");
+        if (screenId === "screenForm") {
+          document.getElementById("progressBar").style.display = "block";
+          irPaso(1);
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
-// ── NAVEGACIÓN DE PASOS ──
-// ── VERIFICACIÓN IAPOS ──
-var afiliadoVerificado = false;
+      function toggleConsent() {
+        var cb = document.getElementById("consentCheck");
+        document
+          .getElementById("btnContinuar")
+          .classList.toggle("active", cb.checked);
+      }
 
-async function verificarDNI() {
-    console.log('Verificando elegibilidad para DNI:', dni);
-    var dni = document.getElementById('dni').value.trim();
-    if (dni.length < 6) return;
+      function iniciarFormulario() {
+        if (!document.getElementById("consentCheck").checked) return;
+        irA("screenForm");
+      }
 
-    var msgEl = document.getElementById('dniMsg');
-    if (!msgEl) {
-        msgEl = document.createElement('div');
-        msgEl.id = 'dniMsg';
-        msgEl.style.cssText = 'margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;';
-        document.getElementById('dni').parentNode.appendChild(msgEl);
-    }
+      // ── NAVEGACIÓN DE PASOS ──
+      // ── VERIFICACIÓN IAPOS ──
+      var afiliadoVerificado = false;
 
-    msgEl.style.background = '#f8fafc';
-    msgEl.style.color = '#64748b';
-    msgEl.style.border = '1px solid #e2e8f0';
-    msgEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
-    afiliadoVerificado = false;
+      async function verificarDNI() {
+        console.log("Verificando elegibilidad para DNI:", dni);
+        var dni = document.getElementById("dni").value.trim();
+        if (dni.length < 6) return;
 
-    try {
-        var res = await fetch('/verificar-afiliado/' + dni);
-        var data = await res.json();
-        if (data.esActivo) {
-    // Verificar elegibilidad (último DP)
-    const eligRes = await fetch('/verificar-elegibilidad/' + dni);
-    const eligData = await eligRes.json();
-
-        if (!eligData.elegible) {
-            msgEl.style.background = '#fffbeb';
-            msgEl.style.color = '#d97706';
-            msgEl.style.border = '1px solid #fde68a';
-            msgEl.innerHTML = '<i class="fas fa-calendar-times" style="margin-right:6px"></i>' + eligData.mensaje;
-            afiliadoVerificado = false;
-            return;
+        var msgEl = document.getElementById("dniMsg");
+        if (!msgEl) {
+          msgEl = document.createElement("div");
+          msgEl.id = "dniMsg";
+          msgEl.style.cssText =
+            "margin-top:8px; padding:10px 14px; border-radius:8px; font-size:14px; font-weight:500;";
+          document.getElementById("dni").parentNode.appendChild(msgEl);
         }
 
-        msgEl.style.background = '#f0fdf4';
-        msgEl.style.color = '#16a34a';
-        msgEl.style.border = '1px solid #bbf7d0';
-        msgEl.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' + (data.nombre || '') + (data.localidad ? ' · ' + data.localidad : '');
-        afiliadoVerificado = true;
-        // Detectar perfil por edad y redirigir
-        var edad = parseInt(data.edad) || 0;
-        if (edad >= 2 && edad <= 17) {
-            var perfil = edad <= 11 ? 'b' : 'c';
-            if (edad <= 5) perfil = 'a';
-            setTimeout(function() {
-                window.location.href = 'hoja_vida_perfil_' + perfil + '.html?dni=' + dni;
-            }, 1500);
-            msgEl.innerHTML += '<br><small style="color:#0448a2;">Redirigiendo al formulario correspondiente...</small>';
-            return;
-        }
-        if (data.nombre) {
-            var partes = data.nombre.trim().split(',');
-            if (partes.length >= 2) {
-                if (!document.getElementById('apellido').value) document.getElementById('apellido').value = partes[0].trim();
-                if (!document.getElementById('nombre').value) document.getElementById('nombre').value = partes[1].trim();
+        msgEl.style.background = "#f8fafc";
+        msgEl.style.color = "#64748b";
+        msgEl.style.border = "1px solid #e2e8f0";
+        msgEl.innerHTML =
+          '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Verificando afiliación...';
+        afiliadoVerificado = false;
+
+        try {
+          var res = await fetch("/verificar-afiliado/" + dni);
+          var data = await res.json();
+          if (data.esActivo) {
+            // Verificar elegibilidad (último DP)
+            const eligRes = await fetch("/verificar-elegibilidad/" + dni);
+            const eligData = await eligRes.json();
+
+            if (!eligData.elegible) {
+              msgEl.style.background = "#fffbeb";
+              msgEl.style.color = "#d97706";
+              msgEl.style.border = "1px solid #fde68a";
+              msgEl.innerHTML =
+                '<i class="fas fa-calendar-times" style="margin-right:6px"></i>' +
+                eligData.mensaje;
+              afiliadoVerificado = false;
+              return;
             }
-        }
 
-        } else {
-            msgEl.style.background = '#fef2f2';
-            msgEl.style.color = '#dc2626';
-            msgEl.style.border = '1px solid #fecaca';
-            msgEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS. No puede continuar.';
+            msgEl.style.background = "#f0fdf4";
+            msgEl.style.color = "#16a34a";
+            msgEl.style.border = "1px solid #bbf7d0";
+            msgEl.innerHTML =
+              '<i class="fas fa-check-circle" style="margin-right:6px"></i>Afiliado activo — ' +
+              (data.nombre || "") +
+              (data.localidad ? " · " + data.localidad : "");
+            afiliadoVerificado = true;
+            // Detectar perfil por edad y redirigir
+            var edad = parseInt(data.edad) || 0;
+            if (edad >= 2 && edad <= 17) {
+              var perfil = edad <= 11 ? "b" : "c";
+              if (edad <= 5) perfil = "a";
+              setTimeout(function () {
+                var origenParam = origenCarga
+                  ? "&origen=" + encodeURIComponent(origenCarga)
+                  : "";
+                window.location.href =
+                  "hoja_vida_perfil_" +
+                  perfil +
+                  ".html?dni=" +
+                  dni +
+                  origenParam;
+              }, 1500);
+              msgEl.innerHTML +=
+                '<br><small style="color:#0448a2;">Redirigiendo al formulario correspondiente...</small>';
+              return;
+            }
+            if (data.nombre) {
+              var partes = data.nombre.trim().split(",");
+              if (partes.length >= 2) {
+                if (!document.getElementById("apellido").value)
+                  document.getElementById("apellido").value = partes[0].trim();
+                if (!document.getElementById("nombre").value)
+                  document.getElementById("nombre").value = partes[1].trim();
+              }
+            }
+          } else {
+            msgEl.style.background = "#fef2f2";
+            msgEl.style.color = "#dc2626";
+            msgEl.style.border = "1px solid #fecaca";
+            msgEl.innerHTML =
+              '<i class="fas fa-times-circle" style="margin-right:6px"></i>DNI no corresponde a un afiliado activo de IAPOS. No puede continuar.';
             afiliadoVerificado = false;
-            document.getElementById('dni').value = '';
-            document.getElementById('dni').focus();
+            document.getElementById("dni").value = "";
+            document.getElementById("dni").focus();
+          }
+        } catch (e) {
+          msgEl.style.background = "#fffbeb";
+          msgEl.style.color = "#d97706";
+          msgEl.style.border = "1px solid #fde68a";
+          msgEl.innerHTML =
+            '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá igual o consultá a IAPOS.';
+          afiliadoVerificado = true;
         }
-    } catch(e) {
-        msgEl.style.background = '#fffbeb';
-        msgEl.style.color = '#d97706';
-        msgEl.style.border = '1px solid #fde68a';
-        msgEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>No se pudo verificar. Continuá igual o consultá a IAPOS.';
-        afiliadoVerificado = true;
-    }
-}
+      }
 
-// ── VALIDACIONES ──
-function validarPaso(n) {
-    if (n === 1) {
-        var dni = document.getElementById('dni').value.trim();
-        var fecha = document.getElementById('birthDate').value.trim();
-        var apellido = document.getElementById('apellido').value.trim();
-        var nombre = document.getElementById('nombre').value.trim();
+      // ── VALIDACIONES ──
+      function validarPaso(n) {
+        if (n === 1) {
+          var dni = document.getElementById("dni").value.trim();
+          var fecha = document.getElementById("birthDate").value.trim();
+          var apellido = document.getElementById("apellido").value.trim();
+          var nombre = document.getElementById("nombre").value.trim();
 
-        if (!/^[a-zA-Z]?\d{6,8}$/.test(dni)) {
-            mostrarError('dni', 'El DNI debe tener entre 6 y 8 números, con letra opcional al inicio.');
+          if (!/^[a-zA-Z]?\d{6,8}$/.test(dni)) {
+            mostrarError(
+              "dni",
+              "El DNI debe tener entre 6 y 8 números, con letra opcional al inicio.",
+            );
             return false;
-        } else { limpiarError('dni'); }
+          } else {
+            limpiarError("dni");
+          }
 
-        if (!afiliadoVerificado) {
-            mostrarError('dni', 'Verificá el DNI antes de continuar.');
+          if (!afiliadoVerificado) {
+            mostrarError("dni", "Verificá el DNI antes de continuar.");
             return false;
+          }
+
+          if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+            mostrarError("birthDate", "Formato inválido. Usá DD/MM/AAAA.");
+            return false;
+          } else {
+            limpiarError("birthDate");
+          }
+
+          if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(apellido) || apellido.length < 2) {
+            mostrarError(
+              "apellido",
+              "Ingresá un apellido válido (solo letras).",
+            );
+            return false;
+          } else {
+            limpiarError("apellido");
+          }
+
+          if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(nombre) || nombre.length < 2) {
+            mostrarError("nombre", "Ingresá un nombre válido (solo letras).");
+            return false;
+          } else {
+            limpiarError("nombre");
+          }
         }
 
-        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
-            mostrarError('birthDate', 'Formato inválido. Usá DD/MM/AAAA.');
+        if (n === 2) {
+          var email = document.getElementById("email").value.trim();
+          var tel = document.getElementById("phone").value.trim();
+
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            mostrarError("email", "Ingresá un correo electrónico válido.");
             return false;
-        } else { limpiarError('birthDate'); }
+          } else {
+            limpiarError("email");
+          }
 
-        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(apellido) || apellido.length < 2) {
-            mostrarError('apellido', 'Ingresá un apellido válido (solo letras).');
+          if (!/^\d{10,11}$/.test(tel.replace(/[\s()-]/g, ""))) {
+            mostrarError(
+              "phone",
+              "El teléfono debe tener 10 dígitos sin espacios ni guiones.",
+            );
             return false;
-        } else { limpiarError('apellido'); }
+          } else {
+            limpiarError("phone");
+          }
+        }
 
-        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(nombre) || nombre.length < 2) {
-            mostrarError('nombre', 'Ingresá un nombre válido (solo letras).');
+        if (n === 3) {
+          var altura = document.getElementById("height").value;
+          var peso = document.getElementById("weight").value;
+
+          if (!vals["biologicalSex"]) {
+            mostrarErrorTexto("sexoErr", "Seleccioná el sexo biológico.");
             return false;
-        } else { limpiarError('nombre'); }
-    }
+          } else {
+            limpiarErrorTexto("sexoErr");
+          }
 
-    if (n === 2) {
-        var email = document.getElementById('email').value.trim();
-        var tel = document.getElementById('phone').value.trim();
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            mostrarError('email', 'Ingresá un correo electrónico válido.');
+          if (!altura || parseFloat(altura) < 50 || parseFloat(altura) > 250) {
+            mostrarError(
+              "height",
+              "Ingresá una altura válida (entre 50 y 250 cm).",
+            );
             return false;
-        } else { limpiarError('email'); }
+          } else {
+            limpiarError("height");
+          }
 
-        if (!/^\d{10,11}$/.test(tel.replace(/[\s()-]/g, ''))) {
-            mostrarError('phone', 'El teléfono debe tener 10 dígitos sin espacios ni guiones.');
+          if (!peso || parseFloat(peso) < 10 || parseFloat(peso) > 300) {
+            mostrarError(
+              "weight",
+              "Ingresá un peso válido (entre 10 y 300 kg).",
+            );
             return false;
-        } else { limpiarError('phone'); }
-    }
+          } else {
+            limpiarError("weight");
+          }
+        }
 
-    if (n === 3) {
-        var altura = document.getElementById('height').value;
-        var peso = document.getElementById('weight').value;
+        return true;
+      }
 
-        if (!vals['biologicalSex']) {
-            mostrarErrorTexto('sexoErr', 'Seleccioná el sexo biológico.');
-            return false;
-        } else { limpiarErrorTexto('sexoErr'); }
+      function mostrarError(fieldId, msg) {
+        var el = document.getElementById(fieldId);
+        el.style.borderColor = "#dc2626";
+        var err = document.getElementById("err-" + fieldId);
+        if (!err) {
+          err = document.createElement("span");
+          err.id = "err-" + fieldId;
+          err.style.cssText =
+            "font-size:12px; color:#dc2626; margin-top:3px; display:block;";
+          el.parentNode.appendChild(err);
+        }
+        err.textContent = msg;
+      }
 
-        if (!altura || parseFloat(altura) < 50 || parseFloat(altura) > 250) {
-            mostrarError('height', 'Ingresá una altura válida (entre 50 y 250 cm).');
-            return false;
-        } else { limpiarError('height'); }
+      function limpiarError(fieldId) {
+        var el = document.getElementById(fieldId);
+        el.style.borderColor = "";
+        var err = document.getElementById("err-" + fieldId);
+        if (err) err.textContent = "";
+      }
 
-        if (!peso || parseFloat(peso) < 10 || parseFloat(peso) > 300) {
-            mostrarError('weight', 'Ingresá un peso válido (entre 10 y 300 kg).');
-            return false;
-        } else { limpiarError('weight'); }
-    }
+      function mostrarErrorTexto(id, msg) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = msg;
+      }
 
-    return true;
-}
+      function limpiarErrorTexto(id) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = "";
+      }
 
-function mostrarError(fieldId, msg) {
-    var el = document.getElementById(fieldId);
-    el.style.borderColor = '#dc2626';
-    var err = document.getElementById('err-' + fieldId);
-    if (!err) {
-        err = document.createElement('span');
-        err.id = 'err-' + fieldId;
-        err.style.cssText = 'font-size:12px; color:#dc2626; margin-top:3px; display:block;';
-        el.parentNode.appendChild(err);
-    }
-    err.textContent = msg;
-}
+      function irPaso(n) {
+        document
+          .querySelectorAll(".paso")
+          .forEach((p) => (p.style.display = "none"));
+        document.getElementById("paso" + n).style.display = "block";
+        pasoActual = n;
+        actualizarProgress(n);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
-function limpiarError(fieldId) {
-    var el = document.getElementById(fieldId);
-    el.style.borderColor = '';
-    var err = document.getElementById('err-' + fieldId);
-    if (err) err.textContent = '';
-}
+      function actualizarProgress(n) {
+        for (var i = 1; i <= 6; i++) {
+          var el = document.getElementById("ps" + i);
+          el.className = "progress-step";
+          if (i < n) el.classList.add("done");
+          else if (i === n) el.classList.add("active");
+        }
+        document.getElementById("progressText").textContent =
+          "Paso " + n + " de 6";
+        document.getElementById("progressSubtext").textContent = stepNames[n];
+      }
 
-function mostrarErrorTexto(id, msg) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = msg;
-}
+      // ── CHIPS SÍ/NO/NO SÉ ──
+      var grupos = [
+        "hypertension",
+        "diabetes",
+        "cholesterol",
+        "depression",
+        "physicalActivityLow",
+        "sedentary",
+        "drugUseExcessive",
+        "stressAnxietyExcessive",
+        "healthConcernExcessive",
+        "screenTimeExcessive",
+        "familiarHipertension",
+        "familiarDiabetes",
+        "familiarAdicciones",
+        "familiarObesidad",
+        "familiarDepresion",
+        "familiarViolenciaAbuso",
+        "colonCancer",
+        "breastCancer",
+        "cervicalCancer",
+        "prostateCancer",
+        "smokingDuration",
+      ];
 
-function limpiarErrorTexto(id) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = '';
-}
-
-function irPaso(n) {
-    document.querySelectorAll('.paso').forEach(p => p.style.display = 'none');
-    document.getElementById('paso' + n).style.display = 'block';
-    pasoActual = n;
-    actualizarProgress(n);
-    window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function actualizarProgress(n) {
-    for (var i = 1; i <= 6; i++) {
-        var el = document.getElementById('ps' + i);
-        el.className = 'progress-step';
-        if (i < n) el.classList.add('done');
-        else if (i === n) el.classList.add('active');
-    }
-    document.getElementById('progressText').textContent = 'Paso ' + n + ' de 6';
-    document.getElementById('progressSubtext').textContent = stepNames[n];
-}
-
-// ── CHIPS SÍ/NO/NO SÉ ──
-var grupos = [
-    'hypertension','diabetes','cholesterol','depression',
-    'physicalActivityLow','sedentary','drugUseExcessive',
-    'stressAnxietyExcessive','healthConcernExcessive','screenTimeExcessive',
-    'familiarHipertension','familiarDiabetes','familiarAdicciones',
-    'familiarObesidad','familiarDepresion','familiarViolenciaAbuso',
-    'colonCancer','breastCancer','cervicalCancer','prostateCancer',
-    'smokingDuration'
-];
-
-function crearChipsSiNo(grupoId) {
-    var cont = document.getElementById('g-' + grupoId);
-    if (!cont) return;
-    [['si','Sí','sel-si'],['no','No','sel-no'],['no_sabe','No lo sé','sel-ns']].forEach(function(op) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip';
-        btn.textContent = op[1];
-        btn.dataset.grupo = grupoId;
-        btn.dataset.val = op[0];
-        btn.dataset.cls = op[2];
-        btn.onclick = function() { selSiNo(this); };
-        cont.appendChild(btn);
-    });
-}
-
-function selSiNo(el) {
-    var grupo = el.dataset.grupo;
-    var cont = document.getElementById('g-' + grupo);
-    cont.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
-    el.classList.add(el.dataset.cls);
-    vals[grupo] = el.dataset.val;
-}
-
-// Tabaquismo
-function crearChipsTabaco() {
-    var cont = document.getElementById('g-smokingStatus');
-    var opciones = [
-        ['nunca','Nunca fumé'],
-        ['ex_fumador','Ex fumador/a'],
-        ['menos_de_10','Menos de 10 por día'],
-        ['entre_10_y_20','Entre 10 y 20 por día'],
-        ['mas_de_20','Más de 20 por día']
-    ];
-    opciones.forEach(function(op) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip';
-        btn.textContent = op[1];
-        btn.dataset.val = op[0];
-        btn.onclick = function() {
-            cont.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
-            this.classList.add('sel-default');
-            vals['smokingStatus'] = this.dataset.val;
-            document.getElementById('subTabaco').style.display = (this.dataset.val !== 'nunca') ? 'block' : 'none';
-        };
-        cont.appendChild(btn);
-    });
-}
-
-// Sexo biológico
-function selChipSexo(val) {
-    document.getElementById('chip-masculino').className = 'chip';
-    document.getElementById('chip-femenino').className = 'chip';
-    document.getElementById('chip-' + val).classList.add('sel-default');
-    vals['biologicalSex'] = val;
-}
-
-// ── IMC ──
-function calcIMC() {
-    var h = parseFloat(document.getElementById('height').value);
-    var p = parseFloat(document.getElementById('weight').value);
-    var box = document.getElementById('imcBox');
-    if (h > 0 && p > 0) {
-        var imc = p / Math.pow(h / 100, 2);
-        document.getElementById('bmiValue').textContent = imc.toFixed(1);
-        var cat, bgColor, borderColor, textColor;
-        if (imc < 18.5) { cat='Bajo peso'; bgColor='#eff6ff'; borderColor='#bfdbfe'; textColor='#1d4ed8'; }
-        else if (imc < 25) { cat='Peso normal'; bgColor='#f0fdf4'; borderColor='#bbf7d0'; textColor='#16a34a'; }
-        else if (imc < 30) { cat='Sobrepeso'; bgColor='#fffbeb'; borderColor='#fde68a'; textColor='#d97706'; }
-        else { cat='Obesidad'; bgColor='#fef2f2'; borderColor='#fecaca'; textColor='#dc2626'; }
-        var catEl = document.getElementById('bmiCategory');
-        catEl.textContent = cat;
-        catEl.style.background = bgColor;
-        catEl.style.color = textColor;
-        catEl.style.border = '1px solid ' + borderColor;
-        box.style.background = bgColor;
-        box.style.borderColor = borderColor;
-        document.getElementById('bmiValue').style.color = textColor;
-        box.style.display = 'flex';
-    } else {
-        box.style.display = 'none';
-    }
-}
-
-// ── FECHA → EDAD ──
-document.getElementById('birthDate').addEventListener('input', function() {
-    var v = this.value.replace(/\D/g, '');
-    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
-    if (v.length >= 6) v = v.slice(0,5) + '/' + v.slice(5,9);
-    this.value = v;
-    if (v.length === 10) {
-        var parts = v.split('/');
-        var born = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
-        var today = new Date();
-        var age = today.getFullYear() - born.getFullYear();
-        var mo = today.getMonth() - born.getMonth();
-        if (mo < 0 || (mo === 0 && today.getDate() < born.getDate())) age--;
-        if (age > 0 && age < 120) document.getElementById('age').value = age + ' años';
-    } else {
-        document.getElementById('age').value = '';
-    }
-});
-
-// ── GUARDAR ──
-async function guardar() {
-    var tabaquismo = vals['smokingStatus'] || '';
-    var fumador_cronico = 'No aplica';
-    if (tabaquismo && tabaquismo !== 'nunca') {
-        fumador_cronico = vals['smokingDuration'] || 'No aplica';
-    }
-
-    var formData = {
-        'DNI': document.getElementById('dni').value,
-        'Fecha_Nacimiento': document.getElementById('birthDate').value,
-        'Apellido': document.getElementById('apellido').value,
-        'Nombre': document.getElementById('nombre').value,
-        'Edad': document.getElementById('age').value,
-        'Email': document.getElementById('email').value,
-        'Telefono': document.getElementById('phone').value,
-        'Sexo_biologico': vals['biologicalSex'] || '',
-        'Genero_autopercibido': document.getElementById('genderIdentity').value,
-        'Altura': document.getElementById('height').value,
-        'Peso': document.getElementById('weight').value,
-        'BMI': document.getElementById('bmiValue').textContent,
-        'Categoria_BMI': document.getElementById('bmiCategory').textContent,
-        'Hipertension': vals['hypertension'] || '',
-        'Diabetes': vals['diabetes'] || '',
-        'Colesterol': vals['cholesterol'] || '',
-        'Depresion': vals['depression'] || '',
-        'Actividad fisica': vals['physicalActivityLow'] || '',
-        'sedentarismo': vals['sedentary'] || '',
-        'Abuso_alcohol_drogas': vals['drugUseExcessive'] || '',
-        'Stress': vals['stressAnxietyExcessive'] || '',
-        'Exceso_preocupacion_salud': vals['healthConcernExcessive'] || '',
-        'Exceso_pantalla': vals['screenTimeExcessive'] || '',
-        'Fuma': tabaquismo,
-        'Fumador_cronico': fumador_cronico,
-        'Hipertension_familiar': vals['familiarHipertension'] || '',
-        'Diabetes_familiar': vals['familiarDiabetes'] || '',
-        'Adicciones_familiar': vals['familiarAdicciones'] || '',
-        'Obesidad _familiar': vals['familiarObesidad'] || '',
-        'Depresion_familiar': vals['familiarDepresion'] || '',
-        'Violencia_familiar': vals['familiarViolenciaAbuso'] || '',
-        'Cancer_de_colon': vals['colonCancer'] || '',
-        'Cancer_de_mama': vals['breastCancer'] || '',
-        'Cancer_cuello_utero': vals['cervicalCancer'] || '',
-        'Cancer_de_prostata': vals['prostateCancer'] || ''
-    };
-
-    // Mostrar spinner
-    document.querySelectorAll('.paso').forEach(function(p) { p.style.display = 'none'; });
-    document.getElementById('spinnerGuardando').style.display = 'block';
-
-    try {
-        var response = await fetch('/saveData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+      function crearChipsSiNo(grupoId) {
+        var cont = document.getElementById("g-" + grupoId);
+        if (!cont) return;
+        [
+          ["si", "Sí", "sel-si"],
+          ["no", "No", "sel-no"],
+          ["no_sabe", "No lo sé", "sel-ns"],
+        ].forEach(function (op) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip";
+          btn.textContent = op[1];
+          btn.dataset.grupo = grupoId;
+          btn.dataset.val = op[0];
+          btn.dataset.cls = op[2];
+          btn.onclick = function () {
+            selSiNo(this);
+          };
+          cont.appendChild(btn);
         });
-        var resultado = await response.json();
-        if (response.ok && resultado.success) {
-            mostrarResultado(true);
-        } else {
-            mostrarResultado(false, resultado.message || 'Error desconocido');
-        }
-    } catch(error) {
-        console.error('Error:', error);
-        mostrarResultado(false, 'Error de conexión. Por favor verifique su conexión e intente nuevamente.');
-    }
-}
+      }
 
-function mostrarResultado(ok, msg) {
-    document.getElementById('progressBar').style.display = 'none';
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('visible'); });
-    document.getElementById('screenResult').classList.add('visible');
-    window.scrollTo({top:0, behavior:'smooth'});
-    if (ok) {
-        document.getElementById('resultOk').style.display = 'block';
-        document.getElementById('resultError').style.display = 'none';
-        var seg = 10;
-        var el = document.getElementById('cuentaRegresiva');
-        var timer = setInterval(function() {
+      function selSiNo(el) {
+        var grupo = el.dataset.grupo;
+        var cont = document.getElementById("g-" + grupo);
+        cont.querySelectorAll(".chip").forEach(function (c) {
+          c.className = "chip";
+        });
+        el.classList.add(el.dataset.cls);
+        vals[grupo] = el.dataset.val;
+      }
+
+      // Tabaquismo
+      function crearChipsTabaco() {
+        var cont = document.getElementById("g-smokingStatus");
+        var opciones = [
+          ["nunca", "Nunca fumé"],
+          ["ex_fumador", "Ex fumador/a"],
+          ["menos_de_10", "Menos de 10 por día"],
+          ["entre_10_y_20", "Entre 10 y 20 por día"],
+          ["mas_de_20", "Más de 20 por día"],
+        ];
+        opciones.forEach(function (op) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip";
+          btn.textContent = op[1];
+          btn.dataset.val = op[0];
+          btn.onclick = function () {
+            cont.querySelectorAll(".chip").forEach(function (c) {
+              c.className = "chip";
+            });
+            this.classList.add("sel-default");
+            vals["smokingStatus"] = this.dataset.val;
+            document.getElementById("subTabaco").style.display =
+              this.dataset.val !== "nunca" ? "block" : "none";
+          };
+          cont.appendChild(btn);
+        });
+      }
+
+      // Sexo biológico
+      function selChipSexo(val) {
+        document.getElementById("chip-masculino").className = "chip";
+        document.getElementById("chip-femenino").className = "chip";
+        document.getElementById("chip-" + val).classList.add("sel-default");
+        vals["biologicalSex"] = val;
+      }
+
+      // ── IMC ──
+      function calcIMC() {
+        var h = parseFloat(document.getElementById("height").value);
+        var p = parseFloat(document.getElementById("weight").value);
+        var box = document.getElementById("imcBox");
+        if (h > 0 && p > 0) {
+          var imc = p / Math.pow(h / 100, 2);
+          document.getElementById("bmiValue").textContent = imc.toFixed(1);
+          var cat, bgColor, borderColor, textColor;
+          if (imc < 18.5) {
+            cat = "Bajo peso";
+            bgColor = "#eff6ff";
+            borderColor = "#bfdbfe";
+            textColor = "#1d4ed8";
+          } else if (imc < 25) {
+            cat = "Peso normal";
+            bgColor = "#f0fdf4";
+            borderColor = "#bbf7d0";
+            textColor = "#16a34a";
+          } else if (imc < 30) {
+            cat = "Sobrepeso";
+            bgColor = "#fffbeb";
+            borderColor = "#fde68a";
+            textColor = "#d97706";
+          } else {
+            cat = "Obesidad";
+            bgColor = "#fef2f2";
+            borderColor = "#fecaca";
+            textColor = "#dc2626";
+          }
+          var catEl = document.getElementById("bmiCategory");
+          catEl.textContent = cat;
+          catEl.style.background = bgColor;
+          catEl.style.color = textColor;
+          catEl.style.border = "1px solid " + borderColor;
+          box.style.background = bgColor;
+          box.style.borderColor = borderColor;
+          document.getElementById("bmiValue").style.color = textColor;
+          box.style.display = "flex";
+        } else {
+          box.style.display = "none";
+        }
+      }
+
+      // ── FECHA → EDAD ──
+      document
+        .getElementById("birthDate")
+        .addEventListener("input", function () {
+          var v = this.value.replace(/\D/g, "");
+          if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2);
+          if (v.length >= 6) v = v.slice(0, 5) + "/" + v.slice(5, 9);
+          this.value = v;
+          if (v.length === 10) {
+            var parts = v.split("/");
+            var born = new Date(
+              parseInt(parts[2]),
+              parseInt(parts[1]) - 1,
+              parseInt(parts[0]),
+            );
+            var today = new Date();
+            var age = today.getFullYear() - born.getFullYear();
+            var mo = today.getMonth() - born.getMonth();
+            if (mo < 0 || (mo === 0 && today.getDate() < born.getDate())) age--;
+            if (age > 0 && age < 120)
+              document.getElementById("age").value = age + " años";
+          } else {
+            document.getElementById("age").value = "";
+          }
+        });
+
+      // ── GUARDAR ──
+      async function guardar() {
+        var tabaquismo = vals["smokingStatus"] || "";
+        var fumador_cronico = "No aplica";
+        if (tabaquismo && tabaquismo !== "nunca") {
+          fumador_cronico = vals["smokingDuration"] || "No aplica";
+        }
+
+        var formData = {
+          DNI: document.getElementById("dni").value,
+          Fecha_Nacimiento: document.getElementById("birthDate").value,
+          Apellido: document.getElementById("apellido").value,
+          Nombre: document.getElementById("nombre").value,
+          Edad: document.getElementById("age").value,
+          Email: document.getElementById("email").value,
+          Telefono: document.getElementById("phone").value,
+          Sexo_biologico: vals["biologicalSex"] || "",
+          Genero_autopercibido: document.getElementById("genderIdentity").value,
+          Altura: document.getElementById("height").value,
+          Peso: document.getElementById("weight").value,
+          BMI: document.getElementById("bmiValue").textContent,
+          Categoria_BMI: document.getElementById("bmiCategory").textContent,
+          Hipertension: vals["hypertension"] || "",
+          Diabetes: vals["diabetes"] || "",
+          Colesterol: vals["cholesterol"] || "",
+          Depresion: vals["depression"] || "",
+          "Actividad fisica": vals["physicalActivityLow"] || "",
+          sedentarismo: vals["sedentary"] || "",
+          Abuso_alcohol_drogas: vals["drugUseExcessive"] || "",
+          Stress: vals["stressAnxietyExcessive"] || "",
+          Exceso_preocupacion_salud: vals["healthConcernExcessive"] || "",
+          Exceso_pantalla: vals["screenTimeExcessive"] || "",
+          Fuma: tabaquismo,
+          Fumador_cronico: fumador_cronico,
+          Hipertension_familiar: vals["familiarHipertension"] || "",
+          Diabetes_familiar: vals["familiarDiabetes"] || "",
+          Adicciones_familiar: vals["familiarAdicciones"] || "",
+          "Obesidad _familiar": vals["familiarObesidad"] || "",
+          Depresion_familiar: vals["familiarDepresion"] || "",
+          Violencia_familiar: vals["familiarViolenciaAbuso"] || "",
+          Cancer_de_colon: vals["colonCancer"] || "",
+          Cancer_de_mama: vals["breastCancer"] || "",
+          Cancer_cuello_utero: vals["cervicalCancer"] || "",
+          Cancer_de_prostata: vals["prostateCancer"] || "",
+          Origen_Carga: origenCarga,
+        };
+
+        // Mostrar spinner
+        document.querySelectorAll(".paso").forEach(function (p) {
+          p.style.display = "none";
+        });
+        document.getElementById("spinnerGuardando").style.display = "block";
+
+        try {
+          var response = await fetch("/saveData", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+          var resultado = await response.json();
+          if (response.ok && resultado.success) {
+            mostrarResultado(true);
+          } else {
+            mostrarResultado(false, resultado.message || "Error desconocido");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          mostrarResultado(
+            false,
+            "Error de conexión. Por favor verifique su conexión e intente nuevamente.",
+          );
+        }
+      }
+
+      function mostrarResultado(ok, msg) {
+        document.getElementById("progressBar").style.display = "none";
+        document.querySelectorAll(".screen").forEach(function (s) {
+          s.classList.remove("visible");
+        });
+        document.getElementById("screenResult").classList.add("visible");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (ok) {
+          document.getElementById("resultOk").style.display = "block";
+          document.getElementById("resultError").style.display = "none";
+          var seg = 10;
+          var el = document.getElementById("cuentaRegresiva");
+          var timer = setInterval(function () {
             seg--;
             if (seg <= 0) {
-                clearInterval(timer);
-                window.location.href = 'index.html';
+              clearInterval(timer);
+              window.location.href = "index.html";
             } else {
-                el.textContent = 'Redirigiendo en ' + seg + ' segundo' + (seg === 1 ? '...' : 's...');
+              el.textContent =
+                "Redirigiendo en " +
+                seg +
+                " segundo" +
+                (seg === 1 ? "..." : "s...");
             }
-        }, 1000);
-    } else {
-        document.getElementById('resultOk').style.display = 'none';
-        document.getElementById('resultError').style.display = 'block';
-        if (msg) document.getElementById('errorMsg').textContent = msg;
-    }
-}
+          }, 1000);
+        } else {
+          document.getElementById("resultOk").style.display = "none";
+          document.getElementById("resultError").style.display = "block";
+          if (msg) document.getElementById("errorMsg").textContent = msg;
+        }
+      }
 
-function irPasoDesdeError() {
-    document.getElementById('progressBar').style.display = 'block';
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('visible'); });
-    document.getElementById('screenForm').classList.add('visible');
-    irPaso(6);
-}
+      function irPasoDesdeError() {
+        document.getElementById("progressBar").style.display = "block";
+        document.querySelectorAll(".screen").forEach(function (s) {
+          s.classList.remove("visible");
+        });
+        document.getElementById("screenForm").classList.add("visible");
+        irPaso(6);
+      }
 
-// ── INICIALIZACIÓN ──
-grupos.forEach(function(g) { crearChipsSiNo(g); });
-crearChipsTabaco();
-</script>
-
-</body>
+      // ── INICIALIZACIÓN ──
+      grupos.forEach(function (g) {
+        crearChipsSiNo(g);
+      });
+      crearChipsTabaco();
+    </script>
+  </body>
 </html>
