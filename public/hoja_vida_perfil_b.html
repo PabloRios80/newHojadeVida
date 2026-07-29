@@ -510,7 +510,7 @@ async function guardar() {
         atencion_mental:    vals['atencion_mental'] || '',
         violencia:          vals['violencia'] || '',
         observaciones:      document.getElementById('observaciones').value.trim(),
-        origen_carga:           new URLSearchParams(window.location.search).get('origen') || nul
+        origen_carga:           new URLSearchParams(window.location.search).get('origen') || null
     };
 
     document.getElementById('paso' + pasoActual).style.display = 'none';

@@ -578,7 +578,7 @@ async function guardar() {
         educ_sexual:        vals['educ_sexual'] || '',
         dudas:              vals['dudas'] || '',
         observaciones:      document.getElementById('observaciones').value.trim(),
-        origen_carga:           new URLSearchParams(window.location.search).get('origen') || nul
+        origen_carga:           new URLSearchParams(window.location.search).get('origen') || null  
     };
 
     document.getElementById('paso' + pasoActual).style.display = 'none';
