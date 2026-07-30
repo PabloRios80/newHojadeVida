@@ -1337,6 +1337,13 @@
           } else {
             limpiarError("telefono");
           }
+          var email = document.getElementById("email").value.trim();
+          if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            mostrarError("email", "Ingresá un correo electrónico válido.");
+            return false;
+          } else {
+            limpiarError("email");
+          }
         }
         return true;
       }
@@ -1346,7 +1353,6 @@
         var faltantes = [];
 
         filas.forEach(function (fila) {
-          // Si la fila está oculta (ej. sección femenina con display:none), no la exigimos
           var visible = fila.offsetParent !== null;
           if (!visible) return;
 
@@ -1354,11 +1360,14 @@
           if (!chip) return;
           var onclickAttr = chip.getAttribute("onclick") || "";
           var match = onclickAttr.match(/'([^']+)'/g);
-          if (!match || match.length < 2) return;
-          var grupo = match[1].replace(/'/g, "");
+          if (!match || match.length === 0) return;
+          var grupo = match[0].replace(/'/g, "");
 
           if (!vals[grupo]) {
             faltantes.push(fila);
+          } else {
+            fila.style.border = "";
+            fila.style.padding = "";
           }
         });
 
