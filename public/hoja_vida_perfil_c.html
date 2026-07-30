@@ -1190,6 +1190,10 @@
           });
         el.classList.add(val);
         vals[grupo] = val;
+
+        var fila = el.closest(".chips-row");
+        fila.style.border = "";
+        fila.style.padding = "";
       }
 
       function selChipSingle(el, grupo) {
@@ -1198,6 +1202,10 @@
           .forEach((c) => c.classList.remove("sel"));
         el.classList.add("sel");
         vals[grupo] = el.textContent.trim();
+
+        var fila = el.closest(".chips-row");
+        fila.style.border = "";
+        fila.style.padding = "";
       }
 
       function selChipSexo(val) {
@@ -1404,8 +1412,11 @@
             limpiarError("telefono");
           }
           var email = document.getElementById("email").value.trim();
-          if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            mostrarError("email", "Ingresá un correo electrónico válido.");
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            mostrarError(
+              "email",
+              "Ingresá un correo electrónico válido (debe contener @).",
+            );
             return false;
           } else {
             limpiarError("email");
