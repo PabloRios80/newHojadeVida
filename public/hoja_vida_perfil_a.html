@@ -1480,43 +1480,7 @@
         document.getElementById("dni").value = dniUrl;
         verificarDNI();
       }
-      function validarChipsDelPaso(n) {
-        var contenedor = document.getElementById("paso" + n);
-        var filas = contenedor.querySelectorAll(".chips-row");
-        var faltantes = [];
 
-        filas.forEach(function (fila) {
-          // Si la fila está oculta (ej. sección femenina con display:none), no la exigimos
-          var visible = fila.offsetParent !== null;
-          if (!visible) return;
-
-          var chip = fila.querySelector(".chip");
-          if (!chip) return;
-          var onclickAttr = chip.getAttribute("onclick") || "";
-          var match = onclickAttr.match(/'([^']+)'/g);
-          if (!match || match.length < 2) return;
-          var grupo = match[1].replace(/'/g, "");
-
-          if (!vals[grupo]) {
-            faltantes.push(fila);
-          }
-        });
-
-        if (faltantes.length > 0) {
-          faltantes.forEach(function (fila) {
-            fila.style.border = "1px solid #dc2626";
-            fila.style.borderRadius = "8px";
-            fila.style.padding = "4px";
-          });
-          faltantes[0].scrollIntoView({ behavior: "smooth", block: "center" });
-          alert(
-            "Por favor respondé todas las preguntas de esta sección antes de continuar.",
-          );
-          return false;
-        }
-
-        return true;
-      }
     </script>
   </body>
 </html>
