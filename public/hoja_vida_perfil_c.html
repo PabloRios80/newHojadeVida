@@ -757,7 +757,10 @@
           <button class="btn-prev" onclick="irPaso(1)">
             <i class="fas fa-arrow-left"></i> Anterior
           </button>
-          <button class="btn-next" onclick="irPaso(3)">
+          <button
+            class="btn-next"
+            onclick="if (validarPasoMenor(2)) irPaso(3);"
+          >
             Siguiente <i class="fas fa-arrow-right"></i>
           </button>
         </div>
@@ -849,7 +852,10 @@
           <button class="btn-prev" onclick="irPaso(2)">
             <i class="fas fa-arrow-left"></i> Anterior
           </button>
-          <button class="btn-next" onclick="irPaso(4)">
+          <button
+            class="btn-next"
+            onclick="if (validarPasoMenor(3)) irPaso(4);"
+          >
             Siguiente <i class="fas fa-arrow-right"></i>
           </button>
         </div>
@@ -960,7 +966,10 @@
           <button class="btn-prev" onclick="irPaso(3)">
             <i class="fas fa-arrow-left"></i> Anterior
           </button>
-          <button class="btn-next" onclick="irPaso(5)">
+          <button
+            class="btn-next"
+            onclick="if (validarPasoMenor(4)) irPaso(5);"
+          >
             Siguiente <i class="fas fa-arrow-right"></i>
           </button>
         </div>
@@ -1059,7 +1068,10 @@
           <button class="btn-prev" onclick="irPaso(4)">
             <i class="fas fa-arrow-left"></i> Anterior
           </button>
-          <button class="btn-next" onclick="irPaso(6)">
+          <button
+            class="btn-next"
+            onclick="if (validarPasoMenor(5)) irPaso(6);"
+          >
             Siguiente <i class="fas fa-arrow-right"></i>
           </button>
         </div>
@@ -1117,7 +1129,10 @@
           <button class="btn-prev" onclick="irPaso(5)">
             <i class="fas fa-arrow-left"></i> Anterior
           </button>
-          <button class="btn-guardar" onclick="guardar()">
+          <button
+            class="btn-guardar"
+            onclick="if (validarChipsDelPaso(6)) guardar();"
+          >
             <i class="fas fa-save"></i> Guardar Hoja de Vida
           </button>
         </div>
@@ -1389,6 +1404,43 @@
             limpiarError("telefono");
           }
         }
+        return true;
+      }
+      function validarChipsDelPaso(n) {
+        var contenedor = document.getElementById("paso" + n);
+        var filas = contenedor.querySelectorAll(".chips-row");
+        var faltantes = [];
+
+        filas.forEach(function (fila) {
+          // Si la fila está oculta (ej. sección femenina con display:none), no la exigimos
+          var visible = fila.offsetParent !== null;
+          if (!visible) return;
+
+          var chip = fila.querySelector(".chip");
+          if (!chip) return;
+          var onclickAttr = chip.getAttribute("onclick") || "";
+          var match = onclickAttr.match(/'([^']+)'/g);
+          if (!match || match.length < 2) return;
+          var grupo = match[1].replace(/'/g, "");
+
+          if (!vals[grupo]) {
+            faltantes.push(fila);
+          }
+        });
+
+        if (faltantes.length > 0) {
+          faltantes.forEach(function (fila) {
+            fila.style.border = "1px solid #dc2626";
+            fila.style.borderRadius = "8px";
+            fila.style.padding = "4px";
+          });
+          faltantes[0].scrollIntoView({ behavior: "smooth", block: "center" });
+          alert(
+            "Por favor respondé todas las preguntas de esta sección antes de continuar.",
+          );
+          return false;
+        }
+
         return true;
       }
       // ── GUARDAR ──
