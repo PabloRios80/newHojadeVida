@@ -7,7 +7,9 @@ const supabase = createClient(
   { realtime: { transport: ws } },
 );
 const express = require("express");
-const axios = require("axios"); // La herramienta correcta que sí tenemos instalada
+const axios = require("axios");
+const https = require("https");
+const agenteIapos = new https.Agent({ rejectUnauthorized: false });
 const path = require("path");
 
 const app = express();
@@ -17,7 +19,8 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // ── Rutas cortas por grupo/institución (redirige a la hoja de vida con su origen) ──
 const ORIGENES_CORTOS = {
   atem: "ATEM",
-  // A medida que se sumen grupos nuevos, agregar acá: "clave-corta": "NombreOrigen"
+  coronda: "Sede Coronda",
+  delta: "Delta",
 };
 
 app.get("/:origenCorto", (req, res, next) => {
@@ -63,6 +66,7 @@ app.get("/verificar-afiliado/:dni", async (req, res) => {
           SOAPAction: "IAPOS_WSaction/ABEWSVALIDAAFI.Execute",
         },
         timeout: 10000,
+        httpsAgent: agenteIapos,
       },
     );
     const xml = response.data;
