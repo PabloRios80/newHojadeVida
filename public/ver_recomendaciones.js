@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
       subtitulo: 'Detección de infecciones',
       icono: 'fas fa-virus',
       color: '#dcfce7', colorIcono: '#16a34a', colorTitulo: '#166534',
-      practicas: ['anticuerpos anti_vih','hepatitis b antigeno de superficie_aghb','hepatitis c _hcv_ac_igg','vdrl','test chagas']
+      practicas: ['anticuerpos anti_vih','hepatitis b antigeno de superficie_aghb','hepatitis b anti core','hepatitis c _hcv_ac_igg','vdrl','test chagas']
     },
     {
       id: 'vacunas',
@@ -237,6 +237,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!porGrupoAD[g.id]) return;
         html += renderGrupo(g, porGrupoAD[g.id], true);
       });
+
+      if (porGrupoAD['otros']) {
+        html += renderGrupoOtros(porGrupoAD['otros'], true);
+      }
     }
 
     // PORTAL
