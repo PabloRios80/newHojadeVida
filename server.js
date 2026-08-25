@@ -662,12 +662,17 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       "ldl/colesterol": "dislipemias",
       "tomar ta ambos brazos personal capacitado": "presion_arterial",
       "creatinina, formula filtrado glomerular": "erc",
+      creatinina: "erc",
+      "formula filtrado glomerular": "erc",
       espirometria: "epoc",
       "calcular imc": "imc",
       "ecografia abdominal": "aneurisma_aorta",
       "densitometria osea": "osteoporosis",
       papanicolau: "cancer_cervico_pap",
       "test hpv": "cancer_cervico_hpv",
+      "test hpv genotipo 16": "cancer_cervico_hpv",
+      "test hpv genotipo 18": "cancer_cervico_hpv",
+      "test hpv otros genotipos alto riesgo": "cancer_cervico_hpv",
       "sangre oculta en materia fecal - somf": "somf",
       "videocolonoscopia - vcc": "cancer_colon_colonoscopia",
       mamografia: "cancer_mama_mamografia",
@@ -677,7 +682,9 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       "hepatitis b antigeno de superficie_aghb": "hepatitis_b",
       "hepatitis c _hcv_ac_igg": "hepatitis_c",
       vdrl: "vdrl",
-      "test chagas": "chagas",
+      "test chagas hai": "chagas",
+      "test chagas eclia": "chagas",
+      "hepatitis b anti core": "hepatitis_b",
       vacunas: "inmunizaciones",
       "control odontologico": "control_odontologico_adultos",
       "control vision": "agudeza_visual",
@@ -687,6 +694,10 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       "consejeria/tratamiento depresion": "depresion",
       "consejeria/tratamiento caida adultos mayores": "caidas_adultos_mayores",
       "consejeria actividad fisica": "actividad_fisica",
+      "consejeria alimentacion saludable": "alimentacion_saludable",
+      "consejeria educacion sexual integral": "educacion_sexual",
+      "consejeria seguridad vial": "seguridad_vial",
+      "evaluacion salud mental integral": "salud_mental_integral",
     };
 
     const VALORES_REALIZADOS = [
@@ -723,9 +734,24 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
     const alDia = [];
     const procesadas = new Set();
 
+    // Prácticas que solo se habilitan cuando el afiliado está enrolado en el
+    // subprograma "Seguimiento Crónicos". Hasta que exista un enrolamiento
+    // explícito (a cargo de médico/enfermera), se excluyen por completo de
+    // esta pantalla y de la información mostrada al afiliado.
+    const EXCLUIR_CRONICOS = [
+      "hemoglobina glicosilada",
+      "proteinuria",
+      "microalbuminuria",
+      "creatinina, clearence de depuracion",
+      "indice de lesion renal (abumina / creatinina) -urinario",
+      "indice de lesion renal (albumina / creatinina) -urinario",
+      "rac - relacion albumina/creatinina",
+    ];
+
     for (const regla of reglas || []) {
       if (!regla.practica) continue;
       const practicaNorm = normalizar(regla.practica);
+      if (EXCLUIR_CRONICOS.includes(practicaNorm)) continue;
       if (procesadas.has(practicaNorm)) continue;
 
       const sexoRegla = normalizar(regla.sexo_aplica || "ambos");
@@ -752,7 +778,44 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
 
       const campoDP = EQUIVALENCIAS[practicaNorm];
 
-      if (!ultimoDP || !campoDP) {
+      // Prácticas sin campo propio en historial_dia_preventivo (consejerías/
+      // evaluaciones que no tienen columna dedicada): se consideran cubiertas
+      // por cualquier cierre de Día Preventivo (adulto o pediátrico, ambos
+      // quedan en la misma tabla), sin depender de un valor puntual.
+      if (!campoDP) {
+        if (ultimoDP) {
+          const frecuencia = parseFloat(regla.frecuencia_anios) || 1;
+          const fechaVisita = new Date(ultimoDP.fechax);
+          const fechaVencimiento = new Date(fechaVisita);
+          fechaVencimiento.setFullYear(
+            fechaVencimiento.getFullYear() + frecuencia,
+          );
+          const hoy = new Date();
+
+          if (fechaVencimiento > hoy) {
+            alDia.push({
+              practica: regla.practica,
+              subcategoria: regla.subcategoria || "",
+              fechaRealizacion: fechaVisita.toLocaleDateString("es-AR"),
+              fechaVencimiento: fechaVencimiento.toLocaleDateString("es-AR"),
+            });
+          } else {
+            pendientes.push({
+              practica: regla.practica,
+              subcategoria: regla.subcategoria || "",
+              ultimaVez: fechaVisita.toLocaleDateString("es-AR"),
+            });
+          }
+        } else {
+          pendientes.push({
+            practica: regla.practica,
+            subcategoria: regla.subcategoria || "",
+          });
+        }
+        continue;
+      }
+
+      if (!ultimoDP) {
         pendientes.push({
           practica: regla.practica,
           subcategoria: regla.subcategoria || "",
