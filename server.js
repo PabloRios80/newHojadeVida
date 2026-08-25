@@ -768,7 +768,8 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       if (
         !valorNorm ||
         valorNorm.includes("no se realiza") ||
-        valorNorm.includes("no se realizo")
+        valorNorm.includes("no se realizo") ||
+        valorNorm.includes("pendiente")
       ) {
         pendientes.push({
           practica: regla.practica,
