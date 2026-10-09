@@ -337,12 +337,29 @@ function evaluarReglas(
   // Último día preventivo
   const ultimoDP = historial.length > 0 ? historial[0] : null;
 
-  // Set de prácticas ya autorizadas o realizadas para evitar duplicados
-  const yaAutorizadas = new Set(
-    practicasYaAutorizadas.map((p) =>
-      p.descripcion_practica.toLowerCase().trim(),
-    ),
-  );
+  // Estado previo de cada práctica en practicas_autorizadas:
+  //  - pendiente: hay una fila AUTORIZADA sin realizar → no duplicar
+  //  - ultimaRealizada: fecha de la última REALIZADA → se re-autoriza
+  //    recién cuando se cumple la frecuencia de la regla (o nunca, si la
+  //    regla es de estudio único).
+  // Antes se bloqueaba cualquier práctica que hubiera existido alguna vez,
+  // sin mirar la fecha, y la frecuencia nunca llegaba a aplicarse.
+  const estadoPrevio = {};
+  for (const p of practicasYaAutorizadas) {
+    const key = (p.descripcion_practica || "").toLowerCase().trim();
+    if (!key) continue;
+    const e = (estadoPrevio[key] = estadoPrevio[key] || {
+      pendiente: false,
+      ultimaRealizada: null,
+    });
+    if (p.estado === "AUTORIZADA") e.pendiente = true;
+    if (p.estado === "REALIZADA") {
+      const f = new Date(p.fecha_carga || p.fecha_autorizacion);
+      if (!isNaN(f) && (!e.ultimaRealizada || f > e.ultimaRealizada))
+        e.ultimaRealizada = f;
+    }
+  }
+  const yaAutorizadas = new Set(); // prácticas autorizadas en esta corrida
 
   for (const regla of reglas) {
     // ── VERIFICAR EDAD ──────────────────────────────
@@ -399,6 +416,18 @@ function evaluarReglas(
       }
     }
 
+    // ── ESTUDIO ÚNICO (ej. Chagas) ──────────────────
+    // Si ya figura realizado en el historial o en prácticas históricas,
+    // no se vuelve a autorizar por algoritmo (cualquier resultado).
+    if (regla.unica_vez) {
+      const yaHecha = buscarUltimaRealizacion(
+        regla.practica,
+        practicasHistoricas,
+        historial,
+      );
+      if (yaHecha) continue;
+    }
+
     // ── VERIFICAR FRECUENCIA ────────────────────────
     if (regla.frecuencia_anios && regla.frecuencia_anios > 0) {
       const ultimaRealizacion = buscarUltimaRealizacion(
@@ -414,9 +443,29 @@ function evaluarReglas(
       }
     }
 
-    // ── EVITAR DUPLICADOS ──────────────────────────
+    // ── EVITAR DUPLICADOS / RESPETAR FRECUENCIA ────
     const practicaNorm = regla.practica.toLowerCase().trim();
     if (yaAutorizadas.has(practicaNorm)) continue;
+    const previo = estadoPrevio[practicaNorm];
+    if (previo && previo.pendiente) continue; // ya tiene una autorización abierta
+    if (regla.unica_vez) {
+      // Estudio único: si cualquier práctica del mismo estudio (misma clave de
+      // guía, ej. Chagas HAI + ECLIA) ya se realizó, no se repite por algoritmo
+      const grupo = reglas
+        .filter((r) => r.explicativo_id && r.explicativo_id === regla.explicativo_id)
+        .map((r) => r.practica.toLowerCase().trim());
+      if (!grupo.includes(practicaNorm)) grupo.push(practicaNorm);
+      if (grupo.some((k) => estadoPrevio[k] && estadoPrevio[k].ultimaRealizada))
+        continue;
+    }
+    if (previo && previo.ultimaRealizada) {
+      // Sin frecuencia (null) o "inmediata" (0) → se toma el ciclo anual del DP
+      const anios = parseFloat(regla.frecuencia_anios) > 0
+        ? parseFloat(regla.frecuencia_anios)
+        : 1;
+      const dias = (hoy - previo.ultimaRealizada) / (1000 * 60 * 60 * 24);
+      if (dias < anios * 365) continue;
+    }
 
     // ── AUTORIZAR ──────────────────────────────────
     practicasAutorizar.push({ practica: regla.practica });
@@ -474,6 +523,15 @@ function buscarUltimaRealizacion(practica, practicasHistoricas, historial) {
     if (encontrada) return encontrada.fecha;
   }
 
+  // Chagas: el resultado vive en las columnas chagas_hai / chagas_eclia de
+  // las filas de laboratorio de practicas_historicas
+  if (practicaNorm.includes("chagas")) {
+    const conChagas = practicasHistoricas.find(
+      (p) => p.fecha && (p.chagas_hai || p.chagas_eclia),
+    );
+    if (conChagas) return conChagas.fecha;
+  }
+
   // Buscar en historial_dia_preventivo
   const MAPA_HISTORIAL = {
     mamografia: "cancer_mama_mamografia",
@@ -483,6 +541,7 @@ function buscarUltimaRealizacion(practica, practicasHistoricas, historial) {
     glucemia: "dislipemias",
     somf: "somf",
     psa: "prostata_psa",
+    chagas: "chagas",
     densitometria: "osteoporosis",
     colonoscopia: "cancer_colon_colonoscopia",
   };
@@ -492,8 +551,8 @@ function buscarUltimaRealizacion(practica, practicasHistoricas, historial) {
       const encontrado = historial.find(
         (h) =>
           h[campo] &&
-          !["no se realiza", "no aplica", "pendiente"].includes(
-            h[campo].toLowerCase(),
+          !["no se realiza", "no aplica", "pendiente", "-", ""].includes(
+            h[campo].toLowerCase().trim(),
           ),
       );
       if (encontrado) return encontrado.fechax;
@@ -745,13 +804,10 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
         contenido: g.contenido,
       };
     });
+    // Se completa dentro del loop con la guía de la regla que efectivamente
+    // aplica a este afiliado (la misma práctica tiene textos distintos para
+    // adultos y para chicos, ej. vacunas, control odontológico, TA).
     const guiaPorPractica = {};
-    (reglas || []).forEach((r) => {
-      if (!r.practica || !r.explicativo_id) return;
-      const guia = guiaPorClave[normalizar(r.explicativo_id)];
-      const pNorm = normalizar(r.practica);
-      if (guia && !guiaPorPractica[pNorm]) guiaPorPractica[pNorm] = guia;
-    });
 
     const edad = parseInt(afiliado.edad) || 0;
     const sexo = normalizar(afiliado.sexo_biologico || "");
@@ -786,9 +842,11 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       const edadHasta = parseInt(regla.edad_hasta) || 120;
       if (edad < edadDesde || edad > edadHasta) continue;
 
-      procesadas.add(practicaNorm);
-
       // ── VERIFICAR CONDICIÓN EN HOJA DE VIDA ──
+      // (antes de marcar la práctica como procesada: si una regla con
+      // condición no aplica, tiene que poder evaluarse la regla general de la
+      // misma práctica — ej. PSA, SOMF y VCC tienen una regla por antecedente
+      // familiar y otra general)
       if (regla.condicion_campo && regla.condicion_valor) {
         const campoAfiliado = regla.condicion_campo.toLowerCase();
         const valorAfiliado = (afiliado[campoAfiliado] || "")
@@ -799,6 +857,12 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
           .split(",")
           .map((v) => v.trim());
         if (!valoresAceptados.some((v) => valorAfiliado.includes(v))) continue;
+      }
+
+      procesadas.add(practicaNorm);
+      if (regla.explicativo_id) {
+        const guia = guiaPorClave[normalizar(regla.explicativo_id)];
+        if (guia) guiaPorPractica[practicaNorm] = guia;
       }
 
       const campoDP = EQUIVALENCIAS[practicaNorm];
@@ -855,6 +919,7 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
 
       if (
         !valorNorm ||
+        valorNorm === "-" ||
         valorNorm.includes("no se realiza") ||
         valorNorm.includes("no se realizo") ||
         valorNorm.includes("pendiente")
@@ -862,6 +927,18 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
         pendientes.push({
           practica: regla.practica,
           subcategoria: regla.subcategoria || "",
+        });
+        continue;
+      }
+
+      // Estudio único (ej. Chagas): ya realizado → al día, sin fecha de repetición
+      if (regla.unica_vez) {
+        alDia.push({
+          practica: regla.practica,
+          subcategoria: regla.subcategoria || "",
+          resultado: valorCrudo,
+          fechaRealizacion: new Date(ultimoDP.fechax).toLocaleDateString("es-AR"),
+          unicaVez: true,
         });
         continue;
       }

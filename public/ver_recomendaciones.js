@@ -315,7 +315,9 @@ document.addEventListener('DOMContentLoaded', function () {
               <p class="practica-nombre">${p.practica}</p>
               <div class="practica-detalle">
                 <span><i class="fas fa-calendar-check" style="color:#16a34a;"></i> Realizada: <strong>${p.fechaRealizacion}</strong></span>
-                <span><i class="fas fa-calendar-alt" style="color:#f59e0b;"></i> Repetir a partir de: <strong>${p.fechaVencimiento}</strong></span>
+                ${p.unicaVez
+                  ? `<span><i class="fas fa-circle-check" style="color:#16a34a;"></i> Estudio único: no hace falta repetirlo</span>`
+                  : `<span><i class="fas fa-calendar-alt" style="color:#f59e0b;"></i> Repetir a partir de: <strong>${p.fechaVencimiento}</strong></span>`}
               </div>
               ${renderGuia(p)}
             </div>
