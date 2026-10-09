@@ -653,6 +653,15 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
       .from("reglas_preventivas")
       .select("*");
 
+    // 3b. Guías para el afiliado (fundamento de cada práctica).
+    // Se vinculan por reglas_preventivas.explicativo_id = guias_clinicas.clave.
+    // Si la tabla falla o no hay guía, la pantalla funciona igual sin el texto.
+    const { data: guias } = await supabase
+      .from("guias_clinicas")
+      .select("clave, titulo, contenido")
+      .eq("audiencia", "afiliado")
+      .eq("activo", true);
+
     const EQUIVALENCIAS = {
       "glucemia en ayunas": "diabetes",
       "colesterol total": "dislipemias",
@@ -727,6 +736,22 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .trim();
+
+    // Mapa práctica (normalizada) → guía para el afiliado
+    const guiaPorClave = {};
+    (guias || []).forEach((g) => {
+      guiaPorClave[normalizar(g.clave)] = {
+        titulo: g.titulo,
+        contenido: g.contenido,
+      };
+    });
+    const guiaPorPractica = {};
+    (reglas || []).forEach((r) => {
+      if (!r.practica || !r.explicativo_id) return;
+      const guia = guiaPorClave[normalizar(r.explicativo_id)];
+      const pNorm = normalizar(r.practica);
+      if (guia && !guiaPorPractica[pNorm]) guiaPorPractica[pNorm] = guia;
+    });
 
     const edad = parseInt(afiliado.edad) || 0;
     const sexo = normalizar(afiliado.sexo_biologico || "");
@@ -863,6 +888,12 @@ app.get("/getPracticasGuardadas/:dni", async (req, res) => {
         });
       }
     }
+
+    // Adjuntar la guía del afiliado a cada práctica que tenga una
+    [...pendientes, ...alDia].forEach((p) => {
+      const guia = guiaPorPractica[normalizar(p.practica)];
+      if (guia) p.guia = guia;
+    });
 
     res.json({
       success: true,

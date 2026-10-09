@@ -266,6 +266,33 @@ document.addEventListener('DOMContentLoaded', function () {
     resultadosDiv.innerHTML = html;
   }
 
+  // Texto de la guía → HTML seguro (párrafos separados por línea en blanco,
+  // líneas que empiezan con "- " como lista)
+  function escaparHTML(t) {
+    return (t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function formatearGuia(texto) {
+    return (texto || '').split(/\n\s*\n/).map(bloque => {
+      const lineas = bloque.split('\n').map(l => l.trim()).filter(Boolean);
+      const items = lineas.filter(l => l.startsWith('- '));
+      const texto = lineas.filter(l => !l.startsWith('- '));
+      let html = '';
+      if (texto.length) html += `<p>${escaparHTML(texto.join(' '))}</p>`;
+      if (items.length) html += `<ul>${items.map(l => `<li>${escaparHTML(l.slice(2))}</li>`).join('')}</ul>`;
+      return html;
+    }).join('');
+  }
+
+  function renderGuia(p) {
+    if (!p.guia || !p.guia.contenido) return '';
+    return `
+      <details class="guia-afiliado">
+        <summary><i class="fas fa-circle-info"></i> ${escaparHTML(p.guia.titulo || '¿Por qué te lo recomendamos?')}</summary>
+        <div class="guia-contenido">${formatearGuia(p.guia.contenido)}</div>
+      </details>`;
+  }
+
   function renderGrupo(g, practicas, esAlDia) {
     let html = `
       <div class="card" style="margin-bottom:14px;">
@@ -290,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span><i class="fas fa-calendar-check" style="color:#16a34a;"></i> Realizada: <strong>${p.fechaRealizacion}</strong></span>
                 <span><i class="fas fa-calendar-alt" style="color:#f59e0b;"></i> Repetir a partir de: <strong>${p.fechaVencimiento}</strong></span>
               </div>
+              ${renderGuia(p)}
             </div>
           </div>`;
       } else if (p.ultimaVez) {
@@ -301,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <div class="practica-detalle">
                 <span><i class="fas fa-calendar-times" style="color:#d97706;"></i> Última vez: ${p.ultimaVez} — venció</span>
               </div>
+              ${renderGuia(p)}
             </div>
           </div>`;
       } else {
@@ -312,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <div class="practica-detalle">
                 <span style="color:#0448a2;"><i class="fas fa-circle-check"></i> Autorizada sin cargo en el Día Preventivo</span>
               </div>
+              ${renderGuia(p)}
             </div>
           </div>`;
       }

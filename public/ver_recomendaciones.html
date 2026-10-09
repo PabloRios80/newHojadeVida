@@ -100,6 +100,17 @@
         /* FOOTER */
         footer { text-align: center; padding: 20px; font-size: 12px; color: #94a3b8; }
 
+        /* GUÍA PARA EL AFILIADO */
+        .guia-afiliado { margin-top: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .guia-afiliado summary { cursor: pointer; list-style: none; padding: 8px 12px; font-size: 13px; font-weight: 600; color: #0448a2; display: flex; align-items: center; gap: 6px; }
+        .guia-afiliado summary::-webkit-details-marker { display: none; }
+        .guia-afiliado summary::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; margin-left: auto; transition: transform 0.2s; }
+        .guia-afiliado[open] summary::after { transform: rotate(180deg); }
+        .guia-contenido { padding: 0 12px 12px; font-size: 13px; color: #334155; line-height: 1.6; }
+        .guia-contenido p { margin-bottom: 8px; }
+        .guia-contenido ul { margin: 0 0 8px 18px; }
+        .guia-contenido li { margin-bottom: 4px; }
+
         /* SIN GRUPO */
         .sin-datos { text-align: center; padding: 2rem; color: #94a3b8; font-size: 14px; }
     </style>
