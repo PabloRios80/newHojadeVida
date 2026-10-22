@@ -1651,6 +1651,15 @@
                 .getElementById("fechaNacRespaldo")
                 .addEventListener("change", function () {
                   var edad = calcularEdad(this.value);
+                                    var campoFnac = document.getElementById("birthDate");
+                  if (campoFnac && !campoFnac.value) {
+                    if (campoFnac.type === "date") {
+                      campoFnac.value = this.value;
+                    } else {
+                      var p = this.value.split("-");
+                      campoFnac.value = p[2] + "/" + p[1] + "/" + p[0];
+                    }
+                  }
                   if (edad === null) return;
                   afiliadoVerificado = true;
                   if (!derivarPorEdad(edad, dni, msgEl)) {
