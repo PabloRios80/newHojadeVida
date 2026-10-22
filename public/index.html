@@ -1565,9 +1565,38 @@
       // ── VERIFICACIÓN IAPOS ──
       var afiliadoVerificado = false;
 
+            function calcularEdad(fechaISO) {
+        if (!fechaISO) return null;
+        var nac = new Date(fechaISO + "T00:00:00");
+        if (isNaN(nac)) return null;
+        var hoy = new Date();
+        var edad = hoy.getFullYear() - nac.getFullYear();
+        var m = hoy.getMonth() - nac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+        return edad >= 0 && edad < 120 ? edad : null;
+      }
+
+      function derivarPorEdad(edad, dni, msgEl) {
+        if (edad >= 2 && edad <= 17) {
+          var perfil = edad <= 11 ? "b" : "c";
+          if (edad <= 5) perfil = "a";
+          setTimeout(function () {
+            var origenParam = origenCarga
+              ? "&origen=" + encodeURIComponent(origenCarga)
+              : "";
+            window.location.href =
+              "hoja_vida_perfil_" + perfil + ".html?dni=" + dni + origenParam;
+          }, 1500);
+          msgEl.innerHTML +=
+            '<br><small style="color:#0448a2;">Redirigiendo al formulario correspondiente...</small>';
+          return true;
+        }
+        return false;
+      }
+
       async function verificarDNI() {
-        console.log("Verificando elegibilidad para DNI:", dni);
         var dni = document.getElementById("dni").value.trim();
+        console.log("Verificando elegibilidad para DNI:", dni);
         if (dni.length < 6) return;
 
         var msgEl = document.getElementById("dniMsg");
@@ -1605,6 +1634,36 @@
               return;
             }
 
+            // Padrón IAPOS sin respuesta: pedimos fecha de nacimiento para elegir el perfil
+            if (data.padronCaido) {
+              var hoyISO = new Date().toISOString().split("T")[0];
+              msgEl.style.background = "#fffbeb";
+              msgEl.style.color = "#92400e";
+              msgEl.style.border = "1px solid #fde68a";
+              msgEl.innerHTML =
+                '<i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>' +
+                "No pudimos consultar el padrón de IAPOS en este momento. Para continuar, ingresá tu fecha de nacimiento:" +
+                '<br><input type="date" id="fechaNacRespaldo" max="' + hoyISO + '" ' +
+                'style="margin-top:8px; padding:6px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px;">';
+              afiliadoVerificado = false;
+
+              document
+                .getElementById("fechaNacRespaldo")
+                .addEventListener("change", function () {
+                  var edad = calcularEdad(this.value);
+                  if (edad === null) return;
+                  afiliadoVerificado = true;
+                  if (!derivarPorEdad(edad, dni, msgEl)) {
+                    msgEl.style.background = "#f0fdf4";
+                    msgEl.style.color = "#16a34a";
+                    msgEl.style.border = "1px solid #bbf7d0";
+                    msgEl.innerHTML =
+                      '<i class="fas fa-check-circle" style="margin-right:6px"></i>Podés continuar con el formulario.';
+                  }
+                });
+              return;
+            }
+
             msgEl.style.background = "#f0fdf4";
             msgEl.style.color = "#16a34a";
             msgEl.style.border = "1px solid #bbf7d0";
@@ -1613,26 +1672,10 @@
               (data.nombre || "") +
               (data.localidad ? " · " + data.localidad : "");
             afiliadoVerificado = true;
+
             // Detectar perfil por edad y redirigir
-            var edad = parseInt(data.edad) || 0;
-            if (edad >= 2 && edad <= 17) {
-              var perfil = edad <= 11 ? "b" : "c";
-              if (edad <= 5) perfil = "a";
-              setTimeout(function () {
-                var origenParam = origenCarga
-                  ? "&origen=" + encodeURIComponent(origenCarga)
-                  : "";
-                window.location.href =
-                  "hoja_vida_perfil_" +
-                  perfil +
-                  ".html?dni=" +
-                  dni +
-                  origenParam;
-              }, 1500);
-              msgEl.innerHTML +=
-                '<br><small style="color:#0448a2;">Redirigiendo al formulario correspondiente...</small>';
-              return;
-            }
+            if (derivarPorEdad(parseInt(data.edad) || 0, dni, msgEl)) return;
+
             if (data.nombre) {
               var partes = data.nombre.trim().split(",");
               if (partes.length >= 2) {
