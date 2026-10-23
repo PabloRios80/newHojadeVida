@@ -8,6 +8,28 @@ const supabase = createClient(
 );
 const express = require("express");
 const axios = require("axios");
+
+// ── PADRÓN IAPOS CON CORTE RÁPIDO ──
+// Si el webservice de IAPOS está caído, cada consulta esperaba hasta 10 s (o
+// más, si la conexión quedaba colgada) y eso hacía lentas todas las búsquedas.
+// Ahora: tope duro de 5 s por consulta y, si falla, se deja de consultar
+// durante 5 minutos (se responde al instante como "no se pudo verificar").
+let padronIaposEnPausaHasta = 0;
+async function padronPost(url, body, opciones = {}) {
+  if (Date.now() < padronIaposEnPausaHasta) {
+    throw new Error("Padrón IAPOS no disponible (reintento automático en unos minutos)");
+  }
+  const opts = { ...opciones, timeout: 4000 };
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    opts.signal = AbortSignal.timeout(5000);
+  }
+  try {
+    return await axios.post(url, body, opts);
+  } catch (e) {
+    padronIaposEnPausaHasta = Date.now() + 5 * 60 * 1000;
+    throw e;
+  }
+}
 const https = require("https");
 const agenteIapos = new https.Agent({ rejectUnauthorized: false });
 const path = require("path");
@@ -39,96 +61,58 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
 
-const iaposAgent = new https.Agent({ rejectUnauthorized: false });
-
-async function consultarPadronIapos(dni) {
+app.get("/verificar-afiliado/:dni", async (req, res) => {
+  const dni = req.params.dni;
   const hoy = new Date().toISOString().split("T")[0];
   const soapBody = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-<soap:Body>
-  <BEWsValidaAfi.Execute xmlns="IAPOS_WS">
-    <Usuario>CONSULTAPDP</Usuario>
-    <Passwd>1Qaz</Passwd>
-    <Nafiliado>${dni}</Nafiliado>
-    <Badocnumdo>${dni}</Badocnumdo>
-    <Tidocodigo_de_documento>96</Tidocodigo_de_documento>
-    <Ogorcodigo>1</Ogorcodigo>
-    <Fechpresta>${hoy}</Fechpresta>
-  </BEWsValidaAfi.Execute>
-</soap:Body>
-</soap:Envelope>`;
-
-  const response = await axios.post(
-    "https://aswe.santafe.gov.ar/iapos-sw-srvt/servlet/abewsvalidaafi",
-    soapBody,
-    {
-      headers: {
-        "Content-Type": "text/xml; charset=utf-8",
-        SOAPAction: "IAPOS_WSaction/ABEWSVALIDAAFI.Execute",
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <BEWsValidaAfi.Execute xmlns="IAPOS_WS">
+            <Usuario>CONSULTAPDP</Usuario>
+            <Passwd>1Qaz</Passwd>
+            <Nafiliado>${dni}</Nafiliado>
+            <Badocnumdo>${dni}</Badocnumdo>
+            <Tidocodigo_de_documento>96</Tidocodigo_de_documento>
+            <Ogorcodigo>1</Ogorcodigo>
+            <Fechpresta>${hoy}</Fechpresta>
+        </BEWsValidaAfi.Execute>
+      </soap:Body>
+    </soap:Envelope>`;
+  try {
+    const response = await padronPost(
+      "https://aswe.santafe.gov.ar/iapos-sw-srvt/servlet/abewsvalidaafi",
+      soapBody,
+      {
+        headers: {
+          "Content-Type": "text/xml; charset=utf-8",
+          SOAPAction: "IAPOS_WSaction/ABEWSVALIDAAFI.Execute",
+        },
+        timeout: 10000,
+        httpsAgent: agenteIapos,
       },
-      timeout: 12000,
-      httpsAgent: iaposAgent,
-    },
-  );
+    );
+    const xml = response.data;
+    const get = (tag) => {
+      const m = xml.match(new RegExp(`<${tag}[^>]*>([^<]*)<\/${tag}>`));
+      return m ? m[1].trim() : null;
+    };
+    const estado = get("Estado");
+    res.json({
+      esActivo: estado === "A",
+      estado,
+      nombre: get("Apenom"),
+      edad: get("Edad"),
+      sexo: get("Sexo"),
+      localidad: get("Localidad"),
+      mensaje: get("Msgdsc"),
+    });
 
-  const xml = String(response.data || "");
-  const get = (tag) => {
-    const m = xml.match(new RegExp(`<${tag}[^>]*>([^<]*)</${tag}>`, "i"));
-    return m ? m[1].trim() : null;
-  };
-  const estado = get("Estado");
-
-  if (estado === null) {
-    // Respondió 200 pero sin el formato esperado: cambiaron la respuesta
-    console.error("⚠️ Padrón IAPOS respondió sin <Estado>. Cuerpo:", xml.slice(0, 1500));
-    throw new Error("Formato de respuesta IAPOS desconocido");
+    console.log("XML IAPOS:", xml.substring(0, 500));
+    console.log("Estado:", estado);
+    console.log("XML IAPOS:", xml.substring(0, 1000));
+  } catch (e) {
+    res.status(500).json({ esActivo: false, error: e.message });
   }
-
-  return {
-    esActivo: estado === "A",
-    estado,
-    nombre: get("Apenom"),
-    edad: get("Edad"),
-    sexo: get("Sexo"),
-    localidad: get("Localidad"),
-    mensaje: get("Msgdsc"),
-    fuente: "padron_iapos",
-  };
-}
-
-app.get("/verificar-afiliado/:dni", async (req, res) => {
-  const dni = String(req.params.dni || "").trim();
-  if (!dni) return res.status(400).json({ esActivo: false, error: "DNI vacío" });
-
-  let ultimoError;
-  for (let intento = 1; intento <= 2; intento++) {
-    try {
-      return res.json(await consultarPadronIapos(dni));
-    } catch (e) {
-      ultimoError = e;
-      console.error(
-        `⚠️ Padrón IAPOS intento ${intento} DNI ${dni}:`,
-        e.code || "",
-        e.response ? `HTTP ${e.response.status}` : "",
-        e.message,
-        e.response ? String(e.response.data).slice(0, 1500) : "",
-      );
-    }
-  }
-
-  // Padrón caído: no trabamos al afiliado
-  res.json({
-    esActivo: true,
-    padronCaido: true,
-    estado: null,
-    nombre: null,
-    edad: null,
-    sexo: null,
-    localidad: null,
-    mensaje: "No pudimos verificar el padrón de IAPOS en este momento. Podés continuar igual.",
-    error: ultimoError ? ultimoError.message : "sin respuesta",
-    fuente: "sin_padron",
-  });
 });
 
 app.post("/saveData", async (req, res) => {
