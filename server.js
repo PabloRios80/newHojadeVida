@@ -41,7 +41,26 @@ const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
 
 const iaposAgent = new https.Agent({ rejectUnauthorized: false });
 
+// ── CORTE RÁPIDO DEL PADRÓN ──
+// Con el padrón caído cada consulta esperaba hasta 12 s y se reintentaba (24 s
+// o más por afiliado). Ahora: tope duro de 5 s y, si falla, se deja de
+// consultar durante 5 minutos; en ese lapso /verificar-afiliado responde al
+// instante con padronCaido: true (mismo camino que ya existía).
+let padronEnPausaHasta = 0;
+
 async function consultarPadronIapos(dni) {
+  if (Date.now() < padronEnPausaHasta) {
+    throw new Error("Padrón IAPOS en pausa por falla reciente");
+  }
+  try {
+    return await consultarPadronIaposDirecto(dni);
+  } catch (e) {
+    padronEnPausaHasta = Date.now() + 5 * 60 * 1000;
+    throw e;
+  }
+}
+
+async function consultarPadronIaposDirecto(dni) {
   const hoy = new Date().toISOString().split("T")[0];
   const soapBody = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -66,7 +85,10 @@ async function consultarPadronIapos(dni) {
         "Content-Type": "text/xml; charset=utf-8",
         SOAPAction: "IAPOS_WSaction/ABEWSVALIDAAFI.Execute",
       },
-      timeout: 12000,
+      timeout: 4000,
+      ...(typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+        ? { signal: AbortSignal.timeout(5000) }
+        : {}),
       httpsAgent: iaposAgent,
     },
   );
@@ -131,9 +153,34 @@ app.get("/verificar-afiliado/:dni", async (req, res) => {
   });
 });
 
+// Edad a partir de la fecha de nacimiento (DD/MM/AAAA o AAAA-MM-DD).
+// Devuelve null si la fecha es imposible (año < 1910, futura o < 1 año).
+function edadDesdeNacimiento(fechaNac) {
+  if (!fechaNac) return null;
+  const t = String(fechaNac).trim();
+  let d, m, a;
+  let x = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (x) [d, m, a] = [+x[1], +x[2], +x[3]];
+  else if ((x = t.match(/^(\d{4})-(\d{2})-(\d{2})/))) [a, m, d] = [+x[1], +x[2], +x[3]];
+  else return null;
+  const nac = new Date(a, m - 1, d);
+  const hoy = new Date();
+  if (isNaN(nac) || a < 1910 || nac > hoy) return null;
+  let edad = hoy.getFullYear() - a;
+  if (hoy.getMonth() < m - 1 || (hoy.getMonth() === m - 1 && hoy.getDate() < d)) edad--;
+  return edad >= 1 && edad <= 115 ? edad : null;
+}
+
 app.post("/saveData", async (req, res) => {
   console.log("Recibida petición en /saveData...");
   const d = req.body;
+  // Con el padrón caído a veces llega sin edad: se calcula desde la fecha
+  // de nacimiento para que el algoritmo pueda generar el plan.
+  if (!(parseInt(d.Edad) > 0)) {
+    const edadCalc = edadDesdeNacimiento(d.Fecha_Nacimiento);
+    if (edadCalc !== null) d.Edad = edadCalc;
+    else console.warn(`⚠️ Hoja de vida DNI ${d.DNI} sin edad válida (fecha: ${d.Fecha_Nacimiento})`);
+  }
 
   try {
     // 1. Guardar en Supabase (principal)
